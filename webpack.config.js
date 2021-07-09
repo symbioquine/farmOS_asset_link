@@ -4,20 +4,14 @@ const { VueLoaderPlugin } = require('vue-loader');
 
 module.exports = {
   entry: {
-    'farmos_vue_demo_page': {
+    'farmos_asset_link': {
       'import': `${__dirname}/src/main.js`,
     },
   },
   output: {
-    path: `${__dirname}/farmos_vue_demo_page/js`,
+    path: `${__dirname}/farmos_asset_link/js`,
     filename: '[name].js',
-  },
-  optimization: {
-    splitChunks: {
-      // Setting this to 1MB rather than the default of 50KB to avoid
-      // Random vendor chunks being generated
-      enforceSizeThreshold: 1024 * 1024,
-    },
+    clean: true,
   },
   performance: {
     hints: false,
@@ -27,8 +21,8 @@ module.exports = {
       context: () => true,
       target: 'http://localhost:80',
       bypass: function (req, res, proxyOptions) {
-        if (req.path.indexOf('modules/farmos_vue_demo_page/js/farmos_vue_demo_page.js') !== -1) {
-          return '/farmos_vue_demo_page.js';
+        if (req.path.indexOf('modules/farmos_asset_link/js/') !== -1) {
+          return '/' + req.path.split('/').pop();
         }
         if (req.path.indexOf('.hot-update.js') !== -1) {
           return '/' + req.path.split('/').pop();

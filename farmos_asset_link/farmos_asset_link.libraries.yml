@@ -1,0 +1,5 @@
+farmos_asset_link:
+  js:
+    js/farmos_asset_link.js:
+      preprocess: false
+      minified: true

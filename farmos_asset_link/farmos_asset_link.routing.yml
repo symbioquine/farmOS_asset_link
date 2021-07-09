@@ -1,0 +1,6 @@
+farmos_asset_link.content:
+  path: '/alink/info'
+  defaults:
+    _controller: farmos_asset_link.top_level_controller:content
+  requirements:
+    _permission: 'access content'

@@ -1,0 +1,19 @@
+{
+  "name": "symbioquine/farmos_asset_link",
+  "description": "A contrib module for farmOS 2.x that supercharges links to your farmOS assets with an extensible hybrid PWA experience.",
+  "type": "drupal-module",
+  "homepage": "https://github.com/symbioquine/farmOS_asset_link",
+  "authors": [
+    {
+      "name": "Symbioquine",
+      "homepage": "https://github.com/symbioquine",
+      "role": "Maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/symbioquine/farmOS_asset_link/issues",
+    "source": "https://github.com/symbioquine/farmOS_asset_link"
+  },
+  "license": "GPL-3.0-or-later",
+  "minimum-stability": "dev"
+}

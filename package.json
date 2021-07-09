@@ -1,11 +1,11 @@
 {
-  "name": "farmOS_vue_demo_page",
-  "version": "0.0.4",
-  "description": "A land drawing tool module for farmOS.",
+  "name": "farmOS_asset_link",
+  "version": "1.0.0",
+  "description": "A contrib module for farmOS 2.x that supercharges links to your farmOS assets with an extensible hybrid PWA experience.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/symbioquine/farmOS_vue_demo_page.git"
+    "url": "https://github.com/symbioquine/farmOS_asset_link.git"
   },
   "scripts": {
     "lint": "eslint src",

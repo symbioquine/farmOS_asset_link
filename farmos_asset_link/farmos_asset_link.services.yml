@@ -1,0 +1,7 @@
+services:
+  farmos_asset_link.top_level_controller:
+    class: Drupal\farmos_asset_link\Controller\FarmAssetLinkController
+    arguments:
+     - '@request_stack'
+     - '@config.factory'
+     - '@current_user'
