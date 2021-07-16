@@ -8,6 +8,10 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+
+.farm-asset-link-page .toolbar {
+  display: none;
+}
 
 </style>

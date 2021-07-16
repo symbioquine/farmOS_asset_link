@@ -3,3 +3,9 @@ farmos_asset_link:
     js/farmos_asset_link.js:
       preprocess: false
       minified: true
+
+farmos_asset_link_sidecar:
+  js:
+    js/farmos_asset_link_sidecar.js:
+      preprocess: false
+      minified: true

@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Implements hook_page_attachments().
+ */
+function farmos_asset_link_page_attachments(array &$attachments) {
+  $attachments['#attached']['library'][] = 'farmos_asset_link/farmos_asset_link_sidecar';
+}

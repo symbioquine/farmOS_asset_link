@@ -1,11 +1,15 @@
 const webpack = require('webpack');
 const { VueLoaderPlugin } = require('vue-loader');
+const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 
 
 module.exports = {
   entry: {
     'farmos_asset_link': {
       'import': `${__dirname}/src/main.js`,
+    },
+    'farmos_asset_link_sidecar': {
+      'import': `${__dirname}/src/sidecar.js`,
     },
   },
   output: {
@@ -32,7 +36,10 @@ module.exports = {
   },
   module: {
     rules: [
-      { test: /\.vue$/, use: 'vue-loader' },
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+      },
       {
         test: /\.css$/,
         use: [
@@ -44,5 +51,12 @@ module.exports = {
   },
   plugins: [
     new VueLoaderPlugin(),
+    new ModuleFederationPlugin({
+      name: "farmos_asset_link",
+      filename: "farmos_asset_link_remote_entry.js",
+      remotes: {},
+      exposes: {},
+      shared: require("./package.json").dependencies,
+    }),
   ],
 };

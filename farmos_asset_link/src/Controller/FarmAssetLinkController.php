@@ -6,7 +6,11 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Session\AccountProxyInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
+use Drupal\Core\Render\HtmlResponse;
+
+use Drupal\Core\Render\BareHtmlPageRenderer;
+
+
 
 /**
  * Defines FarmAssetLinkController class.
@@ -55,7 +59,7 @@ class FarmAssetLinkController extends ControllerBase {
    * Top-level handler for demo page requests.
    */
   public function content() {
-    return [
+    $build = [
       '#markup' => '<div id="farm-asset-link-app"></div>',
       '#attached' => [
         'library' => [
@@ -63,6 +67,14 @@ class FarmAssetLinkController extends ControllerBase {
         ],
       ],
     ];
+
+    $attachments = \Drupal::service('html_response.attachments_processor');
+    $renderer = \Drupal::service('renderer');
+
+    $bareHtmlPageRenderer = new BareHtmlPageRenderer($renderer, $attachments);
+
+    $response = $bareHtmlPageRenderer->renderBarePage($build, 'Asset Link', 'farm-asset-link-page');
+    return $response;
   }
 
 }
