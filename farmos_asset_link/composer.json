@@ -15,5 +15,8 @@
     "source": "https://github.com/symbioquine/farmOS_asset_link"
   },
   "license": "GPL-3.0-or-later",
-  "minimum-stability": "dev"
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/subrequests": "^3.0"
+  }
 }

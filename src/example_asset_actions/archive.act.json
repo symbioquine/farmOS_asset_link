@@ -1,0 +1,7 @@
+{
+    "name": "Archive",
+    "weight": 20,
+    "transformAttributes": {
+        "archived": {"from": "$null", "to": "$date(now)"}
+    }
+}

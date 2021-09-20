@@ -3,3 +3,5 @@ description: Supercharges links to your farmOS assets with an extensible hybrid 
 type: module
 package: farmOS Contrib
 core_version_requirement: ^9
+dependencies:
+  - subrequests:subrequests

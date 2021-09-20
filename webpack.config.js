@@ -1,6 +1,7 @@
 const webpack = require('webpack');
+const CopyPlugin = require("copy-webpack-plugin");
 const { VueLoaderPlugin } = require('vue-loader');
-const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 
 module.exports = {
@@ -21,6 +22,7 @@ module.exports = {
     hints: false,
   },
   devServer: {
+    public: 'farmos.test',
     proxy: {
       context: () => true,
       target: 'http://localhost:80',
@@ -37,26 +39,39 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.vue$/,
-        loader: 'vue-loader',
-      },
-      {
         test: /\.css$/,
         use: [
           { loader: 'style-loader' },
           { loader: 'css-loader' },
         ],
       },
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader'
+      },
     ],
   },
+  externals: {
+    axios: 'axios',
+    'bootstrap-vue': 'BootstrapVue',
+    vue: 'Vue',
+  },
   plugins: [
+    new NodePolyfillPlugin(),
     new VueLoaderPlugin(),
-    new ModuleFederationPlugin({
-      name: "farmos_asset_link",
-      filename: "farmos_asset_link_remote_entry.js",
-      remotes: {},
-      exposes: {},
-      shared: require("./package.json").dependencies,
+    new CopyPlugin({
+      patterns: [
+        { from: 'node_modules/vue/dist/vue.min.js' },
+
+        { from: 'node_modules/axios/dist/axios.min.js' },
+
+        { from: 'node_modules/bootstrap/dist/css/bootstrap.min.css', to: '../css/' },
+        { from: 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js' },
+
+        { from: 'node_modules/bootstrap-vue/dist/bootstrap-vue.min.css', to: '../css/' },
+        { from: 'node_modules/bootstrap-vue/dist/bootstrap-vue-icons.min.css', to: '../css/' },
+        { from: 'node_modules/bootstrap-vue/dist/bootstrap-vue.min.js' },
+      ],
     }),
   ],
 };
