@@ -60,14 +60,16 @@ class RequestSubscriber implements EventSubscriberInterface  {
     $request = $event->getRequest();
     $path = $request->getPathInfo();
 
-    // Redirect all requests that start with "/alink" requests to a single
+    // Let '/alink/backend' requests fall through to the
+    // normal routing since those will have their own controllers.
+    if (strpos($path, '/alink/backend') === 0) {
+      return;
+    }
+
+    // Otherwise, redirect all requests that start with "/alink" requests to a single
     // route. Note: this is necessary because core doesn't have any other
     // way to really handle "wildcard/catch all" routes.
-    if (strpos($path, '/alink') === 0
-      // Ignore CSS/JS (if it reaches here, it means the file doesn't exist).
-      && !in_array(substr($path, -3), ['.css', '.js'])
-      && !in_array(substr($path, -4), ['.map'])
-    ) {
+    if (strpos($path, '/alink') === 0) {
       $route = $this->routeProvider->getRouteByName('farmos_asset_link.content');
       $definition = $route->getDefault('_controller');
       $controller = $this->controllerResolver->getControllerFromDefinition($definition, $path);

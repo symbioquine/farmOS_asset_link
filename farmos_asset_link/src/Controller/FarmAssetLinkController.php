@@ -7,6 +7,8 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Session\AccountProxyInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\Core\Render\HtmlResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Cookie;
 
 use Drupal\Component\Utility\UrlHelper;
 
@@ -61,126 +63,95 @@ class FarmAssetLinkController extends ControllerBase {
    * Top-level handler for asset link requests.
    */
   public function content() {
-    $siteName = $this->configFactory->get('system.site')->get('name');
+    $request = $this->requestStack->getCurrentRequest();
+    $path = $request->getPathInfo();
 
-    $response = $this->renderBarePage([], 'Asset Link', 'asset_link_page', [
-      '#attached' => [
-        'library' => [
-          'farmos_asset_link/farmos_asset_link'
-        ],
-        'drupalSettings' => [
-          'farmos_asset_link' => [
-            'site_name' => $siteName,
-          ],
-        ],
-      ],
+    if (strpos($path, '/alink') !== 0) {
+      $response = new Response();
+      $response->setStatusCode(400);
+      $response->headers->set('Content-Type', 'text/plain');
+      $response->setContent("This controller is only intended to serve paths under /alink");
+      return $response;
+    }
+
+    // This should never happen since a compliant web server should handle sending a 400 for requests with relative paths
+    // but since it could be a pretty bad security vulnerbility if this ever got through we'll defend against it.
+    // https://datatracker.ietf.org/doc/html/rfc7230#section-5.3.1
+    if (strpos($path, '../') !== false) {
+      $response = new Response();
+      $response->setStatusCode(400);
+      $response->headers->set('Content-Type', 'text/plain');
+      $response->setContent("This controller is only intended to serve paths under /alink");
+      return $response;
+    }
+
+    // TODO: Use injected services here
+    $module_base_path = \Drupal::service('file_system')->realpath(\Drupal::service('module_handler')->getModule('farmos_asset_link')->getPath());
+
+    $asset_link_dist_path = "$module_base_path/asset-link-dist/";
+
+    // Remove the '/alink' prefix
+    $path_suffix = substr($path, 6);
+
+    $file_path = $asset_link_dist_path . $path_suffix;
+
+    if (empty($path_suffix) || $path_suffix === '/' || !file_exists($file_path)) {
+      $file_path = $asset_link_dist_path . "index.html";
+    }
+
+    $content_type = $this->getContentMimetype($file_path);
+
+    $response_content = file_get_contents($file_path);
+
+    $base_path = base_path();
+
+    $response_content = str_replace('/__THIS_GETS_REPLACED_AT_RUNTIME_BY_THE_DRUPAL_CONTROLLER__/', $base_path . 'alink/', $response_content);
+
+    if (false) dd([
+      '$path' => $path,
+      '$file_path' => $file_path,
+      '$path_suffix' => $path_suffix,
+      'file_exists($file_path)' => file_exists($file_path),
+      '$content_type' => $content_type,
+      '$response_content' => $response_content,
     ]);
 
+    $response = new Response();
+    $response->setStatusCode(200);
+
+    $cookie_expiry_epoch_sec = time() + (14 * 24 * 60 * 60);
+
+    $cookie = new Cookie('assetLinkDrupalBasePath', $base_path, $expire = $cookie_expiry_epoch_sec, $path = '/', $domain = null, $secure = false, $httpOnly = false, $raw = true, $sameSite = null);
+    $response->headers->setCookie($cookie);
+
+    $response->headers->set('Content-Type', $content_type);
+    $response->setContent($response_content);
     return $response;
   }
 
-  // based on https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Render%21BareHtmlPageRenderer.php/function/BareHtmlPageRenderer%3A%3ArenderBarePage/8.2.x
-  private function renderBarePage(array $content, $title, $page_theme_property, array $page_additions = []) {
-    $attributes = [
-      'class' => [
-        str_replace('_', '-', $page_theme_property),
-      ],
+  // roughly based on https://developer.mozilla.org/en-US/docs/Learn/Server-side/Node_server_without_framework
+  private function getContentMimetype($file_path) {
+    $extname = pathinfo($file_path, PATHINFO_EXTENSION);
+
+    $mime_types = [
+      'html' => 'text/html',
+      'js' => 'text/javascript',
+      'css' => 'text/css',
+      'json' => 'application/json',
+      'png' => 'image/png',
+      'jpg' => 'image/jpg',
+      'gif' => 'image/gif',
+      'svg' => 'image/svg+xml',
+      'wav' => 'audio/wav',
+      'mp4' => 'video/mp4',
+      'woff' => 'application/font-woff',
+      'ttf' => 'application/font-ttf',
+      'eot' => 'application/vnd.ms-fontobject',
+      'otf' => 'application/font-otf',
+      'wasm' => 'application/wasm',
     ];
-    $html = [
-      '#type' => 'html',
-      '#attributes' => $attributes,
-      'page' => [
-        '#type' => 'page',
-        '#theme' => $page_theme_property,
-        '#title' => $title,
-        'content' => $content,
-      ] + $page_additions,
-    ];
 
-    // For backwards compatibility.
-    // @todo In Drupal 9, add a $show_messages function parameter.
-    if (!isset($page_additions['#show_messages']) || $page_additions['#show_messages'] === TRUE) {
-      $html['page']['highlighted'] = [
-        '#type' => 'status_messages',
-      ];
-    }
-
-    // Attach favicon.
-    if (theme_get_setting('features.favicon')) {
-      $favicon = theme_get_setting('favicon.url');
-      $type = theme_get_setting('favicon.mimetype');
-      $html['page']['#attached']['html_head_link'][][] = array(
-        'rel' => 'shortcut icon',
-        'href' => UrlHelper::stripDangerousProtocols($favicon),
-        'type' => $type,
-      );
-    }
-
-    // Get the major Drupal version.
-    list($version, ) = explode('.', \Drupal::VERSION);
-
-    // Attach default meta tags.
-    $meta_default = array(
-      // Make sure the Content-Type comes first because the IE browser may be
-      // vulnerable to XSS via encoding attacks from any content that comes
-      // before this META tag, such as a TITLE tag.
-      'system_meta_content_type' => array(
-        '#tag' => 'meta',
-        '#attributes' => array(
-          'charset' => 'utf-8',
-        ),
-        // Security: This always has to be output first.
-        '#weight' => -1000,
-      ),
-      // Show Drupal and the major version number in the META GENERATOR tag.
-      'system_meta_generator' => array(
-        '#type' => 'html_tag',
-        '#tag' => 'meta',
-        '#attributes' => array(
-          'name' => 'Generator',
-          'content' => 'Drupal ' . $version . ' (https://www.drupal.org)',
-        ),
-      ),
-      // Attach default mobile meta tags for responsive design.
-      'MobileOptimized' => array(
-        '#tag' => 'meta',
-        '#attributes' => array(
-          'name' => 'MobileOptimized',
-          'content' => 'width',
-        ),
-      ),
-      'HandheldFriendly' => array(
-        '#tag' => 'meta',
-        '#attributes' => array(
-          'name' => 'HandheldFriendly',
-          'content' => 'true',
-        ),
-      ),
-      'viewport' => array(
-        '#tag' => 'meta',
-        '#attributes' => array(
-          'name' => 'viewport',
-          'content' => 'width=device-width, initial-scale=1.0',
-        ),
-      ),
-    );
-    foreach ($meta_default as $key => $value) {
-      $html['page']['#attached']['html_head'][] = [
-        $value,
-        $key,
-      ];
-    }
-
-    \Drupal::service('renderer')->renderRoot($html);
-
-    $response = new HtmlResponse();
-    $response->setContent($html);
-
-    // Process attachments, because this does not go via the regular render
-    // pipeline, but will be sent directly.
-    $response = \Drupal::service('html_response.attachments_processor')->processAttachments($response);
-
-    return $response;
+    return $mime_types[$extname] ?? 'application/octet-stream';
   }
 
 }

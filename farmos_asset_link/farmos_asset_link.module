@@ -8,22 +8,3 @@ function farmos_asset_link_page_attachments(array &$attachments) {
 
   $attachments['#attached']['library'][] = 'farmos_asset_link/farmos_asset_link_sidecar';
 }
-
-/**
- * Implements hook_theme().
- */
-function farmos_asset_link_theme() {
-  return [
-    'asset_link_page' => [
-      'template' => 'asset-link-page',
-      'variables' => ['test_var' => NULL],
-    ],
-  ];
-}
-
-function farmos_asset_link_theme_suggestions_page_alter(array &$suggestions, array $variables) {
-  // dd($suggestions);
-  if ($node = \Drupal::routeMatch()->getParameter('node')) {
-    $suggestions[] = 'page__' . $node->bundle();
-  }
-}

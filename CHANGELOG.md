@@ -7,11 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2021-07-07
+## [0.0.1] - 2022-04-18
 
 ### Added
 
-- Initial release
+- Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0...HEAD
-[1.0.0]: https://github.com/symbioquine/farmOS_asset_link/releases/tag/unbuilt-v1.0.0
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.0.1...HEAD
+[0.0.1]: https://github.com/symbioquine/farmOS_asset_link/releases/tag/unbuilt-v0.0.1

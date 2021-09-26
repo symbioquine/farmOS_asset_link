@@ -10,13 +10,17 @@ PWA experience.
 Use Composer and Drush to install farmOS_asset_link in farmOS 2.x;
 
 ```sh
-composer require symbioquine/farmos_asset_link
+composer require drupal/farmos_asset_link
 drush en farmos_asset_link
 ```
 
 *Available released versions can be viewed at https://www.drupal.org/project/farmos_asset_link*
 
 ## FAQs
+
+### Why would I want to use Asset Link?
+
+You like how farmOS stores your data, but need a simpler interface for use in the field or by less technical collaborators.
 
 ### What does Asset Link actually do?
 
@@ -46,7 +50,6 @@ FieldKit is a separate app which requires internet access to (initially) load, t
 
 On the other hand, Asset Link is installed on your server with farmOS and directly enhances the functionality of farmOS itself. Among other things,
 this means that farmOS_asset_link can work in non-internet-connected environments.
-
 
 ## Development
 

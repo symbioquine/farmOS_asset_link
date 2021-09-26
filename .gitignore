@@ -1,5 +1,7 @@
-/farmos_asset_link/js
-/farmos_asset_link/css
+/farmos_asset_link/asset-link-dist
+
+# Test image from https://commons.wikimedia.org/wiki/File:Dolly_face_closeup.jpg
+Dolly_face_closeup.jpg
 
 /docker/db
 /docker/www
