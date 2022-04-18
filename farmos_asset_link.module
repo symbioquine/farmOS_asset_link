@@ -1,0 +1,10 @@
+<?php
+
+/**
+ * Implements hook_page_attachments().
+ */
+function farmos_asset_link_page_attachments(array &$attachments) {
+  // TODO: special handling for not-yet-logged-in users
+
+  $attachments['#attached']['library'][] = 'farmos_asset_link/farmos_asset_link_sidecar';
+}

@@ -1,8 +1,8 @@
 {
-  "name": "symbioquine/farmos_vue_demo_page",
-  "description": "A demo page for farmOS built with Vue.js.",
+  "name": "symbioquine/farmos_asset_link",
+  "description": "A contrib module for farmOS 2.x that supercharges links to your farmOS assets with an extensible hybrid PWA experience.",
   "type": "drupal-module",
-  "homepage": "https://github.com/symbioquine/farmOS_vue_demo_page",
+  "homepage": "https://github.com/symbioquine/farmOS_asset_link",
   "authors": [
     {
       "name": "Symbioquine",
@@ -11,9 +11,12 @@
     }
   ],
   "support": {
-    "issues": "https://github.com/symbioquine/farmOS_vue_demo_page/issues",
-    "source": "https://github.com/symbioquine/farmOS_vue_demo_page"
+    "issues": "https://github.com/symbioquine/farmOS_asset_link/issues",
+    "source": "https://github.com/symbioquine/farmOS_asset_link"
   },
-  "license": "MIT",
-  "minimum-stability": "dev"
+  "license": "GPL-3.0-or-later",
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/subrequests": "^3.0"
+  }
 }

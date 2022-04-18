@@ -1,64 +1,55 @@
-# farmOS_vue_page_demo
+# farmOS_asset_link
 
-A contrib module for [farmOS](https://farmos.org/) demonstrating a packaging strategy for a page built with [Vue.js](https://vuejs.org/)
+farmOS_asset_link - A.K.A "Asset Link" - is a contrib module for farmOS 2.x that supercharges links to your farmOS assets with an extensible hybrid
+PWA experience.
 
 *Note: Some branches and tags include only the built module. See the [development branch][development branch] for the full source code.*
 
 ## Installation
 
-Use Composer and Drush to install farmOS_vue_page_demo in farmOS 2.x;
+Use Composer and Drush to install farmOS_asset_link in farmOS 2.x;
 
 ```sh
-composer require symbioquine/farmos_vue_page_demo
-drush en farmos_vue_page_demo
+composer require drupal/farmos_asset_link
+drush en farmos_asset_link
 ```
 
-*Available released versions can be viewed at https://packagist.org/packages/symbioquine/farmos_vue_page_demo*
+*Available released versions can be viewed at https://www.drupal.org/project/farmos_asset_link*
 
 ## FAQs
 
-### How does this work?
+### Why would I want to use Asset Link?
 
-The Javascript part of this module gets built by `npm run build` and placed within the Drupal module directory's `js/' folder.
+You like how farmOS stores your data, but need a simpler interface for use in the field or by less technical collaborators.
 
-The Drupal part of this module registers a simple controller which renders a page that includes the built javascript and a DOM node for Vue.js to bind to.
+### What does Asset Link actually do?
 
-### What about installation via Composer?
+* Adds a floating right side bar with actions to the regular farmOS asset pages
+* Hosts an alternate light-weight page for each farmOS asset
+* Exposes an API where other modules can provide actions and UI elements
 
-There are two branches for this repository `development` and `release`. The development workflow for this package involves only pushing changes to the `development` branch and to tags
-with a `unbuilt-` prefix.
+### How does it work?
 
-A Github action is triggered by pushes to the `development` branch and tags with the `unbuilt-` prefix. That action performs the `npm run build` step and pushes the resulting built module
-code either to the `release` branch or to regular semantically versioned tags.
+Asset Link does several things;
 
-The Composer `package.json` file is intentionally not included at the root of the repository for the unbuilt source code.
+1. Injects some javascript into all farmOS asset pages which provides offline caching and controls for interacting with "asset link" functionality
+2. Provides an alternate extensible action-driven mobile UX for interacting with farmOS assets
+3. Exposes an API where other modules can customize the display/behavior of specific assets or asset types within the "asset link" UX
 
-Due to [how Packagist works](https://packagist.org/about), the main branch for the Git repository must be set to `release` to ensure Packagist can find the Composer `package.json` file.
+### That last answer sounds like Klingon (unintelligible) to me. Can you explain more simply why I would want this?
 
-### Okay, but how about live reload for development?
+Asset Link makes it so new/existing links to your farmOS assets can have an alternate simplified interface which is more convenient for use
+from mobile devices in the field.
 
-The `docker/` directory of the [development branch][development branch] of this repository contains a `docker-compose.yml` file which mounts the `farmos_vue_demo_page/` directory of this repository
-into the container. That directory is then used as a repository source for Composer to install the Drupal module from. If the Javascript part of this package has already been built, then the module
-will function correctly when accessing the farmOS server at http://localhost:80/vue_demo_page, but will not have live-reloading for the Vue.js code.
+### How is this different from FieldKit?
 
-Next, the Webpack Dev server is used to proxy the farmOS container but replace requests for the assets associated with this module with the development versions - which have special code injected in
-them to support live reloading whenever the Vue.js source code changes.
+Asset Link and FieldKit are very similar in their end goals of providing a mobile-friendly interface to farmOS. Where they differ is in terms
+of the strategy employed to provide that.
 
-### How do you push new versions?
+FieldKit is a separate app which requires internet access to (initially) load, then provides an alternate way to access and interact with farmOS.
 
-From the [development branch][development branch] of this repository:
-
-```sh
-# Add/commit your changes
-git add [...]
-# Update NPM package version and commit
-npm --no-git-tag-version version --force patch
-git commit
-# Tag the release with the unbuilt prefix
-git tag unbuilt-v9000.0.1
-# Push the development branch and new tag
-git push --atomic origin HEAD:development unbuilt-v9000.0.1
-```
+On the other hand, Asset Link is installed on your server with farmOS and directly enhances the functionality of farmOS itself. Among other things,
+this means that farmOS_asset_link can work in non-internet-connected environments.
 
 ## Development
 
@@ -78,6 +69,22 @@ npm install
 npm run dev
 ```
 
-Access the demo page at http://localhost:8080/vue_demo_page
+Access the info page at http://localhost:8080/alink/info
 
-[development branch]: https://github.com/symbioquine/farmOS_vue_page_demo/tree/development
+### Procedure for pushing new versions
+
+From the [development branch][development branch] of this repository:
+
+```sh
+# Add/commit your changes
+git add [...]
+# Update NPM package version and commit
+npm --no-git-tag-version version --force patch
+git commit
+# Tag the release with the unbuilt prefix
+git tag unbuilt-v9000.0.1
+# Push the development branch and new tag
+git push --atomic origin HEAD:development unbuilt-v9000.0.1
+```
+
+[development branch]: https://github.com/symbioquine/farmOS_asset_link/tree/development

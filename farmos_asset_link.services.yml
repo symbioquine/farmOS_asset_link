@@ -1,0 +1,13 @@
+services:
+  farmos_asset_link.top_level_controller:
+    class: Drupal\farmos_asset_link\Controller\FarmAssetLinkController
+    arguments:
+     - '@request_stack'
+     - '@config.factory'
+     - '@current_user'
+
+  farmos_asset_link.request_subscriber:
+    class: Drupal\farmos_asset_link\EventSubscriber\RequestSubscriber
+    arguments: ['@router.route_provider', '@controller_resolver', '@http_kernel.controller.argument_resolver']
+    tags:
+      - { name: event_subscriber }

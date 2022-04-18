@@ -1,0 +1,20 @@
+farmos_asset_link.content:
+  path: '/alink'
+  defaults:
+    _controller: farmos_asset_link.top_level_controller:content
+  requirements:
+    _permission: 'access content'
+
+farmos_asset_link.map:
+  path: '/alink/backend/map-src'
+  defaults:
+    _controller: '\Drupal\farmos_asset_link\Controller\FarmAssetLinkMapController::Render'
+  requirements:
+    _permission: 'access content'
+
+farmos_asset_link.default_plugins:
+  path: '/alink/backend/default-plugins.repo.json'
+  defaults:
+    _controller: '\Drupal\farmos_asset_link\Controller\FarmAssetLinkDefaultPluginRepositoryController::Render'
+  requirements:
+    _permission: 'access content'
