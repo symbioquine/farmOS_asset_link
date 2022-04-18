@@ -1,5 +1,61 @@
 const prefixer = require('postcss-prefix-selector');
 
+const DEV_PROXY_TARGET = process.env.ASSET_LINK_DEV_PROXY_TARGET || 'http://localhost';
+
+const createDevServerConfig = () => {
+  const targetUrl = new URL(DEV_PROXY_TARGET);
+
+  const devHost = targetUrl.hostname;
+
+  let serverConfig = {
+    headers: {
+      'Set-Cookie': 'assetLinkDrupalBasePath=/; path=/',
+    },
+    proxy: {
+      "^/": {
+        ws: false,
+        target: DEV_PROXY_TARGET,
+        context: () => true,
+        headers: {
+          'X-Forwarded-For': `${devHost}:8080`,
+        },
+        bypass: function (req, res, proxyOptions) {
+          if (req.path.indexOf('/alink/backend') === 0) {
+            console.log(`'${req.path}' is an alink backend url - passing to proxy...`);
+            return null;
+          }
+          if (req.path.indexOf('/alink') === 0) {
+            return req.path;
+          }
+          console.log(`'${req.path}' is not an alink url - passing to proxy...`);
+        },
+      },
+    },
+  };
+
+  if (targetUrl.protocol === 'https') {
+    Object.assign(serverConfig, {
+      // Deprecated `https` config still needed to cause links printed to console to have correct protocol
+      // https://github.com/symfony/webpack-encore/issues/1064
+      https: true,
+      server: {
+        type: 'https',
+        options: {
+          ca: `${__dirname}/../devcerts/rootCA.pem`,
+          key: `${__dirname}/../devcerts/${devHost}/privkey.pem`,
+          cert: `${__dirname}/../devcerts/${devHost}/fullchain.pem`,
+        },
+      },
+      host: devHost,
+      allowedHosts: [
+        devHost,
+      ],
+    });
+  }
+
+  return serverConfig;
+};
+
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production'
     ? '/__THIS_GETS_REPLACED_AT_RUNTIME_BY_THE_DRUPAL_CONTROLLER__/'
@@ -84,44 +140,5 @@ module.exports = {
       .use('vue-svg-loader')
       .loader('vue-svg-loader')
   },
-  devServer: {
-    // Deprecated `https` config still needed to cause links printed to console to have correct protocol
-    // https://github.com/symfony/webpack-encore/issues/1064
-    https: true,
-    server: {
-      type: 'https',
-      options: {
-        ca: `${__dirname}/../devcerts/rootCA.pem`,
-        key: `${__dirname}/../devcerts/v2.farmos.test/privkey.pem`,
-        cert: `${__dirname}/../devcerts/v2.farmos.test/fullchain.pem`,
-      },
-    },
-    host: "v2.farmos.test",
-    allowedHosts: [
-      'v2.farmos.test',
-    ],
-    headers: {
-      'Set-Cookie': 'assetLinkDrupalBasePath=/; path=/',
-    },
-    proxy: {
-      "^/": {
-        ws: false,
-        target: 'https://v2.farmos.test:443',
-        context: () => true,
-        headers: {
-          'X-Forwarded-For': 'v2.farmos.test:8080',
-        },
-        bypass: function (req, res, proxyOptions) {
-          if (req.path.indexOf('/alink/backend') === 0) {
-            console.log(`'${req.path}' is an alink backend url - passing to proxy...`);
-            return null;
-          }
-          if (req.path.indexOf('/alink') === 0) {
-            return req.path;
-          }
-          console.log(`'${req.path}' is not an alink url - passing to proxy...`);
-        },
-      },
-    },
-  },
+  devServer: createDevServerConfig(),
 }

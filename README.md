@@ -67,11 +67,25 @@ cd docker/
 **Run the dev proxy server;**
 
 ```sh
+cd alinkjs/
 npm install
-npm run dev
+npm run serve
 ```
 
-Access the info page at http://localhost:8080/alink/info
+Access the home page at http://localhost:8080/alink
+
+### HTTPS dev proxy server
+
+```sh
+mkdir -p ./devcerts/mydomain.farmos.test/
+cp /path/to/my/dev/server/rootCA.pem ./devcerts/rootCA.pem
+cp /path/to/my/dev/server/privkey.pem ./devcerts/mydomain.farmos.test/privkey.pem
+cp /path/to/my/dev/server/fullchain.pem ./devcerts/mydomain.farmos.test/fullchain.pem
+export ASSET_LINK_DEV_PROXY_TARGET='https://mydomain.farmos.test'
+cd alinkjs/
+npm install
+npm run serve
+```
 
 ### Procedure for pushing new versions
 
