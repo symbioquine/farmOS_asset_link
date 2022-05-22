@@ -103,6 +103,17 @@ class FarmAssetLinkController extends ControllerBase {
 
     $response_content = file_get_contents($file_path);
 
+    // The file being served should always exist because when doesn't, we fall back on
+    // serving the `index.html` file. If that doesn't exist it probably means our front-end
+    // artifacts aren't available so return an HTTP 500 - our fault.
+    if ($response_content === false) {
+      $response = new Response();
+      $response->setStatusCode(500);
+      $response->headers->set('Content-Type', 'text/plain');
+      $response->setContent("Could not find Asset Link front-end resources - if this is happening in a development environment, make sure ./alinkjs has been built.");
+      return $response;
+    }
+
     $base_path = base_path();
 
     $response_content = str_replace('/__THIS_GETS_REPLACED_AT_RUNTIME_BY_THE_DRUPAL_CONTROLLER__/', $base_path . 'alink/', $response_content);

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Return an HTTP 500 error when built artifacts are missing
+
 ## [0.0.1] - 2022-04-18
 
 ### Added
