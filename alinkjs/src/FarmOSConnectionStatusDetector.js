@@ -94,16 +94,12 @@ const FarmOSConnectionStatusDetector = Vue.extend({
       const checkConnectionStatus = throttle(() => this.$_checkConnectionStatus(), 1000);
 
       while (this.$data.$_running) {
-        console.log('$_mainLoop iteration');
         await checkConnectionStatus();
         await this.$data.$_barrier.arrive(60 * 1000);
       }
     },
 
     async $_checkConnectionStatus() {
-
-      console.log('$_checkConnectionStatus invocation');
-
       if (!this.hasNetworkConnection) {
         return;
       }
@@ -130,8 +126,6 @@ const FarmOSConnectionStatusDetector = Vue.extend({
         this.canReachFarmOS = true;
 
         const userRef = apiData.meta?.links?.me?.href;
-
-        console.log('apiData', apiData);
 
         this.isLoggedIn = userRef !== undefined
       } catch (error) {

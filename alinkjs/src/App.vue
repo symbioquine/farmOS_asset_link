@@ -164,7 +164,6 @@ export default {
     };
   },
   data() {
-    console.log(this);
     return {
       assetLink: NonReactiveAssetLinkDecorator.decorate(new AssetLink(this)),
 

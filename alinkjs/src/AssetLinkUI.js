@@ -52,7 +52,7 @@ export default class AssetLinkUI {
         const result = await new Promise(resolve => {
           context.$on('submit', resolve);
 
-          this.app.dialogs.push({
+          this._app.dialogs.push({
             id,
             context,
             componentFn: (wrapper, h) =>
@@ -65,7 +65,7 @@ export default class AssetLinkUI {
           });
         });
 
-        this.app.dialogs = this._app.dialogs.filter(d => d.id !== id);
+        this._app.dialogs = this._app.dialogs.filter(d => d.id !== id);
 
         return result;
       },

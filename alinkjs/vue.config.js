@@ -1,3 +1,5 @@
+const chokidar = require('chokidar');
+const path = require('path');
 const prefixer = require('postcss-prefix-selector');
 
 const DEV_PROXY_TARGET = process.env.ASSET_LINK_DEV_PROXY_TARGET || 'http://localhost';
@@ -8,6 +10,37 @@ const createDevServerConfig = () => {
   const devHost = targetUrl.hostname;
 
   let serverConfig = {
+    hot: true,
+    client: {
+      webSocketTransport: `${__dirname}/src/alink-plugin-reloading-dev-server-ws-transport`,
+    },
+    webSocketServer: 'ws',
+    setupMiddlewares: function (middlewares, devServer) {
+      if (!devServer) {
+        throw new Error('webpack-dev-server is not defined');
+      }
+
+      const files = [`${__dirname}/alink-plugins/**`];
+      chokidar
+        .watch(files, {
+          alwaysStat: true,
+          atomic: false,
+          followSymlinks: false,
+          ignoreInitial: true,
+          ignorePermissionErrors: true,
+          persistent: true,
+          usePolling: true,
+        })
+        .on("all", (event, pluginFilePath) => {
+          const fileName = path.basename(pluginFilePath);
+
+          const pluginUrl = `${targetUrl.protocol}//${devHost}:8080/alink/alink-plugins/${fileName}`;
+
+          devServer.sendMessage(devServer.webSocketServer.clients, 'asset-link-plugin-changed', pluginUrl);
+        });
+
+      return middlewares;
+    },
     headers: {
       'Set-Cookie': 'assetLinkDrupalBasePath=/; path=/',
     },
@@ -56,6 +89,18 @@ const createDevServerConfig = () => {
   return serverConfig;
 };
 
+/*
+ * Custom plugin to trigger a compile when saving files outside the bundle
+ * Based on https://stenvdb.be/articles/how-to-live-reload-webpack-dev-server-when-saving-external-files
+ */
+function WatchExternalFilesPlugin() {
+  WatchExternalFilesPlugin.prototype.apply = (compiler) => {
+    compiler.hooks.afterCompile.tap('WatchExternalFilesPlugin', (compilation) => {
+      compilation.contextDependencies.add(`${__dirname}/alink-plugins`);
+    });
+  };
+}
+
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production'
     ? '/__THIS_GETS_REPLACED_AT_RUNTIME_BY_THE_DRUPAL_CONTROLLER__/'
@@ -94,8 +139,24 @@ module.exports = {
       ...config.resolve.fallback,
       "path": require.resolve("path-browserify"),
     };
+
+    config.plugins = [
+      ...config.plugins, // this is important !
+      new WatchExternalFilesPlugin(),
+    ];
   },
   chainWebpack: (config) => {
+    // From https://stackoverflow.com/a/60311642
+    config.plugin('copy')
+      .tap(args => {
+        args[0].patterns.push({
+          from: path.resolve(__dirname, 'alink-plugins'),
+          to: path.resolve(__dirname, '../farmos_asset_link/asset-link-dist/alink-plugins'),
+          toType: 'dir',
+        })
+        return args
+      });
+
     // From https://github.com/vuetifyjs/vuetify/issues/8530#issuecomment-680942337
     const sassRule = config.module.rule('sass');
     const sassNormalRule = sassRule.oneOfs.get('normal');

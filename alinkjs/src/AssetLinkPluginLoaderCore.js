@@ -29,13 +29,15 @@ export default class AssetLinkPluginLoaderCore {
     // TODO: ?
   }
 
-  async loadPlugin(pluginUrl) {
+  async loadPlugin(pluginUrl, opts) {
+    const options = opts || {};
+
     const startTime = performance.now();
 
     let pluginInstance = undefined;
 
     try {
-      let pluginDataUrl = await this._fetchPlugin(pluginUrl);
+      let pluginDataUrl = await this._fetchPlugin(pluginUrl, options);
 
       if (pluginUrl.pathname.endsWith('alink.js')) {
         const pluginCls = (await import(/* webpackIgnore: true */ pluginDataUrl)).default;
@@ -65,7 +67,12 @@ export default class AssetLinkPluginLoaderCore {
 
         const tags = new Set()
         const attrs = new Set()
-        const component = compiler.parseComponent(rawPluginFileData)
+        const component = compiler.parseComponent(rawPluginFileData);
+
+        if (component.errors.length > 0) {
+          throw new Error(`Could not parse component plugin: ${component.errors.join('\n')}`);
+        }
+
         if (component.template) {
           if (component.template.src) {
             throw new Error(`External component template content is not supported.`);
@@ -160,13 +167,23 @@ export default class AssetLinkPluginLoaderCore {
     }
   }
 
-  /* eslint-disable no-console,no-unused-vars */
   async unloadPlugin(pluginUrl) {
-    // TODO: implement
+    const pluginIdx = this.vm.plugins.findIndex(p => p.pluginUrl.toString() === pluginUrl.toString());
+
+    if (pluginIdx !== -1) {
+      this.vm.plugins.splice(pluginIdx, 1);
+    }
   }
 
-  async _fetchPlugin(url) {
-    const skipCache = url.searchParams && url.searchParams.get('skipCache');
+  async reloadPlugin(pluginUrl) {
+    await this.unloadPlugin(pluginUrl);
+    await this.loadPlugin(pluginUrl, { skipCache: true });
+  }
+
+  async _fetchPlugin(url, opts) {
+    const options = opts || {};
+
+    const skipCache = options.skipCache || (url.searchParams && url.searchParams.get('skipCache'));
 
     const cacheKey = `asset-link-cached-plugin-src:${url}`;
 
@@ -182,9 +199,7 @@ export default class AssetLinkPluginLoaderCore {
 
     const pluginDataUrl = "data:application/javascript;base64," + btoa(pluginSrc);
 
-    if (!skipCache) {
-      await this._store.setItem(cacheKey, {key: cacheKey, timestamp, value: pluginDataUrl});
-    }
+    await this._store.setItem(cacheKey, {key: cacheKey, timestamp, value: pluginDataUrl});
 
     return pluginDataUrl;
   }

@@ -170,6 +170,10 @@ export default class AssetLink {
       }
     });
 
+    window.addEventListener('asset-link-plugin-changed', async e => {
+      await this._cores.pluginLoader.reloadPlugin(new URL(e.detail.pluginUrl));
+    });
+
     await this._cores.pluginLoader.boot();
     await this._cores.pluginLists.boot();
 

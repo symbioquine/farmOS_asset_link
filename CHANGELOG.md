@@ -7,9 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Automatically reload core plugins when they change in a development context
+
 ### Fixed
 
 - Return an HTTP 500 error when built artifacts are missing
+- Removed some unnecessary logging
+- Fixed support for custom dialogs
+- Improve handling of plugin component parse errors
 
 ## [0.0.1] - 2022-04-18
 
