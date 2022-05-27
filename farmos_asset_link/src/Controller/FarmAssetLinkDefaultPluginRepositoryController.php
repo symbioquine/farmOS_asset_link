@@ -20,6 +20,7 @@ class FarmAssetLinkDefaultPluginRepositoryController extends ControllerBase {
       ['url' => $base_path . 'alink/alink-plugins/ArchiveAssetActionProvider.alink.js'],
       ['url' => $base_path . 'alink/alink-plugins/RenameAssetActionProvider.alink.js'],
       ['url' => $base_path . 'alink/alink-plugins/OpenInFarmOSMetaActionProvider.alink.js'],
+      ['url' => $base_path . 'alink/alink-plugins/MoveAssetActionProvider.alink.vue'],
       ['url' => $base_path . 'alink/alink-plugins/NameBasedAssetSearcher.alink.js'],
       ['url' => $base_path . 'alink/alink-plugins/UrlBasedAssetSearcher.alink.js'],
       ['url' => $base_path . 'alink/alink-plugins/ProximityAssetSearcher.alink.js'],

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Automatically reload core plugins when they change in a development context
 - Add the `//# sourceURL` pragma to the end of plugins so they appear nicely in the debugger
+- Implement a "move asset" action provider plugin
 
 ### Fixed
 
