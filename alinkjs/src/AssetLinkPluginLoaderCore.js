@@ -197,7 +197,9 @@ export default class AssetLinkPluginLoaderCore {
 
     const pluginSrc = await fetch(url).then(r => r.text());
 
-    const pluginDataUrl = "data:application/javascript;base64," + btoa(pluginSrc);
+    const pluginSrcWithSourceInfo = `${pluginSrc}\n//# sourceURL=asset-link-plugin:./${encodeURIComponent(url)}\n`;
+
+    const pluginDataUrl = "data:application/javascript;base64," + btoa(pluginSrcWithSourceInfo);
 
     await this._store.setItem(cacheKey, {key: cacheKey, timestamp, value: pluginDataUrl});
 
