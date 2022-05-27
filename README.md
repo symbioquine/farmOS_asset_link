@@ -7,10 +7,12 @@ PWA experience.
 
 ## Installation
 
+**Warning: *Asset Link is pre-alpha software at this point. Please consider it highly experimental and don't use it for anything critical.***
+
 Use Composer and Drush to install farmOS_asset_link in farmOS 2.x;
 
 ```sh
-composer require drupal/farmos_asset_link
+composer require 'drupal/farmos_asset_link:^0.0.1@dev'
 drush en farmos_asset_link
 ```
 
@@ -65,11 +67,25 @@ cd docker/
 **Run the dev proxy server;**
 
 ```sh
+cd alinkjs/
 npm install
-npm run dev
+npm run serve
 ```
 
-Access the info page at http://localhost:8080/alink/info
+Access the home page at http://localhost:8080/alink
+
+### HTTPS dev proxy server
+
+```sh
+mkdir -p ./devcerts/mydomain.farmos.test/
+cp /path/to/my/dev/server/rootCA.pem ./devcerts/rootCA.pem
+cp /path/to/my/dev/server/privkey.pem ./devcerts/mydomain.farmos.test/privkey.pem
+cp /path/to/my/dev/server/fullchain.pem ./devcerts/mydomain.farmos.test/fullchain.pem
+export ASSET_LINK_DEV_PROXY_TARGET='https://mydomain.farmos.test'
+cd alinkjs/
+npm install
+npm run serve
+```
 
 ### Procedure for pushing new versions
 
