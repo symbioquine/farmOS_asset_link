@@ -7,7 +7,7 @@
         <h2>Asset: {{ asset.attributes.name }}</h2>
 
         <render-fn-wrapper
-          v-for="slotDef in assetLink.getPageSlots({ route: $route, asset })" :key="slotDef.id"
+          v-for="slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, asset })" :key="slotDef.id"
           :render-fn="slotDef.componentFn"
         ></render-fn-wrapper>
 
@@ -19,11 +19,17 @@
 
 <script>
 export default {
+  props: {
+    wrapper: {
+      type: Object,
+      required: true,
+    }
+  },
   inject: ['assetLink'],
   methods: {
     onAssetResolved(asset) {
-      const metaActionDefs = this.assetLink.getRelevantMetaActions(asset);
-      this.$emit('expose-meta-actions', metaActionDefs);
+      const metaActionDefs = this.assetLink.getSlots({ type: 'asset-meta-action', route: this.$route, asset });
+      this.wrapper.$emit('expose-meta-actions', metaActionDefs);
     },
   },
   onLoad(handle, assetLink) {
@@ -32,7 +38,7 @@ export default {
       assetPageRoute.path("/asset/:assetRef");
 
       assetPageRoute.componentFn((wrapper, h) =>
-        h(handle.thisPlugin, {})
+        h(handle.thisPlugin, { props: { wrapper } })
       );
     });
 

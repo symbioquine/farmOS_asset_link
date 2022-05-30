@@ -480,20 +480,8 @@ export default class AssetLink {
     return coiterateSearchCursors();
   }
 
-  getPageSlots(context) {
-    return this.getPluginDefinedComponents('definedPageSlots', context);
-  }
-
-  getRelevantActions(context) {
-    return this.getPluginDefinedComponents('definedActions', context.asset);
-  }
-
-  getRelevantMetaActions(asset) {
-    return this.getPluginDefinedComponents('definedMetaActions', asset);
-  }
-
-  getRelevantConfigActions(route) {
-    return this.getPluginDefinedComponents('definedConfigActions', route);
+  getSlots(context) {
+    return this.getPluginDefinedComponents('definedSlots', context);
   }
 
   getPluginDefinedComponents(componentDefKey, context) {

@@ -69,20 +69,8 @@ export default class NonReactiveAssetLinkDecorator {
     return this.delegate().searchAssets(searchRequest, searchPhase);
   }
 
-  getPageSlots(context) {
-    return this.delegate().getPageSlots(context);
-  }
-
-  getRelevantActions(asset) {
-    return this.delegate().getRelevantActions(asset);
-  }
-
-  getRelevantMetaActions(asset) {
-    return this.delegate().getRelevantMetaActions(asset);
-  }
-
-  getRelevantConfigActions(route) {
-    return this.delegate().getRelevantConfigActions(route);
+  getSlots(context) {
+    return this.delegate().getSlots(context);
   }
 
 }

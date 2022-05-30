@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Introduced slot system so plugins can render arbitrary components on pages
 - Converted asset page to be a plugin
 - Refactored asset actions to be rendered by a page slot plugin
+- Refactored actions to just be another type of slot
 
 ## [0.1.1] - 2022-05-27
 

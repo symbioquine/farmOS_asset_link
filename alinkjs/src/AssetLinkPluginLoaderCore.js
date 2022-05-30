@@ -168,10 +168,7 @@ export default class AssetLinkPluginLoaderCore {
    */
   registerPlugin(plugin) {
     plugin.definedRoutes = {};
-    plugin.definedPageSlots = {};
-    plugin.definedActions = {};
-    plugin.definedMetaActions = {};
-    plugin.definedConfigActions = {};
+    plugin.definedSlots = {};
 
     this.vm.plugins.push(plugin);
 
@@ -261,10 +258,13 @@ class AssetLinkPluginHandle {
     this._vm.$emit('add-route', routeDef);
   }
 
-  definePageSlot(slotName, slotDefiner) {
+  defineSlot(slotName, slotDefiner) {
     const slotDef = {name: slotName};
 
     const slotHandle = {
+        type(type) {
+          slotDef.type = type;
+        },
         showIf(predicateFn) {
           slotDef.predicateFn = predicateFn;
         },
@@ -275,90 +275,20 @@ class AssetLinkPluginHandle {
 
     slotDefiner(slotHandle);
 
-    const missingCallbacks = ['predicateFn', 'componentFn']
-      .filter(attr => typeof slotDef[attr] !== 'function');
-  
-    if (missingCallbacks.length) {
-      console.log(`Slot '${slotName}' is invalid due to missing or non-function callbacks: ${JSON.stringify(missingCallbacks)}`, slotDef);
+    const missingFields = Object.entries({'type': 'string', 'predicateFn': 'function', 'componentFn': 'function'})
+      .filter(([attr, expectedType]) => typeof slotDef[attr] !== expectedType);
+
+    if (missingFields.length) {
+      console.log(`Slot '${slotName}' is invalid due to missing or mismatched types for fields: ${JSON.stringify(missingFields)}`, slotDef);
       return;
     }
 
-    this._pluginInstance.definedPageSlots[slotName] = slotDef;
-  }
+    const providedPredicateFn = slotDef.predicateFn;
 
-  defineAction(actionId, actionDefiner) {
-    const actionDef = {id: actionId};
+    // Decorate the predicate function to make the slots automatically filtered by type
+    slotDef.predicateFn = (context) => context.type === slotDef.type && providedPredicateFn(context);
 
-    const actionHandle = {
-        showIf(predicateFn) {
-          actionDef.predicateFn = predicateFn;
-        },
-        componentFn(componentFn) {
-          actionDef.componentFn = componentFn;
-        },
-    };
-
-    actionDefiner(actionHandle);
-
-    const missingCallbacks = ['predicateFn', 'componentFn']
-      .filter(attr => typeof actionDef[attr] !== 'function');
-    
-    if (missingCallbacks.length) {
-      console.log(`Action '${actionId}' is invalid due to missing or non-function callbacks: ${JSON.stringify(missingCallbacks)}`, actionDef);
-      return;
-    }
-
-    this._pluginInstance.definedActions[actionId] = actionDef;
-  }
-
-  defineMetaAction(actionId, actionDefiner) {
-    const actionDef = {id: actionId};
-
-    const actionHandle = {
-        showIf(predicateFn) {
-          actionDef.predicateFn = predicateFn;
-        },
-        componentFn(componentFn) {
-          actionDef.componentFn = componentFn;
-        },
-    };
-
-    actionDefiner(actionHandle);
-
-    const missingCallbacks = ['predicateFn', 'componentFn']
-      .filter(attr => typeof actionDef[attr] !== 'function');
-
-    if (missingCallbacks.length) {
-      console.log(`Action '${actionId}' is invalid due to missing or non-function callbacks: ${JSON.stringify(missingCallbacks)}`, actionDef);
-      return;
-    }
-
-    this._pluginInstance.definedMetaActions[actionId] = actionDef;
-  }
-
-  defineConfigAction(actionId, actionDefiner) {
-    const actionDef = {id: actionId};
-
-    const actionHandle = {
-        showIf(predicateFn) {
-          actionDef.predicateFn = predicateFn;
-        },
-        componentFn(componentFn) {
-          actionDef.componentFn = componentFn;
-        },
-    };
-
-    actionDefiner(actionHandle);
-
-    const missingCallbacks = ['predicateFn', 'componentFn']
-      .filter(attr => typeof actionDef[attr] !== 'function');
-
-    if (missingCallbacks.length) {
-      console.log(`Action '${actionId}' is invalid due to missing or non-function callbacks: ${JSON.stringify(missingCallbacks)}`, actionDef);
-      return;
-    }
-
-    this._pluginInstance.definedConfigActions[actionId] = actionDef;
+    this._pluginInstance.definedSlots[slotName] = slotDef;
   }
 
 }

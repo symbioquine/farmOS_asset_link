@@ -3,8 +3,10 @@ export default class RenameAssetActionProvider {
 
     const VBtn = assetLink.ui.c.VBtn;
 
-    handle.defineAction('net.symbioquine.farmos_asset_link.actions.v0.rename', renameAction => {
-      renameAction.showIf(asset => asset.attributes.status !== 'archived');
+    handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.rename', renameAction => {
+      renameAction.type('asset-action');
+
+      renameAction.showIf(({ asset }) => asset.attributes.status !== 'archived');
 
       const doActionWorkflow = async (asset) => {
         const newName = await assetLink.ui.dialog.promptText(`What should "${asset.attributes.name}" be renamed to?`);
@@ -36,7 +38,7 @@ export default class RenameAssetActionProvider {
 
       };
 
-      renameAction.componentFn((wrapper, h, asset) =>
+      renameAction.componentFn((wrapper, h, { asset }) =>
         h(VBtn, { props: { block: true, color: 'secondary' }, on: { click: () => doActionWorkflow(asset) }, 'class': 'text-none' },  "Rename" ));
 
     });

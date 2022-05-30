@@ -209,7 +209,7 @@ export default {
         return [];
       }
 
-      return this.assetLink.getRelevantConfigActions(this.$route);
+      return this.assetLink.getSlots({ type: 'config-action', route: this.$route });
     },
   },
   created () {

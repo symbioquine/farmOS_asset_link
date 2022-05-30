@@ -4,8 +4,10 @@ export default class ArchiveAssetActionProvider {
     const VBtn = assetLink.ui.c.VBtn;
     const formatRFC3339 = assetLink.util.formatRFC3339;
 
-    handle.defineAction('net.symbioquine.farmos_asset_link.actions.v0.archive', archiveAction => {
-      archiveAction.showIf(asset => asset.attributes.status !== 'archived');
+    handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.archive', archiveAction => {
+      archiveAction.type('asset-action');
+
+      archiveAction.showIf(({ asset }) => asset.attributes.status !== 'archived');
 
       const doActionWorkflow = async (asset) => {
         const confirmed = await assetLink.ui.dialog.confirm(`Are you sure you want to archive "${asset.attributes.name}"?`);
@@ -27,13 +29,15 @@ export default class ArchiveAssetActionProvider {
 
       };
 
-      archiveAction.componentFn((wrapper, h, asset) =>
+      archiveAction.componentFn((wrapper, h, { asset }) =>
         h(VBtn, { props: { block: true, color: 'secondary' }, on: { click: () => doActionWorkflow(asset) }, 'class': 'text-none' },  "Archive" ));
 
     });
 
-    handle.defineAction('net.symbioquine.farmos_asset_link.actions.v0.unarchive', unarchiveAction => {
-      unarchiveAction.showIf(asset => asset.attributes.status === 'archived');
+    handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.unarchive', unarchiveAction => {
+      unarchiveAction.type('asset-action');
+
+      unarchiveAction.showIf(({ asset }) => asset.attributes.status === 'archived');
 
       const doActionWorkflow = async (asset) => {
         const confirmed = await assetLink.ui.dialog.confirm(`Are you sure you want to unarchive "${asset.attributes.name}"?`);
@@ -55,7 +59,7 @@ export default class ArchiveAssetActionProvider {
 
       };
 
-      unarchiveAction.componentFn((wrapper, h, asset) =>
+      unarchiveAction.componentFn((wrapper, h, { asset }) =>
         h(VBtn, { props: { block: true, color: 'secondary' }, on: { click: () => doActionWorkflow(asset) }, 'class': 'text-none' },  "Unarchive" ));
 
     });
