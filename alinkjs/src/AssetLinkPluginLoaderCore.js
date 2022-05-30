@@ -1,6 +1,8 @@
 import Vue from 'vue';
 
-import { loadModule } from 'vue3-sfc-loader/dist/vue2-sfc-loader.js';
+import { v4 as uuidv4 } from 'uuid';
+
+import { loadModule } from 'vue3-sfc-loader/dist/vue2-sfc-loader.esm.js';
 
 import currentEpochSecond from '@/util/currentEpochSecond';
 
@@ -98,17 +100,25 @@ export default class AssetLinkPluginLoaderCore {
           .filter(camelAttr => Object.prototype.hasOwnProperty.call(vuetifyDirectives, camelAttr))
           .map(camelAttr => [camelAttr, vuetifyDirectives[camelAttr]]);
 
-        const options = {
-          moduleCache: {
+        if (!this.moduleCache) {
+          this.moduleCache = Object.assign(Object.create(null), {
             vue: Vue,
             'vuetify/lib': vuetify,
 
             // TODO: Figure out how to make loading these cleaner/on-demand
-            'vue-codemirror': await import('vue-codemirror'),
-            'codemirror/mode/javascript/javascript.js': await import('codemirror/mode/javascript/javascript.js'),
-            'codemirror/mode/vue/vue.js': await import('codemirror/mode/vue/vue.js'),
-            'codemirror/lib/codemirror.css': await import('codemirror/lib/codemirror.css'),
-            'codemirror/theme/base16-dark.css': await import('codemirror/theme/base16-dark.css'),
+            'vue-codemirror': import('vue-codemirror'),
+            'codemirror/mode/javascript/javascript.js': import('codemirror/mode/javascript/javascript.js'),
+            'codemirror/mode/vue/vue.js': import('codemirror/mode/vue/vue.js'),
+            'codemirror/lib/codemirror.css': import('codemirror/lib/codemirror.css'),
+            'codemirror/theme/base16-dark.css': import('codemirror/theme/base16-dark.css'),
+          });
+        }
+
+        const options = {
+          moduleCache: this.moduleCache,
+          compiledCache: {
+            set: (key, str) => this._store.setItem(`asset-link-cached-compiled-plugin:${key}`, str),
+            get: (key) => this._store.getItem(`asset-link-cached-compiled-plugin:${key}`),
           },
           async getFile(url) {
             if ( url === pluginUrlWithoutParams ) {
@@ -121,6 +131,10 @@ export default class AssetLinkPluginLoaderCore {
         };
 
         pluginInstance = await loadModule(pluginUrlWithoutParams, options);
+
+        if (!pluginInstance.name) {
+          pluginInstance.name = `unnamed-sfc-plugin-${uuidv4()}`;
+        }
 
         if (usedVuetifyTags.length && !pluginInstance.components) pluginInstance.components = {};
         usedVuetifyTags.filter(t => !pluginInstance.components[t[0]]).forEach(t => pluginInstance.components[t[0]] = t[1]);
@@ -154,6 +168,7 @@ export default class AssetLinkPluginLoaderCore {
    */
   registerPlugin(plugin) {
     plugin.definedRoutes = {};
+    plugin.definedPageSlots = {};
     plugin.definedActions = {};
     plugin.definedMetaActions = {};
     plugin.definedConfigActions = {};
@@ -215,6 +230,10 @@ class AssetLinkPluginHandle {
     this._vm = vm;
   }
 
+  get thisPlugin() {
+    return this._pluginInstance;
+  }
+
   defineRoute(routeName, routeDefiner) {
     const routeDef = {name: routeName};
 
@@ -240,6 +259,31 @@ class AssetLinkPluginHandle {
     this._pluginInstance.definedRoutes[routeName] = routeDef;
 
     this._vm.$emit('add-route', routeDef);
+  }
+
+  definePageSlot(slotName, slotDefiner) {
+    const slotDef = {name: slotName};
+
+    const slotHandle = {
+        showIf(predicateFn) {
+          slotDef.predicateFn = predicateFn;
+        },
+        componentFn(componentFn) {
+          slotDef.componentFn = componentFn;
+        },
+    };
+
+    slotDefiner(slotHandle);
+
+    const missingCallbacks = ['predicateFn', 'componentFn']
+      .filter(attr => typeof slotDef[attr] !== 'function');
+  
+    if (missingCallbacks.length) {
+      console.log(`Slot '${slotName}' is invalid due to missing or non-function callbacks: ${JSON.stringify(missingCallbacks)}`, slotDef);
+      return;
+    }
+
+    this._pluginInstance.definedPageSlots[slotName] = slotDef;
   }
 
   defineAction(actionId, actionDefiner) {

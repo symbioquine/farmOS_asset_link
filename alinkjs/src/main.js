@@ -20,16 +20,17 @@ window.assetLinkDrupalBasePath = Cookies.get('assetLinkDrupalBasePath');
 
 const path = require('path');
 
-function importAll(requireContext) {
+function importAll(requireContext, extension) {
   return requireContext.keys().map((componentFile) => {
     const component = requireContext(componentFile).default;
-    const componentName = path.basename(componentFile, '.vue');
+    const componentName = path.basename(componentFile, extension);
     Vue.component(componentName, component);
     return component;
   });
 }
 
-importAll(require.context('./components/', true, /\.vue$/));
+importAll(require.context('./components/', true, /\.vue$/), '.vue');
+importAll(require.context('./components/', true, /\.js$/), '.js');
 
 new Vue({
   vuetify,

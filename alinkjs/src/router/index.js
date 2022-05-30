@@ -2,7 +2,6 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomePage from '../views/HomePage.vue'
 import AboutPage from '../views/AboutPage.vue'
-import AssetPage from '../views/AssetPage.vue'
 import NotFoundPage from '../views/NotFoundPage.vue'
 
 Vue.use(VueRouter)
@@ -17,11 +16,6 @@ const routes = [
     path: '/about',
     name: 'About',
     component: AboutPage
-  },
-  {
-    path: '/asset/:assetRef',
-    name: 'Asset',
-    component: AssetPage
   },
   {
     path: '*',

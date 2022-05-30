@@ -480,37 +480,49 @@ export default class AssetLink {
     return coiterateSearchCursors();
   }
 
-  getRelevantActions(asset) {
-    const actions = this.plugins.flatMap(plugin => Object.values(plugin.definedActions))
-        .filter(a => a.predicateFn(asset))
-        .map(a => ({
-          id: a.id,
-          componentFn: (wrapper, h) => a.componentFn(wrapper, h, asset),
-        }));
+  getPageSlots(context) {
+    return this.getPluginDefinedComponents('definedPageSlots', context);
+  }
 
-    return actions;
+  getRelevantActions(context) {
+    return this.getPluginDefinedComponents('definedActions', context.asset);
   }
 
   getRelevantMetaActions(asset) {
-    const actions = this.plugins.flatMap(plugin => Object.values(plugin.definedMetaActions))
-        .filter(a => a.predicateFn(asset))
-        .map(a => ({
-          id: a.id,
-          componentFn: (wrapper, h) => a.componentFn(wrapper, h, asset),
-        }));
-
-    return actions;
+    return this.getPluginDefinedComponents('definedMetaActions', asset);
   }
 
   getRelevantConfigActions(route) {
-    const actions = this.plugins.flatMap(plugin => Object.values(plugin.definedConfigActions))
-        .filter(a => a.predicateFn(route))
-        .map(a => ({
-          id: a.id,
-          componentFn: (wrapper, h) => a.componentFn(wrapper, h, route),
-        }));
+    return this.getPluginDefinedComponents('definedConfigActions', route);
+  }
 
-    return actions;
+  getPluginDefinedComponents(componentDefKey, context) {
+    const sortingFn = (a1, a2) => {
+      if (a1.weight < a2.weight) {
+        return -1;
+      }
+      if (a1.weight > a2.weight) {
+        return 1;
+      }
+      if (a1.id < a2.id) {
+        return -1;
+      }
+      if (a1.id > a2.id) {
+        return 1;
+      }
+      return 0;
+    };
+
+    const componentDefs = plugin => plugin[componentDefKey] || {};
+
+    return this.plugins.flatMap(plugin => Object.values(componentDefs(plugin)))
+      .filter(a => a.predicateFn(context))
+      .map(a => ({
+        id: a.id,
+        componentFn: (wrapper, h) => a.componentFn(wrapper, h, context),
+        weight: a.weight || 100,
+      }))
+      .sort(sortingFn);
   }
 
   async _csrfAwareFetch(url, opts) {

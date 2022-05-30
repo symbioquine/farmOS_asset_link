@@ -57,22 +57,6 @@ export default class NonReactiveAssetLinkDecorator {
     return this.delegate().registerPlugin(plugin);
   }
 
-  defineRoute(routeName, routeDefiner) {
-    return this.delegate().defineRoute(routeName, routeDefiner);
-  }
-
-  defineAction(actionId, actionDefiner) {
-    return this.delegate().defineAction(actionId, actionDefiner);
-  }
-
-  defineMetaAction(actionId, actionDefiner) {
-    return this.delegate().defineMetaAction(actionId, actionDefiner);
-  }
-
-  defineConfigAction(actionId, actionDefiner) {
-    return this.delegate().defineConfigAction(actionId, actionDefiner);
-  }
-
   async getAssetTypes() {
     return await this.delegate().getAssetTypes();
   }
@@ -83,6 +67,10 @@ export default class NonReactiveAssetLinkDecorator {
 
   searchAssets(searchRequest, searchPhase) {
     return this.delegate().searchAssets(searchRequest, searchPhase);
+  }
+
+  getPageSlots(context) {
+    return this.delegate().getPageSlots(context);
   }
 
   getRelevantActions(asset) {

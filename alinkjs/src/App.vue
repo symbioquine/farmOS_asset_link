@@ -133,7 +133,7 @@ import Vue from 'vue';
 
 import AssetLink from '@/AssetLink';
 import NonReactiveAssetLinkDecorator from '@/NonReactiveAssetLinkDecorator';
-import RenderFnWrapper from '@/RenderFnWrapper';
+import RenderFnWrapper from '@/components/render-fn-wrapper';
 
 import { VAlert } from 'vuetify/lib'
 
@@ -154,7 +154,6 @@ const DialogWrapper = Vue.component('dialog-wrapper', {
 export default {
   components: {
     VAlert,
-    RenderFnWrapper,
     DialogWrapper,
   },
   provide() {

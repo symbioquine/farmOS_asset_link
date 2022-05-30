@@ -17,6 +17,8 @@ class FarmAssetLinkDefaultPluginRepositoryController extends ControllerBase {
     $base_path = base_path();
 
     $plugins = [
+      ['url' => $base_path . 'alink/alink-plugins/AssetPage.alink.vue'],
+      ['url' => $base_path . 'alink/alink-plugins/AssetActionsPageSlotProvider.alink.vue'],
       ['url' => $base_path . 'alink/alink-plugins/ArchiveAssetActionProvider.alink.js'],
       ['url' => $base_path . 'alink/alink-plugins/RenameAssetActionProvider.alink.js'],
       ['url' => $base_path . 'alink/alink-plugins/OpenInFarmOSMetaActionProvider.alink.js'],

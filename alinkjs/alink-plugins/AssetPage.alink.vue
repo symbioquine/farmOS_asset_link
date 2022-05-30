@@ -1,0 +1,41 @@
+<template>
+  <v-container>
+    <v-container class="text-left">
+
+      <asset-resolver :asset-ref="$route.params.assetRef" #default="{ asset }" @asset-resolved="onAssetResolved($event)">
+
+        <h2>Asset: {{ asset.attributes.name }}</h2>
+
+        <render-fn-wrapper
+          v-for="slotDef in assetLink.getPageSlots({ route: $route, asset })" :key="slotDef.id"
+          :render-fn="slotDef.componentFn"
+        ></render-fn-wrapper>
+
+      </asset-resolver>
+
+    </v-container>
+  </v-container>
+</template>
+
+<script>
+export default {
+  inject: ['assetLink'],
+  methods: {
+    onAssetResolved(asset) {
+      const metaActionDefs = this.assetLink.getRelevantMetaActions(asset);
+      this.$emit('expose-meta-actions', metaActionDefs);
+    },
+  },
+  onLoad(handle, assetLink) {
+
+    handle.defineRoute('net.symbioquine.farmos_asset_link.routes.v0.asset_page', assetPageRoute => {
+      assetPageRoute.path("/asset/:assetRef");
+
+      assetPageRoute.componentFn((wrapper, h) =>
+        h(handle.thisPlugin, {})
+      );
+    });
+
+  }
+}
+</script>

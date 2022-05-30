@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-const RenderFnWrapper = Vue.component('render-fn-wrapper', {
+const RenderFnWrapper = Vue.extend({
   props: {
     renderFn: { type: Function, required: true },
   },
