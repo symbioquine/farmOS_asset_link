@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Converted asset page to be a plugin
 - Refactored asset actions to be rendered by a page slot plugin
 - Refactored actions to just be another type of slot
+- Introduced a widget system where plugins can render widgets that other plugins can decorate
+- Implemented widget decorators to add sex and archived status widgets to the asset name
 
 ## [0.1.1] - 2022-05-27
 

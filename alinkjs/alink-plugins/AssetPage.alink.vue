@@ -4,7 +4,11 @@
 
       <asset-resolver :asset-ref="$route.params.assetRef" #default="{ asset }" @asset-resolved="onAssetResolved($event)">
 
-        <h2>Asset: {{ asset.attributes.name }}</h2>
+        <h2>Asset: <render-widget
+              name="asset-name"
+              :context="{ asset }"
+              >{{ asset.attributes.name }}</render-widget>
+        </h2>
 
         <render-fn-wrapper
           v-for="slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, asset })" :key="slotDef.id"

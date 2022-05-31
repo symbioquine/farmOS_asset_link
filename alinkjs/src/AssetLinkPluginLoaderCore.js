@@ -169,6 +169,7 @@ export default class AssetLinkPluginLoaderCore {
   registerPlugin(plugin) {
     plugin.definedRoutes = {};
     plugin.definedSlots = {};
+    plugin.definedWidgetDecorators = {};
 
     this.vm.plugins.push(plugin);
 
@@ -289,6 +290,40 @@ class AssetLinkPluginHandle {
     slotDef.predicateFn = (context) => context.type === slotDef.type && providedPredicateFn(context);
 
     this._pluginInstance.definedSlots[slotName] = slotDef;
+  }
+
+  defineWidgetDecorator(widgetDecoratorName, widgetDecoratorDefiner) {
+    const widgetDecoratorDef = { name: widgetDecoratorName };
+
+    const widgetDecoratorHandle = {
+        targetWidgetName(targetWidgetName) {
+          widgetDecoratorDef.targetWidgetName = targetWidgetName;
+        },
+        appliesIf(predicateFn) {
+          widgetDecoratorDef.predicateFn = predicateFn;
+        },
+        componentFn(componentFn) {
+          widgetDecoratorDef.componentFn = componentFn;
+        },
+    };
+
+    widgetDecoratorDefiner(widgetDecoratorHandle);
+
+    const missingFields = Object.entries({'targetWidgetName': 'string', 'predicateFn': 'function', 'componentFn': 'function'})
+      .filter(([attr, expectedType]) => typeof widgetDecoratorDef[attr] !== expectedType);
+
+    if (missingFields.length) {
+      console.log(`Widget decorator '${widgetDecoratorName}' is invalid due to missing or mismatched types for fields: ${JSON.stringify(missingFields)}`, widgetDecoratorDef);
+      return;
+    }
+
+    const providedPredicateFn = widgetDecoratorDef.predicateFn;
+
+    // Decorate the predicate function to make the widget decorators automatically filtered by targetWidgetName
+    widgetDecoratorDef.predicateFn = (context) =>
+      context.widgetName === widgetDecoratorDef.targetWidgetName && providedPredicateFn(context);
+
+    this._pluginInstance.definedWidgetDecorators[widgetDecoratorName] = widgetDecoratorDef;
   }
 
 }

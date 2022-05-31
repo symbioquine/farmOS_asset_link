@@ -484,6 +484,10 @@ export default class AssetLink {
     return this.getPluginDefinedComponents('definedSlots', context);
   }
 
+  getWidgetDecorators(context) {
+    return this.getPluginDefinedComponents('definedWidgetDecorators', context);
+  }
+
   getPluginDefinedComponents(componentDefKey, context) {
     const sortingFn = (a1, a2) => {
       if (a1.weight < a2.weight) {
@@ -507,7 +511,7 @@ export default class AssetLink {
       .filter(a => a.predicateFn(context))
       .map(a => ({
         id: a.id,
-        componentFn: (wrapper, h) => a.componentFn(wrapper, h, context),
+        componentFn: (wrapper, h, children) => a.componentFn(wrapper, h, context, children),
         weight: a.weight || 100,
       }))
       .sort(sortingFn);

@@ -73,6 +73,10 @@ export default class NonReactiveAssetLinkDecorator {
     return this.delegate().getSlots(context);
   }
 
+  getWidgetDecorators(context) {
+    return this.delegate().getWidgetDecorators(context);
+  }
+
 }
 
 NonReactiveAssetLinkDecorator.decorate = function(delegate) {
