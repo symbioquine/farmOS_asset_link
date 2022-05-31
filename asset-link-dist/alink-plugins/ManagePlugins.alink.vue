@@ -273,12 +273,14 @@ export default {
     const VListItem = assetLink.ui.c.VListItem;
     const VListItemTitle = assetLink.ui.c.VListItemTitle;
 
-    handle.defineConfigAction('net.symbioquine.farmos_asset_link.actions.v0.manage_plugins', managePlugins => {
-      managePlugins.showIf(route => true);
+    handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.manage_plugins', managePlugins => {
+      managePlugins.type('config-action');
+
+      managePlugins.showIf(context => true);
 
       const targetUrl = createDrupalUrl(`/alink/manage-plugins`).toString();
 
-      managePlugins.componentFn((wrapper, h, route) =>
+      managePlugins.componentFn((wrapper, h, context) =>
         h(VListItem, { props: { to: "/manage-plugins", href: targetUrl } }, [
             h(VListItemTitle, {}, "Manage Plugins"),
         ])

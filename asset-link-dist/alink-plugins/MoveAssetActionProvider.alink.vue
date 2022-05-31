@@ -25,8 +25,10 @@ export default {
     const summarizeAssetNames = assetLink.util.summarizeAssetNames;
     const formatRFC3339 = assetLink.util.formatRFC3339;
 
-    handle.defineAction('net.symbioquine.farmos_asset_link.actions.v0.move', moveAction => {
-      moveAction.showIf(asset => asset.attributes.status !== 'archived');
+    handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.move', moveAction => {
+      moveAction.type('asset-action');
+
+      moveAction.showIf(({ asset }) => asset.attributes.status !== 'archived');
 
       const doActionWorkflow = async (asset) => {
         const destinations = await assetLink.ui.dialog.custom('MoveAssetDialog', []);
@@ -65,7 +67,7 @@ export default {
             {label: movementLog.attributes.name});
       };
 
-      moveAction.componentFn((wrapper, h, asset) =>
+      moveAction.componentFn((wrapper, h, { asset }) =>
         h(VBtn, { props: { block: true, color: 'secondary' }, on: { click: () => doActionWorkflow(asset) }, 'class': 'text-none' },  "Move" ));
 
     });
