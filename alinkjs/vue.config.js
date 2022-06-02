@@ -1,5 +1,7 @@
 const chokidar = require('chokidar');
+const yaml = require('js-yaml');
 const path = require('path');
+const fs = require('fs');
 const prefixer = require('postcss-prefix-selector');
 
 const DEV_PROXY_TARGET = process.env.ASSET_LINK_DEV_PROXY_TARGET || 'http://localhost';
@@ -101,6 +103,32 @@ function WatchExternalFilesPlugin() {
   };
 }
 
+/*
+ * Custom plugin to generate configuration entity yml files for each of our included
+ * default Asset Link plugins.
+ */
+function GenerateDefaultPluginConfigYmlFilesPlugin() {
+  GenerateDefaultPluginConfigYmlFilesPlugin.prototype.apply = (compiler) => {
+    compiler.hooks.beforeCompile.tap('GenerateDefaultPluginConfigYmlFilesPlugin', (compilation) => {
+
+      fs.readdirSync(`${__dirname}/alink-plugins`).forEach(filename => {
+        const nameWithoutExt = filename.replace(/(\.[^.]+)*$/, '');
+
+        const configOutputFilename = `${__dirname}/../farmos_asset_link/config/install/farmos_asset_link.asset_link_default_plugin.${nameWithoutExt}.yml`;
+
+        fs.writeFileSync(configOutputFilename, yaml.dump({
+          langcode: 'en',
+          status: true,
+          id: nameWithoutExt,
+          dependencies: { enforced: { module: [ 'farmos_asset_link' ] } },
+          url: `{base_path}alink/alink-plugins/${filename}`,
+        }));
+      });
+
+    });
+  };
+}
+
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production'
     ? '/__THIS_GETS_REPLACED_AT_RUNTIME_BY_THE_DRUPAL_CONTROLLER__/'
@@ -143,6 +171,7 @@ module.exports = {
     config.plugins = [
       ...config.plugins, // this is important !
       new WatchExternalFilesPlugin(),
+      new GenerateDefaultPluginConfigYmlFilesPlugin(),
     ];
   },
   chainWebpack: (config) => {

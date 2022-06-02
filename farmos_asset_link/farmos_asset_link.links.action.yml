@@ -1,0 +1,5 @@
+entity.asset_link_default_plugin.add_form:
+  route_name: 'entity.asset_link_default_plugin.add_form'
+  title: 'Add Asset Link default plugin'
+  appears_on:
+    - entity.asset_link_default_plugin.collection

@@ -37,6 +37,7 @@ jobs:
 
       - name: Copy Module to Release Working Dir
         run: |
+          rm -f ./release/config/install/farmos_asset_link.asset_link_default_plugin.*.yml
           cp ./main/{README.md,CHANGELOG.md,LICENSE} ./release/
           cp -r ./main/farmos_asset_link/* ./release/
 
@@ -47,6 +48,7 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git add -f composer.json
+          git add -f config/install/farmos_asset_link.asset_link_default_plugin.*.yml
           git commit -m "Release ${{ env.RELEASE_VERSION }}"
           git tag ${{ env.RELEASE_VERSION }}
           git push --atomic origin HEAD:release ${{ env.RELEASE_VERSION }}

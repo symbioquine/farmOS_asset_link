@@ -11,3 +11,13 @@ services:
     arguments: ['@router.route_provider', '@controller_resolver', '@http_kernel.controller.argument_resolver']
     tags:
       - { name: event_subscriber }
+
+  farmos_asset_link.route_subscriber:
+    class: Drupal\farmos_asset_link\EventSubscriber\RouteSubscriber
+    tags:
+      - { name: event_subscriber }
+
+  farmos_asset_link.delete_route_access:
+    class: Drupal\farmos_asset_link\Access\AssetLinkDefaultPluginDeletableAccessCheck
+    tags:
+      - { name: access_check, applies_to: _asset_link_default_plugin_delete_access }

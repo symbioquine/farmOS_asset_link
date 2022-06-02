@@ -18,3 +18,23 @@ farmos_asset_link.default_plugins:
     _controller: '\Drupal\farmos_asset_link\Controller\FarmAssetLinkDefaultPluginRepositoryController::Render'
   requirements:
     _permission: 'access content'
+
+
+
+entity.asset_link_default_plugin.enable:
+  path: '/farm/settings/asset_link_default_plugin/{asset_link_default_plugin}/enable'
+  defaults:
+    _controller: '\Drupal\farmos_asset_link\Controller\FarmAssetLinkDefaultPluginsUIController::ajaxOperation'
+    op: enable
+  requirements:
+    _entity_access: 'asset_link_default_plugin.edit'
+    _csrf_token: 'TRUE'
+
+entity.asset_link_default_plugin.disable:
+  path: '/farm/settings/asset_link_default_plugin/{asset_link_default_plugin}/disable'
+  defaults:
+    _controller: '\Drupal\farmos_asset_link\Controller\FarmAssetLinkDefaultPluginsUIController::ajaxOperation'
+    op: disable
+  requirements:
+    _entity_access: 'asset_link_default_plugin.edit'
+    _csrf_token: 'TRUE'
