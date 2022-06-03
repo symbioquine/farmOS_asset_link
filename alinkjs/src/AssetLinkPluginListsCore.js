@@ -252,12 +252,13 @@ class HttpPluginList {
     this._url = url;
     this._pluginReferenceTracker = pluginReferenceTracker;
     this._isDefault = isDefault;
+    this._isLocal = false;
 
     this._latestPluginListView = undefined;
   }
 
   async load(skipCache) {
-    this._latestPluginListView = postProcessPluginList(await this._getHttpPluginList(skipCache), false, this._url);
+    this._latestPluginListView = postProcessPluginList(await this._getHttpPluginList(skipCache), this._isDefault, this._isLocal, this._url);
 
     await Promise.all(this._latestPluginListView.plugins.map(pRef => this._pluginReferenceTracker.ackPluginReference(pRef.url, this._url)));
 
@@ -310,11 +311,13 @@ class LocalPluginList {
     this._store = store;
     this._storeKey = 'local-plugin-list.repo.json';
     this._url = new URL("indexeddb://asset-link/data/local-plugin-list.repo.json", window.location.origin);
+    this._isDefault = false;
+    this._isLocal = true;
     this._pluginReferenceTracker = pluginReferenceTracker;
   }
 
   async load() {
-    const pluginListView = postProcessPluginList(await this._getLocalPluginList(), false, this._url);
+    const pluginListView = postProcessPluginList(await this._getLocalPluginList(), this._isDefault, this._isLocal, this._url);
 
     await Promise.all(pluginListView.plugins.map(pRef => this._pluginReferenceTracker.ackPluginReference(pRef.url, this._url)));
 
@@ -335,7 +338,7 @@ class LocalPluginList {
 
     await this._pluginReferenceTracker.ackPluginReference(pluginUrl, this._url);
 
-    return postProcessPluginList(pluginList, false, this._url);
+    return postProcessPluginList(pluginList, this._isDefault, this._isLocal, this._url);
   }
 
   async removePlugin(pluginUrl) {
@@ -351,7 +354,7 @@ class LocalPluginList {
 
     await this._pluginReferenceTracker.freePluginReference(pluginUrl, this._url);
 
-    return postProcessPluginList(pluginList, false, this._url);
+    return postProcessPluginList(pluginList, this._isDefault, this._isLocal, this._url);
   }
 
   async _getLocalPluginList() {
@@ -374,8 +377,9 @@ class LocalPluginList {
   }
 }
 
-const postProcessPluginList = (pluginList, isDefault, sourceUrl) => {
+const postProcessPluginList = (pluginList, isDefault, isLocal, sourceUrl) => {
   pluginList.isDefault = isDefault;
+  pluginList.isLocal = isLocal;
   pluginList.sourceUrl = sourceUrl;
 
   if (!pluginList.error) {
