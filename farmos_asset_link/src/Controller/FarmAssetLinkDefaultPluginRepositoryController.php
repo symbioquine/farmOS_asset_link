@@ -23,6 +23,10 @@ class FarmAssetLinkDefaultPluginRepositoryController extends ControllerBase {
     $plugins = [];
 
     foreach($defaultPluginConfigs as $defaultPluginConfig) {
+      if (!$defaultPluginConfig->status()) {
+        continue;
+      }
+
       $raw_url = $defaultPluginConfig->url();
       $url = str_replace("{base_path}", $base_path, $raw_url);
 

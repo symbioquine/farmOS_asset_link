@@ -208,7 +208,13 @@ export default class AssetLinkPluginLoaderCore {
       return cacheItem.value;
     }
 
-    const pluginSrc = await fetch(url).then(r => r.text());
+    const pluginSrcRes = await fetch(url);
+
+    if (!pluginSrcRes.ok) {
+      throw new Error(`HTTP Error ${pluginSrcRes.status}: ${pluginSrcRes.statusText}`);
+    }
+
+    const pluginSrc = await pluginSrcRes.text();
 
     const pluginSrcWithSourceInfo = `${pluginSrc}\n//# sourceURL=asset-link-plugin:./${encodeURIComponent(url)}\n`;
 
