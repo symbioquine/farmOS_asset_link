@@ -127,7 +127,9 @@ export default class AssetLinkPluginLoaderCore {
               throw new Error(`Secondary imports are not supported. url=${url}`);
             }
           },
-          addStyle() { /* TODO */ },
+          addStyle() {
+            /* TODO: https://github.com/FranckFreiburger/vue3-sfc-loader/blob/80f10f9fd82d7dde6c8681d23d36e9ac3ab9a654/docs/examples.md?plain=1#L403-L453 */
+          },
         };
 
         pluginInstance = await loadModule(pluginUrlWithoutParams, options);
