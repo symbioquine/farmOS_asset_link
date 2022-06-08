@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add "context multiplexing" so slot plugins can fan out to provide multiple instances of a slot
 - Add some test data to the provided development farmOS instance configuration
 - Implement a "visual carousel" on the asset page and add the asset's photos to it
+- Implement a way for slot plugins to provide weights
+
+### Changed
+
+- Set the weight on the asset visual carousel to move it above the actions
 
 ### Fixed
 

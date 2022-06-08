@@ -519,7 +519,7 @@ export default class AssetLink {
         return contexts.map((c, idx) => ({
             id: contexts.length === 1 ? a.id : (a.id + '.' + idx),
             componentFn: (wrapper, h, children) => a.componentFn(wrapper, h, c, children),
-            weight: a.weight || 100,
+            weight: a.weightFn(c),
         }));
 
       })

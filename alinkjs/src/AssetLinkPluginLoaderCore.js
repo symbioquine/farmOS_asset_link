@@ -280,6 +280,9 @@ class AssetLinkPluginHandle {
         multiplexContext(contextMultiplexerFn) {
           slotDef.contextMultiplexerFn = contextMultiplexerFn;
         },
+        weight(weightFn) {
+          slotDef.weightFn = weightFn;
+        },
         componentFn(componentFn) {
           slotDef.componentFn = componentFn;
         },
@@ -294,6 +297,10 @@ class AssetLinkPluginHandle {
       missingFields.push(['contextMultiplexerFn', 'function?']);
     }
 
+    if (!['undefined', 'function', 'number'].includes(typeof slotDef.weightFn)) {
+      missingFields.push(['weightFn', '(function|number)?']);
+    }
+
     if (missingFields.length) {
       console.log(`Slot '${slotName}' is invalid due to missing or mismatched types for fields: ${JSON.stringify(missingFields)}`, slotDef);
       return;
@@ -303,6 +310,16 @@ class AssetLinkPluginHandle {
 
     // Decorate the predicate function to make the slots automatically filtered by type
     slotDef.predicateFn = (context) => context.type === slotDef.type && providedPredicateFn(context);
+
+    const providedWeightFn = slotDef.weightFn;
+    // If no weight was provided, use the default of 100
+    if (providedWeightFn === undefined) {
+      slotDef.weightFn = () => 100;
+    }
+    // If the weight is a constant number, wrap it in a function that returns that number
+    else if (typeof providedWeightFn === 'number') {
+      slotDef.weightFn = () => providedWeightFn;
+    }
 
     this._pluginInstance.definedSlots[slotName] = slotDef;
   }
