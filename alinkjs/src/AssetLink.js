@@ -509,11 +509,20 @@ export default class AssetLink {
 
     return this.plugins.flatMap(plugin => Object.values(componentDefs(plugin)))
       .filter(a => a.predicateFn(context))
-      .map(a => ({
-        id: a.id,
-        componentFn: (wrapper, h, children) => a.componentFn(wrapper, h, context, children),
-        weight: a.weight || 100,
-      }))
+      .flatMap(a => {
+
+        let contexts = [context];
+        if (typeof a.contextMultiplexerFn === 'function') {
+          contexts = a.contextMultiplexerFn(context);
+        }
+
+        return contexts.map((c, idx) => ({
+            id: contexts.length === 1 ? a.id : (a.id + '.' + idx),
+            componentFn: (wrapper, h, children) => a.componentFn(wrapper, h, c, children),
+            weight: a.weight || 100,
+        }));
+
+      })
       .sort(sortingFn);
   }
 

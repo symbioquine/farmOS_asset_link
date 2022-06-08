@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Model default plugin configuration using config entities and provide management UI
 - Allow reloading plugin lists and improve when the option to remove plugin lists is shown
+- Add "context multiplexing" so slot plugins can fan out to provide multiple instances of a slot
 
 ### Fixed
 

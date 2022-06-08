@@ -275,6 +275,9 @@ class AssetLinkPluginHandle {
         showIf(predicateFn) {
           slotDef.predicateFn = predicateFn;
         },
+        multiplexContext(contextMultiplexerFn) {
+          slotDef.contextMultiplexerFn = contextMultiplexerFn;
+        },
         componentFn(componentFn) {
           slotDef.componentFn = componentFn;
         },
@@ -282,8 +285,12 @@ class AssetLinkPluginHandle {
 
     slotDefiner(slotHandle);
 
-    const missingFields = Object.entries({'type': 'string', 'predicateFn': 'function', 'componentFn': 'function'})
+    let missingFields = Object.entries({'type': 'string', 'predicateFn': 'function', 'componentFn': 'function'})
       .filter(([attr, expectedType]) => typeof slotDef[attr] !== expectedType);
+
+    if (!['undefined', 'function'].includes(typeof slotDef.contextMultiplexerFn)) {
+      missingFields.push(['contextMultiplexerFn', 'function?']);
+    }
 
     if (missingFields.length) {
       console.log(`Slot '${slotName}' is invalid due to missing or mismatched types for fields: ${JSON.stringify(missingFields)}`, slotDef);
