@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Honor enabled/disabled status of default plugins
 - Handle HTTP failures when retrieving plugin sources
+- Fix bug in accessing Orbit.js sources via NonReactiveAssetLinkDecorator
 
 ## [0.2.1] - 2022-05-31
 

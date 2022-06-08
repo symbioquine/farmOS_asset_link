@@ -30,11 +30,11 @@ export default class NonReactiveAssetLinkDecorator {
   }
 
   get entitySource() {
-    return this.delegate().memory;
+    return this.delegate().entitySource;
   }
 
   get remoteEntitySource() {
-    return this.delegate().remote;
+    return this.delegate().remoteEntitySource;
   }
 
   get booted() {
