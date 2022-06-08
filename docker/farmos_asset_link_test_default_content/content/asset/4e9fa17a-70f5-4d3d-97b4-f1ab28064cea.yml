@@ -1,0 +1,57 @@
+_meta:
+  version: '1.0'
+  entity_type: asset
+  uuid: 4e9fa17a-70f5-4d3d-97b4-f1ab28064cea
+  bundle: equipment
+  default_langcode: en
+  depends:
+    da27983e-2569-4952-a3d6-e3a495cba907: file
+    2c33b8c5-244c-4e6a-b435-007100e067d3: file
+default:
+  revision_user:
+    -
+      target_id: 1
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: 'Tractor: Slow Red'
+  status:
+    -
+      value: active
+  created:
+    -
+      value: 1654610981
+  revision_translation_affected:
+    -
+      value: true
+  image:
+    -
+      entity: da27983e-2569-4952-a3d6-e3a495cba907
+      alt: ''
+      title: ''
+      width: 1750
+      height: 1294
+    -
+      entity: 2c33b8c5-244c-4e6a-b435-007100e067d3
+      alt: ''
+      title: ''
+      width: 2256
+      height: 1504
+  notes:
+    -
+      value: "Photo Credit:\r\n* https://commons.wikimedia.org/wiki/File:MF_698_tractor_24f07.JPG\r\n* https://tractors.fandom.com/wiki/Massey_Ferguson_698?file=Massey_Ferguson_698_2-wd_at_GDSF_08_-_IMG_1076.jpg"
+      format: default
+  is_location:
+    -
+      value: false
+  is_fixed:
+    -
+      value: false
+  manufacturer:
+    -
+      value: 'Massey Fergusion'
+  model:
+    -
+      value: 'MF 698'

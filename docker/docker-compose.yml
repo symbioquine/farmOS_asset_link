@@ -47,11 +47,13 @@ services:
         su www-data -s /bin/bash <<'EOF'
             set -e
 
-            composer config repositories.farmos_dev_modules '{"type": "path", "url": "/farmos_dev_modules/farmos_asset_link"}'
+            composer config repositories.farmos_dev_modules '{"type": "path", "url": "/farmos_dev_modules/*"}'
 
             composer require symbioquine/farmos_asset_link @dev
+            composer require symbioquine/farmos_asset_link_test_default_content @dev
 
             drush --root=/opt/drupal pm-enable farmos_asset_link
+            drush --root=/opt/drupal pm-enable farmos_asset_link_test_default_content
         EOF
 
         exec docker-entrypoint.sh apache2-foreground
@@ -59,6 +61,7 @@ services:
       - './www:/opt/drupal'
       - './php-custom.ini:/usr/local/etc/php/conf.d/php-custom.ini'
       - '../farmos_asset_link:/farmos_dev_modules/farmos_asset_link'
+      - './farmos_asset_link_test_default_content:/farmos_dev_modules/farmos_asset_link_test_default_content'
     ports:
       - '80:80'
     environment:

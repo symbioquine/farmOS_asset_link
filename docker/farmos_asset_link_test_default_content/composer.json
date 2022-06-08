@@ -1,0 +1,23 @@
+{
+  "name": "symbioquine/farmos_asset_link_test_default_content",
+  "description": "Test default content for farmOS_asset_link",
+  "type": "drupal-module",
+  "homepage": "https://github.com/symbioquine/farmOS_asset_link",
+  "authors": [
+    {
+      "name": "Symbioquine",
+      "homepage": "https://github.com/symbioquine",
+      "role": "Maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/symbioquine/farmOS_asset_link/issues",
+    "source": "https://github.com/symbioquine/farmOS_asset_link"
+  },
+  "license": "GPL-3.0-or-later",
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/default_content": "^2.0@alpha",
+    "drupal/devel": "^4.1"
+  }
+}

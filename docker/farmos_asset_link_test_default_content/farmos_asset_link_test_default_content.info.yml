@@ -1,0 +1,7 @@
+name: 'Test farmOS_asset_link default content'
+type: module
+description: 'Test default content for farmOS_asset_link'
+package: Web services
+core_version_requirement: ^9
+dependencies:
+  - default_content:default_content

@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: da27983e-2569-4952-a3d6-e3a495cba907
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: MF_698_tractor_24f07.JPG
+  uri:
+    -
+      value: 'private://farm/asset/2022-06/MF_698_tractor_24f07.JPG'
+  filemime:
+    -
+      value: image/jpeg
+  filesize:
+    -
+      value: 463146
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1654610981

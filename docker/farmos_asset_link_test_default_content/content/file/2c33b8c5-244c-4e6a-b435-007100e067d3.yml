@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: 2c33b8c5-244c-4e6a-b435-007100e067d3
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: Massey_Ferguson_698_2-wd_at_GDSF_08_-_IMG_1076.jpg
+  uri:
+    -
+      value: 'private://farm/asset/2022-06/Massey_Ferguson_698_2-wd_at_GDSF_08_-_IMG_1076.jpg'
+  filemime:
+    -
+      value: image/jpeg
+  filesize:
+    -
+      value: 918153
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1654611875
