@@ -15,10 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add some test data to the provided development farmOS instance configuration
 - Implement a "visual carousel" on the asset page and add the asset's photos to it
 - Implement a way for slot plugins to provide weights
+- Add some rudimentary documentation about the Asset Link extension model
 
 ### Changed
 
 - Set the weight on the asset visual carousel to move it above the actions
+- Add a `pageName` field to the page slot context and filter by it for the asset actions and visual carousel
+- Allow loading of plugins relative to the plugin list
 
 ### Fixed
 

@@ -36,7 +36,7 @@ export default {
     handle.defineSlot('net.symbioquine.farmos_asset_link.slots.v0.visual_carousel', slot => {
       slot.type('page-slot');
 
-      slot.showIf(context => true);
+      slot.showIf(context => context.pageName === 'asset-page');
 
       slot.weight(50);
 

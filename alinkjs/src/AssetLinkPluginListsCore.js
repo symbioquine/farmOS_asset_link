@@ -393,7 +393,7 @@ const postProcessPluginList = (pluginList, isDefault, isLocal, sourceUrl) => {
   pluginList.plugins = pluginList.plugins.map(pluginRef => {
     // Resolve relative paths on this server, but still allow for
     // arbitrary absolute/third-party urls
-    const pluginUrl = new URL(pluginRef.url, window.location.origin);
+    const pluginUrl = new URL(pluginRef.url, isLocal ? window.location.origin : pluginList.sourceUrl);
 
     return {
       url: pluginUrl,

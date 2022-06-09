@@ -11,7 +11,7 @@
         </h2>
 
         <render-fn-wrapper
-          v-for="slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, asset })" :key="slotDef.id"
+          v-for="slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, pageName: 'asset-page', asset })" :key="slotDef.id"
           :render-fn="slotDef.componentFn"
         ></render-fn-wrapper>
 

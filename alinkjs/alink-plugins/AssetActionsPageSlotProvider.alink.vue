@@ -22,7 +22,7 @@ export default {
     handle.defineSlot('net.symbioquine.farmos_asset_link.slots.v0.actions', actionsSlot => {
       actionsSlot.type('page-slot');
 
-      actionsSlot.showIf(context => true);
+      actionsSlot.showIf(context => context.pageName === 'asset-page');
 
       actionsSlot.componentFn((wrapper, h, context) => {
         return h(handle.thisPlugin, { props: { asset: context.asset } });
