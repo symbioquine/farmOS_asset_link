@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implement a "visual carousel" on the asset page and add the asset's photos to it
 - Implement a way for slot plugins to provide weights
 - Add some rudimentary documentation about the Asset Link extension model
+- Implement a way for widget decorator plugins to provide weights
 
 ### Changed
 

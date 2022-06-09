@@ -334,6 +334,9 @@ class AssetLinkPluginHandle {
         appliesIf(predicateFn) {
           widgetDecoratorDef.predicateFn = predicateFn;
         },
+        weight(weightFn) {
+          widgetDecoratorDef.weightFn = weightFn;
+        },
         componentFn(componentFn) {
           widgetDecoratorDef.componentFn = componentFn;
         },
@@ -343,6 +346,10 @@ class AssetLinkPluginHandle {
 
     const missingFields = Object.entries({'targetWidgetName': 'string', 'predicateFn': 'function', 'componentFn': 'function'})
       .filter(([attr, expectedType]) => typeof widgetDecoratorDef[attr] !== expectedType);
+
+    if (!['undefined', 'function', 'number'].includes(typeof widgetDecoratorDef.weightFn)) {
+      missingFields.push(['weightFn', '(function|number)?']);
+    }
 
     if (missingFields.length) {
       console.log(`Widget decorator '${widgetDecoratorName}' is invalid due to missing or mismatched types for fields: ${JSON.stringify(missingFields)}`, widgetDecoratorDef);
@@ -354,6 +361,16 @@ class AssetLinkPluginHandle {
     // Decorate the predicate function to make the widget decorators automatically filtered by targetWidgetName
     widgetDecoratorDef.predicateFn = (context) =>
       context.widgetName === widgetDecoratorDef.targetWidgetName && providedPredicateFn(context);
+
+    const providedWeightFn = widgetDecoratorDef.weightFn;
+    // If no weight was provided, use the default of 100
+    if (providedWeightFn === undefined) {
+      widgetDecoratorDef.weightFn = () => 100;
+    }
+    // If the weight is a constant number, wrap it in a function that returns that number
+    else if (typeof providedWeightFn === 'number') {
+      widgetDecoratorDef.weightFn = () => providedWeightFn;
+    }
 
     this._pluginInstance.definedWidgetDecorators[widgetDecoratorName] = widgetDecoratorDef;
   }
