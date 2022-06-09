@@ -1,7 +1,7 @@
 <template>
   <v-carousel-item contain
       v-if="imageEntity"
-      :src="'http://localhost:8080' + imageEntity.attributes.uri.url"></v-carousel-item>
+      :src="assetLink.util.createDrupalUrl(imageEntity.attributes.uri.url).toString()"></v-carousel-item>
 </template>
 
 <script>

@@ -55,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed some unnecessary logging
 - Fixed support for custom dialogs
 - Improve handling of plugin component parse errors
+- Fixed how URLs are constructed for asset photos to work more generally
 
 ## [0.0.1] - 2022-04-18
 
