@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Honor enabled/disabled status of default plugins
 - Handle HTTP failures when retrieving plugin sources
 - Fix bug in accessing Orbit.js sources via NonReactiveAssetLinkDecorator
+- Fixed how URLs are constructed for asset photos to work more generally
 
 ## [0.2.1] - 2022-05-31
 
@@ -65,7 +66,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed some unnecessary logging
 - Fixed support for custom dialogs
 - Improve handling of plugin component parse errors
-- Fixed how URLs are constructed for asset photos to work more generally
 
 ## [0.0.1] - 2022-04-18
 
