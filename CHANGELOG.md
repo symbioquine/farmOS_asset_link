@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implement a way for slot plugins to provide weights
 - Add some rudimentary documentation about the Asset Link extension model
 - Implement a way for widget decorator plugins to provide weights
+- Add some additional test data - "Dolly the sheep"
 
 ### Changed
 

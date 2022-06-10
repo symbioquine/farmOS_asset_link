@@ -1,0 +1,60 @@
+_meta:
+  version: '1.0'
+  entity_type: asset
+  uuid: 1a7bb66a-56a6-4f1f-a5d0-f3f61d35abce
+  bundle: animal
+  default_langcode: en
+  depends:
+    fb8ca6f1-4699-4197-a83c-5bb62abb9401: file
+    d09840eb-f721-42b9-92a1-7d14aa9209f2: taxonomy_term
+default:
+  revision_user:
+    -
+      target_id: 1
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: Dolly
+  status:
+    -
+      value: archived
+  created:
+    -
+      value: 836524800
+  archived:
+    -
+      value: 1045184400
+  revision_translation_affected:
+    -
+      value: true
+  image:
+    -
+      entity: fb8ca6f1-4699-4197-a83c-5bb62abb9401
+      alt: ''
+      title: ''
+      width: 1024
+      height: 684
+  notes:
+    -
+      value: 'Photo Credit: https://en.wikipedia.org/wiki/Dolly_(sheep)#/media/File:Dolly_face_closeup.jpg'
+      format: default
+  is_location:
+    -
+      value: false
+  is_fixed:
+    -
+      value: false
+  animal_type:
+    -
+      entity: d09840eb-f721-42b9-92a1-7d14aa9209f2
+  birthdate:
+    -
+      value: 836524800
+  is_castrated:
+    -
+      value: false
+  sex:
+    -
+      value: F

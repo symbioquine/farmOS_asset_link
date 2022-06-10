@@ -2,9 +2,6 @@
 /farmos_asset_link/config/install/farmos_asset_link.asset_link_default_plugin.*.yml
 devcerts
 
-# Test image from https://commons.wikimedia.org/wiki/File:Dolly_face_closeup.jpg
-Dolly_face_closeup.jpg
-
 /docker/db
 /docker/www
 /node_modules

@@ -1,0 +1,27 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: fb8ca6f1-4699-4197-a83c-5bb62abb9401
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: Dolly_face_closeup.jpg
+  uri:
+    -
+      value: 'private://farm/asset/2022-06/Dolly_face_closeup.jpg'
+  filemime:
+    -
+      value: image/jpeg
+  filesize:
+    -
+      value: 186734
+  status:
+    -
+      value: true
+  created:
+    -
+      value: 1654800963
