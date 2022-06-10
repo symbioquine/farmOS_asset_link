@@ -1,0 +1,5 @@
+entity.asset_link_default_plugin.collection:
+  base_route: farm_settings.settings_page
+  route_name: entity.asset_link_default_plugin.collection
+  title: 'Asset Link default plugins'
+  weight: 10

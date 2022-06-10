@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2022-06-09
+
+### Fixed
+
+- Fix bug with build writing config entity yml files to a nonexistent directory
+
+## [0.3.1] - 2022-06-09
+
+### Added
+
+- Model default plugin configuration using config entities and provide management UI
+- Allow reloading plugin lists and improve when the option to remove plugin lists is shown
+- Add "context multiplexing" so slot plugins can fan out to provide multiple instances of a slot
+- Add some test data to the provided development farmOS instance configuration
+- Implement a "visual carousel" on the asset page and add the asset's photos to it
+- Implement a way for slot plugins to provide weights
+- Add some rudimentary documentation about the Asset Link extension model
+- Implement a way for widget decorator plugins to provide weights
+- Add some additional test data - "Dolly the sheep"
+
+### Changed
+
+- Set the weight on the asset visual carousel to move it above the actions
+- Add a `pageName` field to the page slot context and filter by it for the asset actions and visual carousel
+- Allow loading of plugins relative to the plugin list
+
+### Fixed
+
+- Honor enabled/disabled status of default plugins
+- Handle HTTP failures when retrieving plugin sources
+- Fix bug in accessing Orbit.js sources via NonReactiveAssetLinkDecorator
+
 ## [0.2.1] - 2022-05-31
 
 ### Changed
@@ -33,6 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed some unnecessary logging
 - Fixed support for custom dialogs
 - Improve handling of plugin component parse errors
+- Fixed how URLs are constructed for asset photos to work more generally
 
 ## [0.0.1] - 2022-04-18
 
@@ -40,7 +73,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.2.1...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.3.2...HEAD
+[0.3.2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.3.1...unbuilt-v0.3.2
+[0.3.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.2.1...unbuilt-v0.3.1
 [0.2.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.1.1...unbuilt-v0.2.1
 [0.1.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.0.1...unbuilt-v0.1.1
 [0.0.1]: https://github.com/symbioquine/farmOS_asset_link/releases/tag/unbuilt-v0.0.1

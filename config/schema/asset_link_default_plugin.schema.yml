@@ -1,0 +1,13 @@
+farmos_asset_link.asset_link_default_plugin.*:
+  type: config_entity
+  label: 'Asset Link default plugin'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    url:
+      type: string
+      label: 'url'
+    status:
+      type: boolean
+      label: 'Status'

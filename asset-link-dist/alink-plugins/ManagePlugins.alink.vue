@@ -21,7 +21,7 @@
               </v-icon>
             </v-list-item-avatar>
             <v-list-item-title>{{ pluginList.sourceUrl.toString() }}</v-list-item-title>
-            <v-list-item-action>
+            <v-list-item-action v-if="!pluginList.isLocal">
               <v-menu top offset-x>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -34,7 +34,10 @@
                 </template>
 
                 <v-list>
-                  <v-list-item @click="removePluginListByUrl(pluginList.sourceUrl)">
+                  <v-list-item v-if="!pluginList.isLocal" @click="reloadPluginListByUrl(pluginList.sourceUrl)">
+                    <v-list-item-title>reload</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item v-if="!pluginList.isDefault && !pluginList.isLocal" @click="removePluginListByUrl(pluginList.sourceUrl)">
                     <v-list-item-title>remove</v-list-item-title>
                   </v-list-item>
                 </v-list>
@@ -228,6 +231,9 @@ export default {
       }
 
       await this.assetLink.cores.pluginLists.addExtraPluginList(new URL(url));
+    },
+    async reloadPluginListByUrl(sourcePluginListUrl) {
+      await this.assetLink.cores.pluginLists.reloadPluginList(sourcePluginListUrl);
     },
     async removePluginListByUrl(sourcePluginListUrl) {
       const confirmed = await this.assetLink.ui.dialog.confirm(`Are you sure you want to remove the plugin list "${sourcePluginListUrl}"?`);

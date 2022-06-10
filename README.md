@@ -103,4 +103,11 @@ git tag unbuilt-v9000.0.1
 git push --atomic origin HEAD:development unbuilt-v9000.0.1
 ```
 
+### Adding new default content
+
+```sh
+cd docker/
+docker-compose exec www drush dcer asset 1 --folder=modules/farmos_asset_link_test_default_content/content
+```
+
 [development branch]: https://github.com/symbioquine/farmOS_asset_link/tree/development
