@@ -111,10 +111,16 @@ function GenerateDefaultPluginConfigYmlFilesPlugin() {
   GenerateDefaultPluginConfigYmlFilesPlugin.prototype.apply = (compiler) => {
     compiler.hooks.beforeCompile.tap('GenerateDefaultPluginConfigYmlFilesPlugin', (compilation) => {
 
+      const configOutputDir = `${__dirname}/../farmos_asset_link/config/install`;
+
+      if (!fs.existsSync(configOutputDir)) {
+        fs.mkdirSync(configOutputDir, { recursive: true });
+      }
+
       fs.readdirSync(`${__dirname}/alink-plugins`).forEach(filename => {
         const nameWithoutExt = filename.replace(/(\.[^.]+)*$/, '');
 
-        const configOutputFilename = `${__dirname}/../farmos_asset_link/config/install/farmos_asset_link.asset_link_default_plugin.${nameWithoutExt}.yml`;
+        const configOutputFilename = `${configOutputDir}/farmos_asset_link.asset_link_default_plugin.${nameWithoutExt}.yml`;
 
         fs.writeFileSync(configOutputFilename, yaml.dump({
           langcode: 'en',
