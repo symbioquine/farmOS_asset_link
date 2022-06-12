@@ -190,13 +190,25 @@ export default {
       }
       // TODO: Implement multi-asset page
     },
-    addRoute(routeDef) {
+    async addRoute(routeDef) {
+      const currentRoute = this.$route.name;
+      const currentRoutePath = this.$route.path;
+
+      console.log(this.$route);
+
       this.$router.addRoute({
         name: routeDef.name,
         path: routeDef.path,
         component: RenderFnWrapper,
-        props: { renderFn: routeDef.componentFn },
+        props: { renderFn: routeDef.componentFn, debounceId: routeDef.debounceId },
       });
+
+      if (currentRoute === routeDef.name) {
+        await this.$router.replace('/');
+        await this.$router.replace(currentRoutePath);
+      }
+
+      console.log(this.$route);
     },
     /* eslint-disable no-console,no-unused-vars */
     removeRoute(routeDef) {

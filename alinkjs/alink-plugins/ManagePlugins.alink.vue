@@ -81,6 +81,9 @@
                 </template>
 
                 <v-list>
+                  <v-list-item @click="reloadPluginByUrl(plugin.url)">
+                    <v-list-item-title>reload</v-list-item-title>
+                  </v-list-item>
                   <v-list-item @click="removePluginByUrl(plugin.url)">
                     <v-list-item-title>remove</v-list-item-title>
                   </v-list-item>
@@ -212,6 +215,9 @@ export default {
       }
 
       await this.assetLink.cores.pluginLists.addPluginToLocalList(url);
+    },
+    async reloadPluginByUrl(pluginUrl) {
+      await this.assetLink.cores.pluginLoader.reloadPlugin(pluginUrl);
     },
     async removePluginByUrl(pluginUrl) {
       const confirmed = await this.assetLink.ui.dialog.confirm(`Are you sure you want to remove the plugin "${pluginUrl}"?`);

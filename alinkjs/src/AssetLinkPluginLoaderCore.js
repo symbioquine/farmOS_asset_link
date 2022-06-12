@@ -127,6 +127,7 @@ export default class AssetLinkPluginLoaderCore {
             get: (key) => this._store.getItem(`asset-link-cached-compiled-plugin:${key}`),
           },
           async getFile(url) {
+            console.log(url);
             if ( url === pluginUrlWithoutParams ) {
               return rawPluginFileData;
             } else {
@@ -202,6 +203,10 @@ export default class AssetLinkPluginLoaderCore {
   }
 
   async unloadPlugin(pluginUrl) {
+    if (this.moduleCache && this.moduleCache[pluginUrl.toString()]) {
+      delete this.moduleCache[pluginUrl.toString()];
+    }
+
     const pluginIdx = this.vm.plugins.findIndex(p => p.pluginUrl.toString() === pluginUrl.toString());
 
     const plugin = this.vm.plugins[pluginIdx];
@@ -273,7 +278,7 @@ class AssetLinkPluginHandle {
   }
 
   defineRoute(routeName, routeDefiner) {
-    const routeDef = {name: routeName};
+    const routeDef = {name: routeName, debounceId: uuidv4() };
 
     const routeHandle = {
         path(path) {
