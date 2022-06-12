@@ -39,10 +39,16 @@ export default class AssetLinkPluginLoaderCore {
     let pluginInstance = undefined;
 
     try {
-      let pluginDataUrl = await this._fetchPlugin(pluginUrl, options);
+      const pluginDataUrl = await this._fetchPlugin(pluginUrl, options);
+
+      const rawPluginSource = await fetch(pluginDataUrl).then(r => r.text());
 
       if (pluginUrl.pathname.endsWith('alink.js')) {
-        const pluginCls = (await import(/* webpackIgnore: true */ pluginDataUrl)).default;
+        const pluginSourceWithSourceInfo = `${rawPluginSource}\n//# sourceURL=asset-link-plugin:./${encodeURIComponent(pluginUrl)}\n`;
+
+        const pluginDataUrlWithSourceInfo = "data:application/javascript;base64," + btoa(pluginSourceWithSourceInfo);
+
+        const pluginCls = (await import(/* webpackIgnore: true */ pluginDataUrlWithSourceInfo)).default;
         pluginInstance = new pluginCls();
       } else if (pluginUrl.pathname.endsWith('alink.vue')) {
         const pluginUrlWithoutParams = new URL(pluginUrl.toString());
@@ -146,10 +152,11 @@ export default class AssetLinkPluginLoaderCore {
 
         Vue.component(pluginInstance.name, pluginInstance);
       } else {
-        throw new Error(`Cannot load plugin ${pluginUrl} with unsupported type. Path of url must end in '.alink.js' or '.alink.vue'`);
+        pluginInstance = {};
       }
 
       pluginInstance.pluginUrl = pluginUrl;
+      pluginInstance.rawSource = rawPluginSource;
 
       this.registerPlugin(pluginInstance);
     } catch (error) {
@@ -172,6 +179,8 @@ export default class AssetLinkPluginLoaderCore {
     plugin.definedRoutes = {};
     plugin.definedSlots = {};
     plugin.definedWidgetDecorators = {};
+    plugin.definedPluginIngestor = undefined;
+    plugin.attributedErrors = {};
 
     this.vm.plugins.push(plugin);
 
@@ -180,14 +189,38 @@ export default class AssetLinkPluginLoaderCore {
 
       plugin.onLoad(handle, this._assetLink);
     }
+
+    this.vm.plugins.forEach(p => {
+      if (p !== plugin && p.definedPluginIngestor) {
+        // TODO: Catch errors
+        p.definedPluginIngestor.ingestorFn(plugin);
+      }
+      if (p !== plugin && plugin.definedPluginIngestor) {
+        plugin.definedPluginIngestor.ingestorFn(p);
+      }
+    });
   }
 
   async unloadPlugin(pluginUrl) {
     const pluginIdx = this.vm.plugins.findIndex(p => p.pluginUrl.toString() === pluginUrl.toString());
 
+    const plugin = this.vm.plugins[pluginIdx];
+
+    if (typeof plugin.onUnload === 'function') {
+      plugin.onUnload(this._assetLink);
+    }
+
     if (pluginIdx !== -1) {
       this.vm.plugins.splice(pluginIdx, 1);
     }
+
+    this.vm.plugins.forEach(otherPlugin => {
+      ['definedRoutes', 'definedSlots', 'definedWidgetDecorators', 'attributedErrors'].forEach(attributedKey => {
+        if (otherPlugin[attributedKey]) {
+          delete otherPlugin[attributedKey][pluginUrl.toString()];
+        }
+      });
+    });
   }
 
   async reloadPlugin(pluginUrl) {
@@ -218,9 +251,7 @@ export default class AssetLinkPluginLoaderCore {
 
     const pluginSrc = await pluginSrcRes.text();
 
-    const pluginSrcWithSourceInfo = `${pluginSrc}\n//# sourceURL=asset-link-plugin:./${encodeURIComponent(url)}\n`;
-
-    const pluginDataUrl = "data:application/javascript;base64," + btoa(pluginSrcWithSourceInfo);
+    const pluginDataUrl = "data:application/javascript;base64," + btoa(pluginSrc);
 
     await this._store.setItem(cacheKey, {key: cacheKey, timestamp, value: pluginDataUrl});
 
@@ -231,9 +262,10 @@ export default class AssetLinkPluginLoaderCore {
 
 class AssetLinkPluginHandle {
 
-  constructor(pluginInstance, vm) {
+  constructor(pluginInstance, vm, attributedTo) {
     this._pluginInstance = pluginInstance;
     this._vm = vm;
+    this._attributedTo = attributedTo || pluginInstance;
   }
 
   get thisPlugin() {
@@ -258,12 +290,11 @@ class AssetLinkPluginHandle {
       .filter(([attr, expectedType]) => typeof routeDef[attr] !== expectedType);
 
     if (missingFields.length) {
-      console.log(`Action '${routeName}' is invalid due to missing or mismatched types for fields: ${JSON.stringify(missingFields)}`, routeDef);
+      console.log(`Route '${routeName}' is invalid due to missing or mismatched types for fields: ${JSON.stringify(missingFields)}`, routeDef);
       return;
     }
 
-    this._pluginInstance.definedRoutes[routeName] = routeDef;
-
+    this._setAttributedDefinition('definedRoutes', routeName, routeDef);
     this._vm.$emit('add-route', routeDef);
   }
 
@@ -321,7 +352,7 @@ class AssetLinkPluginHandle {
       slotDef.weightFn = () => providedWeightFn;
     }
 
-    this._pluginInstance.definedSlots[slotName] = slotDef;
+    this._setAttributedDefinition('definedSlots', slotName, slotDef);
   }
 
   defineWidgetDecorator(widgetDecoratorName, widgetDecoratorDefiner) {
@@ -372,7 +403,63 @@ class AssetLinkPluginHandle {
       widgetDecoratorDef.weightFn = () => providedWeightFn;
     }
 
-    this._pluginInstance.definedWidgetDecorators[widgetDecoratorName] = widgetDecoratorDef;
+    this._setAttributedDefinition('definedWidgetDecorators', widgetDecoratorName, widgetDecoratorDef);
+  }
+
+  definePluginIngestor(pluginIngestorDefiner) {
+    if (this._pluginInstance !== this._attributedTo) {
+      throw new Error("Plugin ingestors cannot be attributed to other plugins.");
+    }
+    if (this._pluginInstance.definedPluginIngestor) {
+      throw new Error("Plugin ingestor already defined. Plugins cannot define multiple plugin ingestors.");
+    }
+
+    const ingestorDef = {};
+
+    const ingestorHandle = {
+        onEveryPlugin(ingestorFn) {
+          ingestorDef.ingestorFn = ingestorFn;
+        },
+        // TODO: Consider allowing ingestors to react to plugin unloading
+    };
+
+    pluginIngestorDefiner(ingestorHandle);
+
+    const missingFields = Object.entries({'ingestorFn': 'function'})
+      .filter(([attr, expectedType]) => typeof ingestorDef[attr] !== expectedType);
+
+    if (missingFields.length) {
+      console.log(`Plugin ingestor is invalid due to missing or mismatched types for fields: ${JSON.stringify(missingFields)}`, ingestorDef);
+      return;
+    }
+
+    this._pluginInstance.definedPluginIngestor = ingestorDef;
+  }
+
+  onBehalfOf(otherPlugin, attributedHandlerFn) {
+    if (this._pluginInstance !== this._attributedTo) {
+      throw new Error("Plugins may only act on behalf of eachother directly - e.g. onBehalfOf blocks cannot be nested.");
+    }
+
+    const attributedHandle = new AssetLinkPluginHandle(this._pluginInstance, this._vm, otherPlugin);
+
+    attributedHandlerFn(attributedHandle);
+  }
+
+  recordError(errorString) {
+    if (!this._pluginInstance.attributedErrors[this._attributedTo.pluginUrl.toString()]) {
+      this._pluginInstance.attributedErrors[this._attributedTo.pluginUrl.toString()] = [];
+    }
+
+    this._pluginInstance.attributedErrors[this._attributedTo.pluginUrl.toString()].push(errorString);
+  }
+
+  _setAttributedDefinition(defType, defKey, defValue) {
+    if (!this._pluginInstance[defType][this._attributedTo.pluginUrl.toString()]) {
+      this._pluginInstance[defType][this._attributedTo.pluginUrl.toString()] = {};
+    }
+
+    this._pluginInstance[defType][this._attributedTo.pluginUrl.toString()][defKey] = defValue;
   }
 
 }

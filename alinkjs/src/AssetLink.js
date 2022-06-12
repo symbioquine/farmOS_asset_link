@@ -505,9 +505,10 @@ export default class AssetLink {
       return 0;
     };
 
-    const componentDefs = plugin => plugin[componentDefKey] || {};
+    const componentDefs = plugin => Object.values(plugin[componentDefKey] || {})
+      .flatMap(cDefsById => Object.values(cDefsById));
 
-    return this.plugins.flatMap(plugin => Object.values(componentDefs(plugin)))
+    return this.plugins.flatMap(plugin => componentDefs(plugin))
       .filter(a => a.predicateFn(context))
       .flatMap(a => {
 

@@ -197,10 +197,7 @@ class PluginReferenceTracker {
     };
   }
 
-  /* eslint-disable no-console */
   async ackPluginReference(pluginUrl, listUrl) {
-    console.log('ackPluginReference', pluginUrl.toString(), listUrl.toString());
-
     const pluginExists = Object.hasOwn(this._pluginReferences, pluginUrl.toString());
 
     if (!pluginExists) {

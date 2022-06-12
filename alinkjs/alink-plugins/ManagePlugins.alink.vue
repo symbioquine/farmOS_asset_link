@@ -245,9 +245,15 @@ export default {
       await this.assetLink.cores.pluginLists.removeExtraPluginList(sourcePluginListUrl);
     },
     getPluginError(pluginRef) {
+      let errors = this.assetLink.plugins
+        .flatMap(otherPlugin => otherPlugin.attributedErrors[pluginRef.url] || []);
+
       const plugin = this.pluginsByUrl[pluginRef.url];
-      if (!plugin) return undefined;
-      return plugin.error;
+      if (plugin && plugin.error) {
+        errors.unshift(plugin.error);
+      }
+
+      return errors.join('\n');
     }
   },
 

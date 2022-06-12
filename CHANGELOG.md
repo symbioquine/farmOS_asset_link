@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add support for loading plugins of arbitrary formats using other plugins
+
 ## [0.3.2] - 2022-06-09
 
 ### Fixed
