@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2022-06-12
+
+### Added
+
+- Add support for loading plugins of arbitrary formats using other plugins
+
 ## [0.3.2] - 2022-06-09
 
 ### Fixed
@@ -38,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Honor enabled/disabled status of default plugins
 - Handle HTTP failures when retrieving plugin sources
 - Fix bug in accessing Orbit.js sources via NonReactiveAssetLinkDecorator
+- Fixed how URLs are constructed for asset photos to work more generally
 
 ## [0.2.1] - 2022-05-31
 
@@ -65,7 +72,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed some unnecessary logging
 - Fixed support for custom dialogs
 - Improve handling of plugin component parse errors
-- Fixed how URLs are constructed for asset photos to work more generally
 
 ## [0.0.1] - 2022-04-18
 
@@ -73,7 +79,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.3.2...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.4.1...HEAD
+[0.4.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.3.2...unbuilt-v0.4.1
 [0.3.2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.3.1...unbuilt-v0.3.2
 [0.3.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.2.1...unbuilt-v0.3.1
 [0.2.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.1.1...unbuilt-v0.2.1
