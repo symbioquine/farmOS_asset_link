@@ -8,9 +8,56 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
-
+const Components = require('unplugin-vue-components/vite');
 const { configure } = require('quasar/wrappers');
-const { QuasarPluginOptions } = require('quasar');
+const { NodeGlobalsPolyfillPlugin } = require('@esbuild-plugins/node-globals-polyfill');
+const fs = require('fs');
+const path = require('path');
+
+const DEV_PROXY_TARGET = process.env.ASSET_LINK_DEV_PROXY_TARGET || 'http://localhost';
+
+const targetUrl = new URL(DEV_PROXY_TARGET);
+
+const devHost = targetUrl.hostname;
+
+const quasarComponents = [];
+const quasarDirectives = [];
+
+fs.readdirSync(`${__dirname}/node_modules/quasar/dist/api`).forEach(filename => {
+  const nameWithoutExt = filename.replace(/(\.[^.]+)*$/, '');
+  const apiData = JSON.parse(fs.readFileSync(`${__dirname}/node_modules/quasar/dist/api/${filename}`));
+
+  if (apiData.type === 'component') {
+    quasarComponents.push(nameWithoutExt);
+  }
+
+  if (apiData.type === 'directive') {
+    quasarDirectives.push(nameWithoutExt);
+  }
+});
+
+const assetLinkPluginsDir = fs.realpathSync(`${__dirname}/public/alink-plugins`);
+
+function AssetLinkPluginHotReload() {
+  return {
+    name: 'asset-link-plugin-changed',
+    handleHotUpdate({ file, server }) {
+      const realFilePath = fs.realpathSync(file);
+
+      const fileName = path.basename(file);
+
+      if (realFilePath.indexOf(assetLinkPluginsDir) == 0) {
+        server.ws.send({
+          type: "custom",
+          event: "asset-link-plugin-changed",
+          data: {
+            pluginUrl: `${targetUrl.protocol}//${devHost}:${server.config.server.port}/alink/alink-plugins/${fileName}`,
+          },
+        });
+      }
+    },
+  }
+}
 
 
 module.exports = configure(function (/* ctx */) {
@@ -31,8 +78,7 @@ module.exports = configure(function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli/boot-files
     boot: [
-      
-      
+
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
@@ -51,7 +97,7 @@ module.exports = configure(function (/* ctx */) {
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
       'roboto-font', // optional, you are not bound to it
-      'material-icons', // optional, you are not bound to it
+      'mdi-v6', // optional, you are not bound to it
     ],
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
@@ -77,7 +123,36 @@ module.exports = configure(function (/* ctx */) {
       // polyfillModulePreload: true,
       // distDir
 
-      // extendViteConf (viteConf) {},
+      extendViteConf (viteConf) {
+        viteConf.resolve.alias.path = 'path-browserify';
+
+        viteConf.plugins.push(AssetLinkPluginHotReload());
+        viteConf.plugins.push(Components({ /* options */ }));
+
+        viteConf.build.rollupOptions = {
+          output: {
+            manualChunks(id) {
+              if (id.includes('/node_modules/')) {
+                const modules = ['quasar', '@quasar', 'vue', '@vue']
+                const chunk = modules.find((module) => id.includes(`/node_modules/${module}`))
+                return chunk ? `vendor-${chunk}` : 'vendor'
+              }
+            },
+          }
+        };
+
+        viteConf.optimizeDeps = viteConf.optimizeDeps || {};
+        viteConf.optimizeDeps.esbuildOptions = viteConf.optimizeDeps.esbuildOptions || {};
+
+        viteConf.optimizeDeps.esbuildOptions.define = viteConf.optimizeDeps.esbuildOptions.define || {};
+        viteConf.optimizeDeps.esbuildOptions.define.global = 'globalThis';
+
+        viteConf.optimizeDeps.esbuildOptions.plugins = viteConf.optimizeDeps.esbuildOptions.plugins || [];
+        viteConf.optimizeDeps.esbuildOptions.plugins.push(NodeGlobalsPolyfillPlugin({
+          buffer: true
+        }));
+      },
+
       // viteVuePluginOptions: {},
 
       
@@ -89,9 +164,12 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
       // https: true
-      open: false, // opens browser window automatically 
+      open: true, // opens browser window automatically 
       proxy: {
         '^(/alink/backend|/(?!alink).*)': 'http://localhost:80',
+      },
+      headers: {
+        'Set-Cookie': 'assetLinkDrupalBasePath=/; path=/',
       },
     },
 
@@ -106,8 +184,8 @@ module.exports = configure(function (/* ctx */) {
       // (like functional components as one of the examples),
       // you can manually specify Quasar components/directives to be available everywhere:
       //
-      components: Object.keys(QuasarPluginOptions["components"]),
-      directives: Object.keys(QuasarPluginOptions["directives"]),
+      components: quasarComponents,
+      directives: quasarDirectives,
 
       // Quasar plugins
       plugins: []
