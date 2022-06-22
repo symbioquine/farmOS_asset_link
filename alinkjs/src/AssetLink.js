@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 
 import { Coordinator, RequestStrategy, SyncStrategy } from '@orbit/coordinator';
 import { Orbit } from '@orbit/core';
@@ -22,6 +22,7 @@ import AssetLinkPluginListsCore from '@/AssetLinkPluginListsCore';
 import AssetLinkPluginLoaderCore from '@/AssetLinkPluginLoaderCore';
 
 import currentEpochSecond from '@/util/currentEpochSecond';
+import EventBus from '@/util/EventBus';
 
 const fetchJson = (url, args) => fetch(url, args).then(response => response.json());
 
@@ -36,24 +37,27 @@ const fetchJson = (url, args) => fetch(url, args).then(response => response.json
 export default class AssetLink {
 
   constructor(app) {
+    console.log(app);
     this._app = app;
-    this._viewModel = reactive({
+    this._vm = reactive({
       booted: false,
       bootProgress: 0,
       bootText: "Starting",
-
-      connectionStatus: new FarmOSConnectionStatusDetector(),
 
       pendingUpdates: [],
 
       messages: [],
     });
 
+    this._connectionStatus = new FarmOSConnectionStatusDetector();
+
+    this._eventBus = new EventBus();
+
     this._booted = new Promise((resolve) => {
-      // this._viewModel.$once('booted', () => {
-      //   this._viewModel.booted = true;
-      //   resolve(true);
-      // });
+      this._eventBus.$once('booted', () => {
+        this._vm.booted = true;
+        resolve(true);
+      });
     });
 
     this._store = localforage.createInstance({
@@ -83,8 +87,22 @@ export default class AssetLink {
    * A {Vue} instance used to expose some of Asset Link's state to
    * its UI in a reactive way.
    */
-  get viewModel() {
-    return this._viewModel;
+  get vm() {
+    return this._vm;
+  }
+
+  /**
+   * Get the connection status detector instance.
+   */
+  get connectionStatus() {
+    return this._connectionStatus;
+  }
+
+  /**
+   * An async event bus used to signal when booting is completed.
+   */
+  get eventBus() {
+    return this._eventBus;
   }
 
   /**
@@ -144,7 +162,7 @@ export default class AssetLink {
 
   /* eslint-disable no-console,no-unused-vars */
   async boot() {
-    this.viewModel.bootText = "Initializing storage";
+    this.vm.bootText = "Initializing storage";
 
     await this._store.ready();
 
@@ -175,7 +193,7 @@ export default class AssetLink {
     await this._cores.pluginLoader.boot();
     await this._cores.pluginLists.boot();
 
-    this.viewModel.bootText = "Loading models...";
+    this.vm.bootText = "Loading models...";
     this._models = await this._loadModels();
 
     Orbit.fetch = this._csrfAwareFetch.bind(this);
@@ -200,12 +218,12 @@ export default class AssetLink {
       },
       bucket,
       requestQueueSettings: {
-        autoProcess: this.viewModel.connectionStatus.isOnline || false,
+        autoProcess: this.connectionStatus.isOnline || false,
       },
     });
 
     const updateViewModelPendingUpdates = () => {
-      this.viewModel.pendingUpdates = this._remote.requestQueue.entries.filter(r => r.type === 'update');
+      this.vm.pendingUpdates = this._remote.requestQueue.entries.filter(r => r.type === 'update');
     };
 
     this._remote.requestQueue.reified.then(updateViewModelPendingUpdates);
@@ -237,7 +255,7 @@ export default class AssetLink {
       blocking: true
     });
     // Only use the remote query strategy when online
-    if (this.viewModel.connectionStatus.isOnline) {
+    if (this.connectionStatus.isOnline) {
       this._coordinator.addStrategy(this._remoteQueryStrategy);
     }
 
@@ -278,18 +296,18 @@ export default class AssetLink {
 
     await this._coordinator.activate();
 
-    this.viewModel.bootProgress = 100;
+    this.vm.bootProgress = 100;
 
     this._memory.on('update', update => {
       console.log('_memory::update', update);
 
       if (update.operations.op === 'updateRecord' && update.operations.record.type.startsWith('asset--')) {
-        this.viewModel.$emit('changed:asset', update.operations.record.type, update.operations.record.id);
+        this.eventBus.$emit('changed:asset', update.operations.record.type, update.operations.record.id);
       }
 
     });
 
-    this.viewModel.connectionStatus.$watch('isOnline', async (isOnline) => {
+    watch(() => this.connectionStatus.isOnline, async (isOnline) => {
       this._remote.requestQueue.autoProcess = isOnline;
       if (isOnline && !this._remote.requestQueue.empty) {
         this._remote.requestQueue.process();
@@ -308,9 +326,9 @@ export default class AssetLink {
       await this._coordinator.activate();
     });
 
-    this.viewModel.$emit('booted');
+    this.eventBus.$emit('booted');
 
-    if (this.viewModel.connectionStatus.isOnline) {
+    if (this.connectionStatus.isOnline) {
       this._precache();
     }
 
@@ -539,7 +557,7 @@ export default class AssetLink {
 
     try {
       if (addCsrfHeader) {
-        const tokenResponse = await this.viewModel.connectionStatus.fetch(createDrupalUrl('/session/token'));
+        const tokenResponse = await this.connectionStatus.fetch(createDrupalUrl('/session/token'));
 
         console.log("tokenResponse:", tokenResponse);
 
@@ -550,7 +568,7 @@ export default class AssetLink {
         options.headers['X-CSRF-Token'] = token;
       }
   
-      return await this.viewModel.connectionStatus.fetch(url, options);
+      return await this.connectionStatus.fetch(url, options);
     } catch (error) {
       console.log("Error in _csrfAwareFetch", typeof error, error);
       if (error.message === 'Network request failed') {
@@ -583,7 +601,7 @@ export default class AssetLink {
   }
 
   async _loadModelsFromServer() {
-    this.viewModel.bootText = "Loading server schema";
+    this.vm.bootText = "Loading server schema";
     const serverSchema = await fetchJson(createDrupalUrl('/api/schema'));
 
     const serverRelatedSchemas = serverSchema.allOf.flatMap(schemaRef => schemaRef.links || []);
@@ -617,7 +635,7 @@ export default class AssetLink {
         relationships: relatedItemSchema.definitions?.relationships?.properties || {},
       };
 
-      this.viewModel.bootProgress = ((Object.keys(models).length / serverRelatedSchemas.length) * 100).toFixed(1);
+      this.vm.bootProgress = ((Object.keys(models).length / serverRelatedSchemas.length) * 100).toFixed(1);
     }));
 
     return models;

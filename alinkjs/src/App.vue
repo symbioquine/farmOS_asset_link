@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { defineComponent, defineAsyncComponent } from 'vue'
+import { defineComponent, defineAsyncComponent, inject } from 'vue'
 import * as Vue from 'vue';
 import { loadModule } from 'vue3-sfc-loader/dist/vue3-sfc-loader.esm.js';
 
@@ -95,8 +95,10 @@ export default defineComponent({
     TestComponent,
   },
   setup () {
+    const app = inject('app');
+
     return {
-      assetLink: NonReactiveAssetLinkDecorator.decorate(new AssetLink(this)),
+      assetLink: NonReactiveAssetLinkDecorator.decorate(new AssetLink(app)),
     }
   },
   created () {

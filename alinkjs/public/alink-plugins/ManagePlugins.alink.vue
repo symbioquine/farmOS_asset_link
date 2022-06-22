@@ -164,21 +164,8 @@
 </template>
 
 <script>
-//require component
-import { codemirror } from 'vue-codemirror'
-
-// require styles
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/mode/javascript/javascript.js';
-import 'codemirror/mode/vue/vue.js';
-import 'codemirror/theme/base16-dark.css';
-
 export default {
   name: 'ManagePluginsPage',
-
-  components: {
-    codemirror
-  },
 
   inject: ['assetLink'],
 
@@ -198,11 +185,6 @@ export default {
   },
 
   methods: {
-    onEditorReady() {
-      setTimeout(() => {
-        this.$refs.editor.codemirror.refresh();
-      }, 100);
-    },
     async addPluginFromUrl() {
       // TODO: Add a warning about only adding trusted code
       const url = await this.assetLink.ui.dialog.promptText(`What is the url of the plugin to be added?`);

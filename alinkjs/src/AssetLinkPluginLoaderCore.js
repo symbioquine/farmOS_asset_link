@@ -79,34 +79,34 @@ export default class AssetLinkPluginLoaderCore {
         const attrs = new Set()
         // const component = compiler.parseComponent(rawPluginFileData);
 
-        if (component.errors.length > 0) {
-          throw new Error(`Could not parse component plugin: ${component.errors.join('\n')}`);
-        }
+        // if (component.errors.length > 0) {
+        //   throw new Error(`Could not parse component plugin: ${component.errors.join('\n')}`);
+        // }
 
-        if (component.template) {
-          if (component.template.src) {
-            throw new Error(`External component template content is not supported.`);
-          }
-          compiler.compile(component.template.content, {
-            modules: [{
-              postTransformNode: node => {
-                if ("directives" in node) {
-                  node.directives.forEach(({ name }) => attrs.add(name))
-                }
-                tags.add(node.tag)
-              }
-            }]
-          });
-        }
+        // if (component.template) {
+        //   if (component.template.src) {
+        //     throw new Error(`External component template content is not supported.`);
+        //   }
+        //   compiler.compile(component.template.content, {
+        //     modules: [{
+        //       postTransformNode: node => {
+        //         if ("directives" in node) {
+        //           node.directives.forEach(({ name }) => attrs.add(name))
+        //         }
+        //         tags.add(node.tag)
+        //       }
+        //     }]
+        //   });
+        // }
 
         /* eslint-disable no-unused-vars */
-        const usedVuetifyTags = Array.from(tags).map(item => [hyphenate(item), capitalize(camelize(item))])
-          .filter(([kebabTag, camelTag]) => kebabTag.startsWith('v-') && Object.prototype.hasOwnProperty.call(vuetifyComponents, camelTag))
-          .map(([kebabTag, camelTag]) => [camelTag, vuetifyComponents[camelTag]]);
-
-        const usedVuetifyDirectives = Array.from(attrs).map(item => capitalize(camelize(item)))
-          .filter(camelAttr => Object.prototype.hasOwnProperty.call(vuetifyDirectives, camelAttr))
-          .map(camelAttr => [camelAttr, vuetifyDirectives[camelAttr]]);
+        // const usedVuetifyTags = Array.from(tags).map(item => [hyphenate(item), capitalize(camelize(item))])
+        //   .filter(([kebabTag, camelTag]) => kebabTag.startsWith('v-') && Object.prototype.hasOwnProperty.call(vuetifyComponents, camelTag))
+        //   .map(([kebabTag, camelTag]) => [camelTag, vuetifyComponents[camelTag]]);
+        // 
+        // const usedVuetifyDirectives = Array.from(attrs).map(item => capitalize(camelize(item)))
+        //   .filter(camelAttr => Object.prototype.hasOwnProperty.call(vuetifyDirectives, camelAttr))
+        //   .map(camelAttr => [camelAttr, vuetifyDirectives[camelAttr]]);
 
         if (!this.moduleCache) {
           this.moduleCache = Object.assign(Object.create(null), {
@@ -129,9 +129,16 @@ export default class AssetLinkPluginLoaderCore {
             get: (key) => this._store.getItem(`asset-link-cached-compiled-plugin:${key}`),
           },
           async getFile(url) {
-            console.log(url);
-            if ( url === pluginUrlWithoutParams ) {
-              return rawPluginFileData;
+            const fileUrl = new URL(url);
+
+            const pluginSrcRes = await fetch(fileUrl);
+
+            const pluginSrc = await pluginSrcRes.text();
+
+            if (fileUrl.pathname.endsWith('alink.js')) {
+              return { getContentData: () => pluginSrc, type: ".mjs" }
+            } else if (fileUrl.pathname.endsWith('alink.vue')) {
+              return { getContentData: () => pluginSrc, type: ".vue" }
             } else {
               throw new Error(`Secondary imports are not supported. url=${url}`);
             }
@@ -147,13 +154,14 @@ export default class AssetLinkPluginLoaderCore {
           pluginInstance.name = `unnamed-sfc-plugin-${uuidv4()}`;
         }
 
-        if (usedVuetifyTags.length && !pluginInstance.components) pluginInstance.components = {};
-        usedVuetifyTags.filter(t => !pluginInstance.components[t[0]]).forEach(t => pluginInstance.components[t[0]] = t[1]);
+        // if (usedVuetifyTags.length && !pluginInstance.components) pluginInstance.components = {};
+        // usedVuetifyTags.filter(t => !pluginInstance.components[t[0]]).forEach(t => pluginInstance.components[t[0]] = t[1]);
+        // 
+        // if (usedVuetifyDirectives.length && !pluginInstance.directives) pluginInstance.directives = {};
+        // usedVuetifyDirectives.filter(t => !pluginInstance.directives[t[0]]).forEach(t => pluginInstance.directives[t[0]] = t[1]);
 
-        if (usedVuetifyDirectives.length && !pluginInstance.directives) pluginInstance.directives = {};
-        usedVuetifyDirectives.filter(t => !pluginInstance.directives[t[0]]).forEach(t => pluginInstance.directives[t[0]] = t[1]);
-
-        Vue.component(pluginInstance.name, pluginInstance);
+        // TODO: Determine if this is even necessary
+        // this._assetLink.app.component(pluginInstance.name, pluginInstance);
       } else {
         pluginInstance = {};
       }
@@ -188,7 +196,7 @@ export default class AssetLinkPluginLoaderCore {
     this.vm.plugins.push(plugin);
 
     if (typeof plugin.onLoad === 'function') {
-      const handle = new AssetLinkPluginHandle(plugin, this.vm);
+      const handle = new AssetLinkPluginHandle(plugin, this.vm, this._eventBus);
 
       plugin.onLoad(handle, this._assetLink);
     }
@@ -269,9 +277,10 @@ export default class AssetLinkPluginLoaderCore {
 
 class AssetLinkPluginHandle {
 
-  constructor(pluginInstance, vm, attributedTo) {
+  constructor(pluginInstance, vm, eventBus, attributedTo) {
     this._pluginInstance = pluginInstance;
     this._vm = vm;
+    this._eventBus = eventBus;
     this._attributedTo = attributedTo || pluginInstance;
   }
 
@@ -448,7 +457,7 @@ class AssetLinkPluginHandle {
       throw new Error("Plugins may only act on behalf of eachother directly - e.g. onBehalfOf blocks cannot be nested.");
     }
 
-    const attributedHandle = new AssetLinkPluginHandle(this._pluginInstance, this._vm, otherPlugin);
+    const attributedHandle = new AssetLinkPluginHandle(this._pluginInstance, this._vm, this._eventBus, otherPlugin);
 
     attributedHandlerFn(attributedHandle);
   }
