@@ -1,0 +1,14 @@
+{
+  "AssetLinkPluginFormat": "com.example.farmos_asset_link.plugin_format.v0.basic_asset_log",
+  "id": "log_changed_equipment_oil",
+  "name": "Log: Changed oil",
+  "appliesTo": {
+    "type": "asset--equipment",
+    "attributes.archived": "$null"
+  },
+  "createLog": {
+    "type": "log--activity",
+    "attributes.name": "Changed oil on {{ asset.attributes.name }}",
+    "attributes.status": "done"
+  }
+}

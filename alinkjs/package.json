@@ -11,6 +11,22 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "@jcoreio/async-throttle": "^1.4.3",
+    "@orbit/coordinator": "^0.17.0",
+    "@orbit/core": "^0.17.0",
+    "@orbit/indexeddb": "^0.17.2",
+    "@orbit/indexeddb-bucket": "^0.17.0",
+    "@orbit/jsonapi": "^0.17.1",
+    "@orbit/memory": "^0.17.2",
+    "@orbit/records": "^0.17.0",
+    "@orbit/serializers": "^0.17.0",
+    "cross-fetch": "^3.1.5",
+    "date-fns": "^2.28.0",
+    "haversine-distance": "^1.2.1",
+    "js-cookie": "^3.0.1",
+    "localforage": "^1.10.0",
+    "ngeohash": "^0.6.3",
+    "qr-scanner": "^1.4.1",
     "@babel/core": "^7.18.5",
     "@babel/parser": "^7.18.5",
     "@babel/standalone": "^7.18.5",
@@ -20,7 +36,8 @@
     "quasar": "^2.6.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0",
-    "vue3-sfc-loader": "^0.8.4"
+    "vue3-sfc-loader": "^0.8.4",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",

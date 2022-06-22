@@ -78,7 +78,7 @@ module.exports = configure(function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli/boot-files
     boot: [
-
+      'readDrupalBasePathCookie',
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
@@ -125,6 +125,7 @@ module.exports = configure(function (/* ctx */) {
 
       extendViteConf (viteConf) {
         viteConf.resolve.alias.path = 'path-browserify';
+        viteConf.resolve.alias['@'] = path.resolve(__dirname, './src');
 
         viteConf.plugins.push(AssetLinkPluginHotReload());
         viteConf.plugins.push(Components({ /* options */ }));
@@ -166,7 +167,10 @@ module.exports = configure(function (/* ctx */) {
       // https: true
       open: true, // opens browser window automatically 
       proxy: {
-        '^(/alink/backend|/(?!alink).*)': 'http://localhost:80',
+        '^(/alink/backend|/(?!alink).*)': {
+            target: 'http://localhost:80',
+            xfwd: true,
+        }
       },
       headers: {
         'Set-Cookie': 'assetLinkDrupalBasePath=/; path=/',
