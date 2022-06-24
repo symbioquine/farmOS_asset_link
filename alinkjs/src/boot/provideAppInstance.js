@@ -1,3 +1,3 @@
-export default ({ app, router, store }) => {
+export default ({ app }) => {
   app.provide('app', app);
 }

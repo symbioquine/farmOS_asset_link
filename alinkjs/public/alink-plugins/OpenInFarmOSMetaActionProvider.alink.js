@@ -1,1 +1,24 @@
-export default class OpenInFarmOSMetaActionProvider{onLoad(t,e){const n=e.util.createDrupalUrl,s=e.ui.c.VListItem,a=e.ui.c.VListItemTitle;t.defineSlot("net.symbioquine.farmos_asset_link.actions.v0.open_in_farm_os",(t=>{t.type("asset-meta-action"),t.showIf((t=>!0));const e=t=>n(`/asset/${t.attributes.drupal_internal__id}`).toString();t.componentFn(((t,n,{asset:i})=>n(s,{props:{href:e(i)}},[n(a,{},"Open in farmOS")])))}))}}
+export default class OpenInFarmOSMetaActionProvider {
+  onLoad(handle, assetLink) {
+
+    const createDrupalUrl = assetLink.util.createDrupalUrl;
+
+    const VListItem = assetLink.ui.c.VListItem;
+    const VListItemTitle = assetLink.ui.c.VListItemTitle;
+
+    handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.open_in_farm_os', openInFarmOS => {
+      openInFarmOS.type('asset-meta-action');
+
+      openInFarmOS.showIf(context => true);
+
+      const getTargetUrl = (asset) => createDrupalUrl(`/asset/${asset.attributes.drupal_internal__id}`).toString();
+
+      openInFarmOS.componentFn((wrapper, h, { asset }) =>
+        h(VListItem, { href: getTargetUrl(asset) }, [
+            h(VListItemTitle, {}, "Open in farmOS"),
+        ])
+      );
+    });
+
+  }
+}

@@ -25,7 +25,7 @@ export default {
       actionsSlot.showIf(context => context.pageName === 'asset-page');
 
       actionsSlot.componentFn((wrapper, h, context) => {
-        return h(handle.thisPlugin, { props: { asset: context.asset } });
+        return h(handle.thisPlugin, { asset: context.asset });
       });
 
     });

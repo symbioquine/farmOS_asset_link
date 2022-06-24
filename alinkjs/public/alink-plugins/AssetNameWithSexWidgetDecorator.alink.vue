@@ -25,7 +25,7 @@ export default {
       anwsWidgetDecorator.appliesIf(context => !!context.asset.attributes.sex);
 
       anwsWidgetDecorator.componentFn((wrapper, h, context, children) => {
-        return h(handle.thisPlugin, { props: { asset: context.asset } }, children);
+        return h(handle.thisPlugin, { asset: context.asset }, children);
       });
 
     });

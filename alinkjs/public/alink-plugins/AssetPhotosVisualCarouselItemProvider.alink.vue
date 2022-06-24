@@ -46,7 +46,7 @@ export default {
       });
 
       vCarouselItem.componentFn((wrapper, h, { asset, imgRef }) => {
-        return h(handle.thisPlugin, { props: { asset, imgRef } });
+        return h(handle.thisPlugin, { asset, imgRef });
       });
 
     });

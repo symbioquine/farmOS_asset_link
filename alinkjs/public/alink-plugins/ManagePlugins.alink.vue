@@ -254,10 +254,10 @@ export default {
   },
 
   onLoad(handle, assetLink) {
-    handle.defineRoute('net.symbioquine.farmos_asset_link.routes.v0.manage_plugins', managePluginsRoute => {
-      managePluginsRoute.path("/manage-plugins");
+    handle.defineRoute('net.symbioquine.farmos_asset_link.routes.v0.manage_plugins', pageRoute => {
+      pageRoute.path("/manage-plugins");
 
-      managePluginsRoute.componentFn((wrapper, h) =>
+      pageRoute.componentFn((wrapper, h) =>
         h('ManagePluginsPage', {})
       );
     });
@@ -267,15 +267,15 @@ export default {
     const VListItem = assetLink.ui.c.VListItem;
     const VListItemTitle = assetLink.ui.c.VListItemTitle;
 
-    handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.manage_plugins', managePlugins => {
-      managePlugins.type('config-action');
+    handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.manage_plugins', slot => {
+      slot.type('config-action');
 
-      managePlugins.showIf(context => true);
+      slot.showIf(context => true);
 
       const targetUrl = createDrupalUrl(`/alink/manage-plugins`).toString();
 
-      managePlugins.componentFn((wrapper, h, context) =>
-        h(VListItem, { props: { to: "/manage-plugins", href: targetUrl } }, [
+      slot.componentFn((wrapper, h, context) =>
+        h(VListItem, { to: "/manage-plugins", href: targetUrl }, [
             h(VListItemTitle, {}, "Manage Plugins"),
         ])
       );

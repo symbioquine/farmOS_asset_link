@@ -68,7 +68,7 @@ export default {
       };
 
       moveAction.componentFn((wrapper, h, { asset }) =>
-        h(VBtn, { props: { block: true, color: 'secondary' }, on: { click: () => doActionWorkflow(asset) }, 'class': 'text-none' },  "Move" ));
+        h(VBtn, { block: true, color: 'secondary', on: { click: () => doActionWorkflow(asset) }, 'class': 'text-none' },  "Move" ));
 
     });
 

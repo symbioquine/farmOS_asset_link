@@ -1,1 +1,47 @@
-export default class RenameAssetActionProvider{onLoad(t,e){const a=e.ui.c.VBtn;t.defineSlot("net.symbioquine.farmos_asset_link.actions.v0.rename",(t=>{t.type("asset-action"),t.showIf((({asset:t})=>"archived"!==t.attributes.status));const n=async t=>{const a=await e.ui.dialog.promptText(`What should "${t.attributes.name}" be renamed to?`);if(!a)return;const n=await e.getEntityModel(t.type);console.log(n);let s={name:a};if("undefined"!==typeof n.attributes.nickname){const e=t.attributes.nickname||[];s.nickname=[t.attributes.name,...e]}await e.entitySource.update((e=>e.updateRecord({type:t.type,id:t.id,attributes:s})),{label:`Rename asset: "${t.attributes.name}" to "${a}"`})};t.componentFn(((t,e,{asset:s})=>e(a,{props:{block:!0,color:"secondary"},on:{click:()=>n(s)},class:"text-none"},"Rename")))}))}}
+export default class RenameAssetActionProvider {
+  onLoad(handle, assetLink) {
+
+    const VBtn = assetLink.ui.c.VBtn;
+
+    handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.rename', renameAction => {
+      renameAction.type('asset-action');
+
+      renameAction.showIf(({ asset }) => asset.attributes.status !== 'archived');
+
+      const doActionWorkflow = async (asset) => {
+        const newName = await assetLink.ui.dialog.promptText(`What should "${asset.attributes.name}" be renamed to?`);
+
+        if (!newName) {
+          return;
+        }
+
+        const model = await assetLink.getEntityModel(asset.type);
+        console.log(model);
+
+        let updatedAttributes = {
+          name: newName,
+        };
+
+        if ((typeof model.attributes.nickname) !== 'undefined') {
+          const existingNicknames = asset.attributes.nickname || [];
+
+          updatedAttributes.nickname = [asset.attributes.name, ...existingNicknames];
+        }
+
+        const res = await assetLink.entitySource.update((t) => {
+          return t.updateRecord({
+            type: asset.type,
+            id: asset.id,
+            attributes: updatedAttributes,
+          });
+        }, {label: `Rename asset: "${asset.attributes.name}" to "${newName}"`});
+
+      };
+
+      renameAction.componentFn((wrapper, h, { asset }) =>
+        h(VBtn, { block: true, color: 'secondary', on: { click: () => doActionWorkflow(asset) }, 'class': 'text-none' },  "Rename" ));
+
+    });
+
+  }
+}

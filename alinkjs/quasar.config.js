@@ -78,6 +78,7 @@ module.exports = configure(function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli/boot-files
     boot: [
+      'autoImportAllComponents',
       'provideAppInstance',
       'readDrupalBasePathCookie',
     ],
@@ -193,7 +194,9 @@ module.exports = configure(function (/* ctx */) {
       directives: quasarDirectives,
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        'Loading',
+      ]
     },
 
     // animations: 'all', // --- includes all animations

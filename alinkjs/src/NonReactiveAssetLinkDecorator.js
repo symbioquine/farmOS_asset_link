@@ -13,8 +13,12 @@ export default class NonReactiveAssetLinkDecorator {
     return this.delegate().app;
   }
 
-  get viewModel() {
-    return this.delegate().viewModel;
+  get vm() {
+    return this.delegate().vm;
+  }
+
+  get eventBus() {
+    return this.delegate().eventBus;
   }
 
   get ui() {

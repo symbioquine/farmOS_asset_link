@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { ref, computed } from 'vue';
 import fetch from 'cross-fetch';
 import throttle from '@jcoreio/async-throttle'
 import createDrupalUrl from '@/createDrupalUrl';
@@ -23,14 +23,17 @@ export default class FarmOSConnectionStatusDetector {
     this.$_barrier = new Barrier();
 
     this.hasNetworkConnection = window.navigator.onLine;
-    this.canReachFarmOS = undefined;
-    this.isLoggedIn = undefined;
+    this.canReachFarmOS = ref(null);
+    this.isLoggedIn = ref(null);
+    this.isOnline = computed(() => {
+      return this.canReachFarmOS.value && this.isLoggedIn.value;
+    });
   }
 
   created() {
     window.addEventListener('offline', () => {
-      this.hasNetworkConnection = false;
-      this.canReachFarmOS = false;
+      this.hasNetworkConnection.value = false;
+      this.canReachFarmOS.value = false;
     });
     window.addEventListener('online', () => {
       this.hasNetworkConnection = true;
@@ -40,12 +43,6 @@ export default class FarmOSConnectionStatusDetector {
       window.navigator.connection.addEventListener('change', () => this.$data.$_barrier.release());
     }
     this.$_mainLoop();
-  }
-
-  computed() {
-    //isOnline() {
-    //  return this.canReachFarmOS && this.isLoggedIn;
-    //},
   }
 
   beforeUnmount() {

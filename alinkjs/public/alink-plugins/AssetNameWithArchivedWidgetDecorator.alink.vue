@@ -12,7 +12,7 @@ export default {
       anwaWidgetDecorator.appliesIf(context => context.asset.attributes.status === 'archived');
 
       anwaWidgetDecorator.componentFn((wrapper, h, context, children) => {
-        return h(handle.thisPlugin, { props: { asset: context.asset } }, children);
+        return h(handle.thisPlugin, { asset: context.asset }, children);
       });
 
     });

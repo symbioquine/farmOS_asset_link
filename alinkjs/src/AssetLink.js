@@ -36,9 +36,9 @@ const fetchJson = (url, args) => fetch(url, args).then(response => response.json
  */
 export default class AssetLink {
 
-  constructor(app) {
-    console.log(app);
+  constructor(app, rootComponent) {
     this._app = app;
+    this._rootComponent = rootComponent;
     this._vm = reactive({
       booted: false,
       bootProgress: 0,
@@ -77,10 +77,17 @@ export default class AssetLink {
   }
 
   /**
-   * The top-level {Vue} app component.
+   * The Vue app instance.
    */
   get app() {
     return this._app;
+  }
+
+  /**
+   * The top-level {Vue} app component.
+   */
+  get rootComponent() {
+    return this._rootComponent;
   }
 
   /**
@@ -175,14 +182,14 @@ export default class AssetLink {
     });
 
     this._cores.pluginLoader.eventBus.$on('add-route', routeDef => {
-      if (typeof this.app.addRoute === 'function') {
-        this.app.addRoute(routeDef);
+      if (typeof this.rootComponent.exposed.addRoute === 'function') {
+        this.rootComponent.exposed.addRoute(routeDef);
       }
     });
 
     this._cores.pluginLoader.eventBus.$on('remove-route', routeDef => {
-      if (typeof this.app.removeRoute === 'function') {
-        this.app.removeRoute(routeDef);
+      if (typeof this.rootComponent.exposed.removeRoute === 'function') {
+        this.rootComponent.exposed.removeRoute(routeDef);
       }
     });
 

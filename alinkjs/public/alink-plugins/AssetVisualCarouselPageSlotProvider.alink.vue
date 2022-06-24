@@ -41,7 +41,7 @@ export default {
       slot.weight(50);
 
       slot.componentFn((wrapper, h, context) => {
-        return h(handle.thisPlugin, { props: { asset: context.asset } });
+        return h(handle.thisPlugin, { asset: context.asset });
       });
 
     });
