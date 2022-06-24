@@ -1,9 +1,9 @@
 <template>
   <div>
     <h3 class="my-3">Actions:</h3>
-    <v-row class="ml-2" v-for="actionDef in assetLink.getSlots({ type: 'asset-action', route: $route, asset })">
+    <div class="row ml-2" v-for="actionDef in assetLink.getSlots({ type: 'asset-action', route: $route, asset })">
       <render-fn-wrapper class="mt-3" :key="actionDef.id" :render-fn="actionDef.componentFn"></render-fn-wrapper>
-    </v-row>
+    </div>
   </div>
 </template>
 

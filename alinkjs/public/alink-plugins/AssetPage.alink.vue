@@ -1,9 +1,16 @@
 <template>
   <div class="text-left">
     <asset-resolver :asset-ref="$route.params.assetRef" #default="{ asset }">
+        <h2>Asset: <render-widget
+              name="asset-name"
+              :context="{ asset }"
+              >{{ asset.attributes.name }}</render-widget>
+        </h2>
 
-
-
+        <render-fn-wrapper
+          v-for="slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, pageName: 'asset-page', asset })" :key="slotDef.id"
+          :render-fn="slotDef.componentFn"
+        ></render-fn-wrapper>
     </asset-resolver>
   </div>
 </template>
@@ -31,13 +38,9 @@ export default {
     handle.defineRoute('net.symbioquine.farmos_asset_link.routes.v0.asset_page', pageRoute => {
       pageRoute.path("/asset/:assetRef");
 
-      pageRoute.componentFn((wrapper, h) => {
-        try {
-          return h(handle.thisPlugin, { wrapper })
-        } catch (error) {
-          console.log("Error in AssetPage route render fn", typeof error, error);
-        }
-      });
+      pageRoute.componentFn((wrapper, h) =>
+          h(handle.thisPlugin, { wrapper })
+      );
     });
 
   }

@@ -1,7 +1,7 @@
-export default class RenameAssetActionProvider {
-  onLoad(handle, assetLink) {
+import { QBtn } from 'quasar';
 
-    const VBtn = assetLink.ui.c.VBtn;
+export default class RenameAssetActionProvider {
+  static onLoad(handle, assetLink) {
 
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.rename', renameAction => {
       renameAction.type('asset-action');
@@ -39,7 +39,7 @@ export default class RenameAssetActionProvider {
       };
 
       renameAction.componentFn((wrapper, h, { asset }) =>
-        h(VBtn, { block: true, color: 'secondary', on: { click: () => doActionWorkflow(asset) }, 'class': 'text-none' },  "Rename" ));
+        h(QBtn, { block: true, color: 'secondary', on: { click: () => doActionWorkflow(asset) }, 'class': 'text-none' },  "Rename" ));
 
     });
 

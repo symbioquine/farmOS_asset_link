@@ -1,8 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
+import {
+  QBtn,
+} from 'quasar';
 
 export default class AssetLinkUI {
 
   constructor(app) {
+    console.log("QBtn:", QBtn);
     this._app = app;
   }
 
@@ -14,7 +18,7 @@ export default class AssetLinkUI {
    */
   get c() {
     return {
-      // VBtn,
+      QBtn,
       // VListItem,
       // VListItemTitle,
     };

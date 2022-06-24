@@ -1,7 +1,7 @@
 export default class ArchiveAssetActionProvider {
-  onLoad(handle, assetLink) {
+  static onLoad(handle, assetLink) {
 
-    const VBtn = assetLink.ui.c.VBtn;
+    const QBtn = assetLink.ui.c.QBtn;
     const formatRFC3339 = assetLink.util.formatRFC3339;
 
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.archive', archiveAction => {
@@ -30,7 +30,7 @@ export default class ArchiveAssetActionProvider {
       };
 
       archiveAction.componentFn((wrapper, h, { asset }) =>
-        h(VBtn, { block: true, color: 'secondary', on: { click: () => doActionWorkflow(asset) }, 'class': 'text-none' },  "Archive" ));
+        h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'class': 'text-none' },  "Archive" ));
 
     });
 
@@ -60,7 +60,7 @@ export default class ArchiveAssetActionProvider {
       };
 
       unarchiveAction.componentFn((wrapper, h, { asset }) =>
-        h(VBtn, { block: true, color: 'secondary', on: { click: () => doActionWorkflow(asset) }, 'class': 'text-none' },  "Unarchive" ));
+        h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'class': 'text-none' },  "Unarchive" ));
 
     });
 

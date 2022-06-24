@@ -1,4 +1,5 @@
 import * as Vue from 'vue';
+import * as Quasar from 'quasar';
 import { reactive } from 'vue';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -111,7 +112,7 @@ export default class AssetLinkPluginLoaderCore {
         if (!this.moduleCache) {
           this.moduleCache = Object.assign(Object.create(null), {
             vue: Vue,
-            // 'vuetify/lib': vuetify,
+            'quasar': Quasar,
 
             // TODO: Figure out how to make loading these cleaner/on-demand
             // 'vue-codemirror': import('vue-codemirror'),
@@ -149,6 +150,10 @@ export default class AssetLinkPluginLoaderCore {
         };
 
         pluginInstance = await loadModule(pluginUrlWithoutParams, options);
+
+        if (pluginUrl.pathname.endsWith('alink.js')) {
+          pluginInstance = pluginInstance.default;
+        }
 
         if (!pluginInstance.name) {
           pluginInstance.name = `unnamed-sfc-plugin-${uuidv4()}`;
@@ -194,6 +199,8 @@ export default class AssetLinkPluginLoaderCore {
     plugin.attributedErrors = {};
 
     this.vm.plugins.push(plugin);
+
+    console.log(plugin);
 
     if (typeof plugin.onLoad === 'function') {
       const handle = new AssetLinkPluginHandle(plugin, this.vm, this._eventBus);

@@ -7,6 +7,8 @@
 </template>
 
 <script>
+import { QBtn } from 'quasar';
+
 export default {
   name: 'MoveAssetDialog',
 
@@ -21,7 +23,6 @@ export default {
 
   onLoad(handle, assetLink) {
 
-    const VBtn = assetLink.ui.c.VBtn;
     const summarizeAssetNames = assetLink.util.summarizeAssetNames;
     const formatRFC3339 = assetLink.util.formatRFC3339;
 
@@ -68,7 +69,7 @@ export default {
       };
 
       moveAction.componentFn((wrapper, h, { asset }) =>
-        h(VBtn, { block: true, color: 'secondary', on: { click: () => doActionWorkflow(asset) }, 'class': 'text-none' },  "Move" ));
+        h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'class': 'text-none' },  "Move" ));
 
     });
 
