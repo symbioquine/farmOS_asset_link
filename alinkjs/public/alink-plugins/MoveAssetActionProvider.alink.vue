@@ -10,8 +10,6 @@
 import { QBtn } from 'quasar';
 
 export default {
-  name: 'MoveAssetDialog',
-
   inject: ['dialogContext'],
 
   methods: {
@@ -32,7 +30,7 @@ export default {
       moveAction.showIf(({ asset }) => asset.attributes.status !== 'archived');
 
       const doActionWorkflow = async (asset) => {
-        const destinations = await assetLink.ui.dialog.custom('MoveAssetDialog', []);
+        const destinations = await assetLink.ui.dialog.custom(handle.thisPlugin, []);
 
         console.log(destinations);
 

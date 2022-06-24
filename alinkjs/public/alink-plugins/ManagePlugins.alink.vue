@@ -1,7 +1,7 @@
 <template>
   <div class="manage-plugins">
 
-    <v-list dense>
+    <q-list dense>
 
       <template v-for="(pluginList, index) in assetLink.cores.pluginLists.vm.lists">
 
@@ -93,7 +93,7 @@
 
       </template>
 
-    </v-list>
+    </q-list>
 
     <v-speed-dial v-model="showAddPluginButtons" bottom right fixed class="m-3">
 
@@ -165,8 +165,6 @@
 
 <script>
 export default {
-  name: 'ManagePluginsPage',
-
   inject: ['assetLink'],
 
   data() {
@@ -241,7 +239,7 @@ export default {
 
   computed: {
     pluginsByUrl() {
-      if (!this.assetLink.viewModel.booted) {
+      if (!this.assetLink.vm.booted) {
         return {};
       }
 
@@ -258,7 +256,7 @@ export default {
       pageRoute.path("/manage-plugins");
 
       pageRoute.componentFn((wrapper, h) =>
-        h('ManagePluginsPage', {})
+        h(handle.thisPlugin, {})
       );
     });
 
