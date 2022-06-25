@@ -156,7 +156,10 @@ export default class AssetLinkPluginLoaderCore {
         }
 
         if (!pluginInstance.name) {
-          pluginInstance.name = `unnamed-sfc-plugin-${uuidv4()}`;
+          //pluginInstance.name = `unnamed-sfc-plugin-${uuidv4()}`;
+          const pluginFilename = pluginUrl.pathname.split('/').pop();
+          const pluginBaseName = pluginFilename.split('.alink.')[0];
+          pluginInstance.name = `${hyphenate(pluginBaseName)}-${uuidv4()}`;
         }
 
         // if (usedVuetifyTags.length && !pluginInstance.components) pluginInstance.components = {};

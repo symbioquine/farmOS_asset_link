@@ -1,13 +1,13 @@
-import { v4 as uuidv4 } from 'uuid';
 import {
   QBtn,
+  Dialog,
 } from 'quasar';
 
 export default class AssetLinkUI {
 
-  constructor(app) {
-    console.log("QBtn:", QBtn);
+  constructor(app, rootComponent) {
     this._app = app;
+    this._rootComponent = rootComponent;
   }
 
   /**
@@ -25,46 +25,57 @@ export default class AssetLinkUI {
   }
 
   /**
-   * 
+   * Provides a thin promise wrapper around Quasar dialogs.
+   */
+  async createDialog(opts) {
+    return new Promise(resolve => {
+      Dialog.create(opts).onOk(data => {
+        resolve(data);
+      }).onCancel(() => {
+        resolve(undefined);
+      });
+    });
+  }
+
+  /**
+   * Helpers for some common dialog use-cases.
    */
   get dialog() {
     return {
       confirm: async (text) => {
-        return await this._app.$dialog.confirm({
-          text,
-          title: 'Confirmation'
-        });
-      },
-      promptText: async (text) => {
-        return await this._app.$dialog.prompt({
-          text,
-          title: 'Input',
-        });
-      },
-      custom: async (component, params) => {
-        const id = uuidv4();
-
-        // const context = new Vue({});
-
-        const result = await new Promise(resolve => {
-          // context.$on('submit', resolve);
-
-          this._app.dialogs.push({
-            id,
-            // context,
-            componentFn: (wrapper, h) =>
-              h(VDialog, {
-                props: { value: true, fullscreen: true },
-                on: {
-                  input: () => resolve(undefined),
-                },
-              },  [h(component, {ref: 'dialogComponent', ...params})] ),
+        return new Promise(resolve => {
+          Dialog.create({
+            title: 'Confirmation',
+            message: text,
+            cancel: true,
+            persistent: true
+          }).onOk(() => {
+            resolve(true);
+          }).onCancel(() => {
+            resolve(false);
           });
         });
-
-        this._app.dialogs = this._app.dialogs.filter(d => d.id !== id);
-
-        return result;
+        
+      },
+      promptText: async (text) => {
+        return await this.createDialog({
+          title: 'Prompt',
+          message: text,
+          prompt: {
+            model: '',
+            type: 'text'
+          },
+          cancel: true,
+          persistent: true
+        });
+      },
+      custom: async (component, componentProps) => {
+        return await this.createDialog({
+          component,
+          componentProps,
+          cancel: true,
+          persistent: true
+        });
       },
     };
   }

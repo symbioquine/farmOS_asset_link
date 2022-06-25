@@ -70,33 +70,20 @@
 
     <q-dialog v-model="editPluginDialogShown" :transition="false">
       <q-card>
-        <v-card-title class="text-h5 grey lighten-2">
-          Edit Plugin
-        </v-card-title>
+        <q-card-section>
+          <div class="text-h6 text-grey">Edit Plugin</div>
+        </q-card-section>
 
-        <codemirror v-if="editPluginDialogShown" v-model="code" :options="cmOptions" ref="editor" @ready="onEditorReady()"></codemirror>
+        <q-card-section class="q-pt-none">
+          <codemirror v-if="editPluginDialogShown" v-model="code" :options="cmOptions" ref="editor" @ready="onEditorReady()"></codemirror>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum repellendus sit voluptate voluptas eveniet porro. Rerum blanditiis perferendis totam, ea at omnis vel numquam exercitationem aut, natus minima, porro labore.
+        </q-card-section>
 
-        <q-divider></q-divider>
-
-        <q-card-actions>
-          <q-spacer></q-spacer>
-          <q-btn
-            color="primary"
-            text
-            @click="editPluginDialogShown = false"
-          >
-            Cancel
-          </q-btn>
-          <q-btn
-            color="primary"
-            text
-            @click="editPluginDialogShown = false"
-          >
-            Save
-          </q-btn>
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Save" color="primary" v-close-popup />
         </q-card-actions>
       </q-card>
-
     </q-dialog>
 
   </q-page>

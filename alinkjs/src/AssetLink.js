@@ -72,7 +72,7 @@ export default class AssetLink {
     this._memory = undefined;
     this._remote = undefined;
 
-    this._ui = new AssetLinkUI(app);
+    this._ui = new AssetLinkUI(app, rootComponent);
     this._util = new AssetLinkUtil();
   }
 
