@@ -1,166 +1,105 @@
 <template>
-  <div class="manage-plugins">
+  <q-page padding class="manage-plugins">
 
-    <q-list dense>
-
-      <template v-for="(pluginList, index) in assetLink.cores.pluginLists.vm.lists">
-
-        <v-divider v-if="index != 0"></v-divider>
-
-        <v-list-group
-          :value="true"
-          :key="pluginList.sourceUrl.toString()"
-          append-icon=""
-          no-action
-          dense
-        >
-          <template v-slot:activator>
-            <v-list-item-avatar>
-              <v-icon class="grey lighten-1" dark>
-                mdi-view-list
-              </v-icon>
-            </v-list-item-avatar>
-            <v-list-item-title>{{ pluginList.sourceUrl.toString() }}</v-list-item-title>
-            <v-list-item-action v-if="!pluginList.isLocal">
-              <v-menu top offset-x>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    color="primary"
-                    v-bind="attrs"
-                    v-on="on"
-                    icon>
-                    <v-icon color="grey lighten-1">mdi-dots-vertical</v-icon>
-                  </v-btn>
-                </template>
-
-                <v-list>
-                  <v-list-item v-if="!pluginList.isLocal" @click="reloadPluginListByUrl(pluginList.sourceUrl)">
-                    <v-list-item-title>reload</v-list-item-title>
-                  </v-list-item>
-                  <v-list-item v-if="!pluginList.isDefault && !pluginList.isLocal" @click="removePluginListByUrl(pluginList.sourceUrl)">
-                    <v-list-item-title>remove</v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </v-list-item-action>
-          </template>
-
-          <v-list-item inset v-if="pluginList.error || pluginList.plugins.length === 0">
-              <v-list-item-avatar></v-list-item-avatar>
-            <v-list-item-content>
-              <v-list-item-title v-if="pluginList.plugins.length === 0" class="font-italic">This plugin list is empty</v-list-item-title>
-              <v-list-item-subtitle v-if="pluginList.error" class="font-italic red--text text--lighten-1">{{ pluginList.error }}</v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-
-          <v-list-item v-for="plugin in pluginList.plugins" :key="plugin.url.toString()">
-            <v-list-item-avatar>
-              <v-icon class="grey lighten-1" dark v-if="getPluginError(plugin)">
-                mdi-puzzle-remove
-              </v-icon>
-              <v-icon class="grey lighten-1" dark v-else>
-                mdi-puzzle
-              </v-icon>
-            </v-list-item-avatar>
-
-            <v-list-item-content>
-              <v-list-item-title v-text="plugin.url" style="direction: rtl; text-align: left;"></v-list-item-title>
-              <v-list-item-subtitle v-if="getPluginError(plugin)" class="font-italic red--text text--lighten-1">{{ getPluginError(plugin) }}</v-list-item-subtitle>
-            </v-list-item-content>
-
-            <v-list-item-action>
-              <v-menu top offset-x>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    color="primary"
-                    v-bind="attrs"
-                    v-on="on"
-                    icon>
-                    <v-icon color="grey lighten-1">mdi-dots-vertical</v-icon>
-                  </v-btn>
-                </template>
-
-                <v-list>
-                  <v-list-item @click="removePluginByUrl(plugin.url)">
-                    <v-list-item-title>remove</v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </v-list-item-action>
-          </v-list-item>
-
-        </v-list-group>
-
+    <q-tree
+      :nodes="pluginListsTree"
+      node-key="label"
+      default-expand-all
+      icon='mdi-play'
+      dense
+    >
+      <template v-slot:default-header="prop">
+        <div class="row items-center" style="width: 100%">
+          <div class="col-auto ellipsis">
+            <q-icon :name="prop.node.icon || 'mdi-share'" size="sm" class="q-mr-xs vertical-middle" />
+          </div>
+          <div class="col ellipsis" style="direction: rtl; text-align: left;">
+            <span class="text-grey-10 inline vertical-middle">{{ prop.node.label }}</span>
+          </div>
+          <div class="self-end">
+            <q-btn flat padding="xs" size="xs" icon="mdi-dots-vertical" class="q-ml-sm" @click.stop>
+              <q-menu>
+                <q-list style="min-width: 100px">
+                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin-list' && !prop.node.isLocal">
+                    <q-item-section @click="reloadPluginListByUrl(prop.node.sourceUrl)">reload</q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin-list' && !prop.node.isDefault && !prop.node.isLocal">
+                    <q-item-section @click="removePluginListByUrl(prop.node.sourceUrl)">remove</q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin'">
+                    <q-item-section @click="removePluginByUrl(prop.node.pluginUrl)">remove</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
+          </div>
+        </div>
       </template>
 
-    </q-list>
-
-    <v-speed-dial v-model="showAddPluginButtons" bottom right fixed class="m-3">
-
-      <template v-slot:activator>
-        <v-btn
-          v-model="showAddPluginButtons"
-          color="blue darken-2"
-          dark
-          fab
-        >
-          <v-icon v-if="showAddPluginButtons">
-            mdi-close
-          </v-icon>
-          <v-icon v-else>
-            mdi-puzzle-plus
-          </v-icon>
-        </v-btn>
+      <template v-slot:default-body="prop">
+        <div v-if="prop.node.nodeType === 'plugin-list' && !prop.node.children.length" class="text-italic q-ml-lg">This plugin list is empty</div>
+        <div v-if="prop.node.error" class="text-italic text-red-12 q-ml-lg">{{ prop.node.error }}</div>
       </template>
+    </q-tree>
 
-      <v-btn color="green" fab large dark aria-hidden="false" aria-label="Add a new plugin by URL" @click="addPluginFromUrl()">
-        <v-icon>mdi-link-variant-plus</v-icon>
-      </v-btn>
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-fab v-model="showAddPluginButtons" color="green" icon="mdi-puzzle-plus" active-icon="mdi-close" hide-label direction="up">
+        <q-fab-action
+            color="green"
+            icon="mdi-link-variant-plus"
+            aria-hidden="false"
+            aria-label="Add a new plugin by URL"
+            @click="addPluginFromUrl()"
+        ></q-fab-action>
+        <q-fab-action
+            color="green"
+            icon="mdi-playlist-plus"
+            aria-hidden="false"
+            aria-label="Add a new plugin list repository by URL"
+            @click="addPluginListFromUrl()"
+        ></q-fab-action>
+        <q-fab-action
+            color="green"
+            icon="mdi-puzzle-edit"
+            aria-hidden="false"
+            aria-label="Write a new plugin"
+            @click="editPluginDialogShown = true"
+        ></q-fab-action>
+      </q-fab>
+    </q-page-sticky>
 
-      <v-btn color="green" fab large dark aria-hidden="false" aria-label="Add a new plugin list repository by URL" @click="addPluginListFromUrl()">
-        <v-icon>mdi-playlist-plus</v-icon>
-      </v-btn>
-
-      <v-btn color="green" fab large dark aria-hidden="false" aria-label="Write a new plugin" @click="editPluginDialogShown = true">
-        <v-icon>mdi-puzzle-edit</v-icon>
-      </v-btn>
-
-    </v-speed-dial>
-
-
-
-    <v-dialog v-model="editPluginDialogShown" :transition="false">
-      <v-card>
+    <q-dialog v-model="editPluginDialogShown" :transition="false">
+      <q-card>
         <v-card-title class="text-h5 grey lighten-2">
           Edit Plugin
         </v-card-title>
 
         <codemirror v-if="editPluginDialogShown" v-model="code" :options="cmOptions" ref="editor" @ready="onEditorReady()"></codemirror>
 
-        <v-divider></v-divider>
+        <q-divider></q-divider>
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
+        <q-card-actions>
+          <q-spacer></q-spacer>
+          <q-btn
             color="primary"
             text
             @click="editPluginDialogShown = false"
           >
             Cancel
-          </v-btn>
-          <v-btn
+          </q-btn>
+          <q-btn
             color="primary"
             text
             @click="editPluginDialogShown = false"
           >
             Save
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+          </q-btn>
+        </q-card-actions>
+      </q-card>
 
-    </v-dialog>
+    </q-dialog>
 
-  </div>
+  </q-page>
 </template>
 
 <script>
@@ -248,7 +187,40 @@ export default {
         pluginsByUrl[plugin.pluginUrl.toString()] = plugin;
       });
       return pluginsByUrl;
-    }
+    },
+
+    pluginListsTree() {
+      const treeData = [];
+
+      this.assetLink.cores.pluginLists.vm.lists.forEach((pluginList, index) => {
+        const listRoot = {
+          nodeType: 'plugin-list',
+          label: pluginList.sourceUrl.toString(),
+          icon: 'mdi-view-list',
+          children: [],
+          sourceUrl: pluginList.sourceUrl,
+          isDefault: pluginList.isDefault,
+          isLocal: pluginList.isLocal,
+        };
+
+        pluginList.plugins.forEach(plugin => {
+          const error = this.getPluginError(plugin);
+
+          listRoot.children.push({
+            nodeType: 'plugin',
+            label: plugin.url.toString(),
+            icon: error ? 'mdi-puzzle-remove' : 'mdi-puzzle',
+            error,
+            pluginUrl: plugin.url,
+          });
+        });
+
+        treeData.push(listRoot);
+      });
+
+      return treeData;
+    },
+
   },
 
   onLoad(handle, assetLink) {
