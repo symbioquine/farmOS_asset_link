@@ -169,6 +169,8 @@ export default class AssetLink {
 
   /* eslint-disable no-console,no-unused-vars */
   async boot() {
+    this._connectionStatus.start();
+
     this.vm.bootText = "Initializing storage";
 
     await this._store.ready();

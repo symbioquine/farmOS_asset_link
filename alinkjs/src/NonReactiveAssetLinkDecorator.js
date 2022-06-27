@@ -17,6 +17,10 @@ export default class NonReactiveAssetLinkDecorator {
     return this.delegate().vm;
   }
 
+  get connectionStatus() {
+    return this.delegate().connectionStatus;
+  }
+
   get eventBus() {
     return this.delegate().eventBus;
   }

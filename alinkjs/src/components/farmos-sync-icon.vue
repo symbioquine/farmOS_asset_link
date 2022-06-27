@@ -1,7 +1,7 @@
 <template>
   <template v-if="pendingUpdateCount > 0">
     <q-btn flat dense :icon="statusIcon" class="q-ml-md">
-      <q-badge color="red" floating>{{ pendingUpdateCount }}</q-badge>
+      <q-badge color="red" floating>{{ assetLink.vm.pendingUpdates.length }}</q-badge>
     </q-btn>
   </template>
   <template v-else>
@@ -9,37 +9,26 @@
   </template>
 </template>
 
-<script>
-import { defineComponent } from 'vue'
+<script setup>
+import { inject, computed } from 'vue'
 
-export default defineComponent({
-  // inject: ['assetLink'],
-  data: () => ({
-    // const connectionStatus = this.assetLink.viewModel.connectionStatus;
-    connectionStatus: {
-      hasNetworkConnection: true,
-      canReachFarmOS: true,
-      isLoggedIn: false,
-    },
-    // const pendingUpdateCount = this.assetLink.viewModel.pendingUpdates;
-    pendingUpdateCount: 5,
-  }),
-  computed: {
-    statusIcon() {
-      if (!this.connectionStatus.hasNetworkConnection) {
-        return "mdi-cloud-off-outline";
-      }
+const assetLink = inject('assetLink');
 
-      if (!this.connectionStatus.canReachFarmOS) {
-        return "mdi-cloud-alert";
-      }
+const statusIcon = computed(() => {
+  const connectionStatus = assetLink.connectionStatus;
 
-      if (!this.connectionStatus.isLoggedIn) {
-        return "mdi-cloud-lock";
-      }
+  if (!connectionStatus.hasNetworkConnection) {
+    return "mdi-cloud-off-outline";
+  }
 
-      return "mdi-cloud-sync";
-    },
-  },
+  if (!connectionStatus.canReachFarmOS) {
+    return "mdi-cloud-alert";
+  }
+
+  if (!connectionStatus.isLoggedIn) {
+    return "mdi-cloud-lock";
+  }
+
+  return "mdi-cloud-sync";
 });
 </script>

@@ -30,24 +30,24 @@ export default class FarmOSConnectionStatusDetector {
     });
   }
 
-  created() {
+  start() {
     window.addEventListener('offline', () => {
       this.hasNetworkConnection.value = false;
       this.canReachFarmOS.value = false;
     });
     window.addEventListener('online', () => {
       this.hasNetworkConnection = true;
-      this.$data.$_barrier.release();
+      this.$_barrier.release();
     });
     if (window.navigator && window.navigator.connection) {
-      window.navigator.connection.addEventListener('change', () => this.$data.$_barrier.release());
+      window.navigator.connection.addEventListener('change', () => this.$_barrier.release());
     }
     this.$_mainLoop();
   }
 
-  beforeUnmount() {
-    this.$data.$_running = false;
-    this.$data.$_barrier.release();
+  stop() {
+    this.$_running = false;
+    this.$_barrier.release();
   }
 
   /**
@@ -66,25 +66,25 @@ export default class FarmOSConnectionStatusDetector {
     try {
       const res = await this.fetcherDelegate.fetch(url, options);
       if (isFarmOSRequest && res.status === 403) {
-        this.$data.$_barrier.release();
+        this.$_barrier.release();
       }
       return res;
     } catch (error) {
       if (isFarmOSRequest) {
-        this.$data.$_barrier.release();
+        this.$_barrier.release();
       }
       throw error;
     }
   }
 
   async $_mainLoop() {
-    this.$data.$_running = true;
+    this.$_running = true;
 
     const checkConnectionStatus = throttle(() => this.$_checkConnectionStatus(), 1000);
 
-    while (this.$data.$_running) {
+    while (this.$_running) {
       await checkConnectionStatus();
-      await this.$data.$_barrier.arrive(60 * 1000);
+      await this.$_barrier.arrive(60 * 1000);
     }
   }
 
@@ -99,7 +99,7 @@ export default class FarmOSConnectionStatusDetector {
       const res = await fetch(apiUrl, {credentials: 'same-origin', cache: 'no-cache'});
 
       if (res.status !== 200) {
-        this.canReachFarmOS = false;
+        this.canReachFarmOS.value = false;
         return;
       }
 
@@ -108,17 +108,17 @@ export default class FarmOSConnectionStatusDetector {
       const farmOsVersion = apiData.meta?.farm?.version;
 
       if (farmOsVersion !== '2.x') {
-        this.canReachFarmOS = false;
+        this.canReachFarmOS.value = false;
         return;
       }
 
-      this.canReachFarmOS = true;
+      this.canReachFarmOS.value = true;
 
       const userRef = apiData.meta?.links?.me?.href;
 
-      this.isLoggedIn = userRef !== undefined
+      this.isLoggedIn.value = userRef !== undefined
     } catch (error) {
-      this.canReachFarmOS = false;
+      this.canReachFarmOS.value = false;
     }
   }
   
