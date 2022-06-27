@@ -8,6 +8,19 @@
         </q-toolbar-title>
 
         <farmos-sync-icon @click.stop="$refs.syncTray.toggle()"></farmos-sync-icon>
+
+        <q-btn flat padding="xs" icon="mdi-cog" class="q-ml-sm" @click.stop v-if="configActionDefs.length">
+          <q-menu>
+            <q-list style="min-width: 200px">
+              <component
+                  v-for="slotDef in configActionDefs"
+                  :key="slotDef.id"
+                  :is="slotDef.component"
+                  v-bind="slotDef.props"></component>
+            </q-list>
+          </q-menu>
+        </q-btn>
+
       </q-toolbar>
     </q-header>
 
@@ -20,13 +33,11 @@
 </template>
 
 <script>
-import { defineComponent, defineAsyncComponent, inject, getCurrentInstance, provide } from 'vue'
+import { defineComponent, defineAsyncComponent, inject, getCurrentInstance, provide, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import AssetLink from '@/AssetLink';
 import NonReactiveAssetLinkDecorator from '@/NonReactiveAssetLinkDecorator';
-// import AssetResolver from '@/components/asset-resolver.vue';
-// import RenderWidget from '@/components/render-widget';
 
 if (import.meta.hot) {
   import.meta.hot.on('asset-link-plugin-changed', (data) => {
@@ -46,15 +57,20 @@ export default defineComponent({
     const app = inject('app');
     const rootComponent = getCurrentInstance();
 
-    const router = useRouter()
-    const route = useRoute()
+    const router = useRouter();
+    const route = useRoute();
 
     const assetLink = NonReactiveAssetLinkDecorator.decorate(new AssetLink(app, rootComponent));
 
     provide('assetLink', assetLink);
 
-    // app.component('asset-resolver', AssetResolver);
-    // app.component('render-widget', RenderWidget);
+    const configActionDefs = computed(() => {
+      if (!assetLink.vm.booted) {
+        return [];
+      }
+
+      return assetLink.getSlots({ type: 'config-action', route });
+    });
 
     expose({
       assetLink,
@@ -85,6 +101,7 @@ export default defineComponent({
     });
     return {
       assetLink,
+      configActionDefs,
     };
   },
   created () {
