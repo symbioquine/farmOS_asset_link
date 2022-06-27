@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 
-const count = ref(0)
+const count = ref(1)
 </script>
 
 <template>
@@ -16,9 +16,7 @@ export default {
     handle.defineRoute('net.symbioquine.farmos_asset_link.routes.v0.test_page', pageRoute => {
       pageRoute.path("/test");
 
-      pageRoute.componentFn((wrapper, h) =>
-        h(handle.thisPlugin, { wrapper })
-      );
+      pageRoute.component(handle.thisPlugin);
     });
 
   }

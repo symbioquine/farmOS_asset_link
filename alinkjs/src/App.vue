@@ -25,7 +25,6 @@ import { useRouter, useRoute } from 'vue-router'
 
 import AssetLink from '@/AssetLink';
 import NonReactiveAssetLinkDecorator from '@/NonReactiveAssetLinkDecorator';
-import RenderFnWrapper from '@/components/render-fn-wrapper';
 // import AssetResolver from '@/components/asset-resolver.vue';
 // import RenderWidget from '@/components/render-widget';
 
@@ -67,8 +66,8 @@ export default defineComponent({
         router.addRoute({
           name: routeDef.name,
           path: routeDef.path,
-          component: RenderFnWrapper,
-          props: { renderFn: routeDef.componentFn, debounceId: routeDef.debounceId },
+          component: routeDef.component,
+          props: routeDef.props,
         });
 
         const resolved = router.resolve(currentRoutePath);

@@ -1,18 +1,19 @@
 <template>
-  <div class="text-left">
+  <q-page padding class="text-left">
     <asset-resolver :asset-ref="$route.params.assetRef" #default="{ asset }">
-        <h2>Asset: <render-widget
+        <h4 class="q-my-sm">Asset: <render-widget
               name="asset-name"
               :context="{ asset }"
               >{{ asset.attributes.name }}</render-widget>
-        </h2>
+        </h4>
 
-        <render-fn-wrapper
-          v-for="slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, pageName: 'asset-page', asset })" :key="slotDef.id"
-          :render-fn="slotDef.componentFn"
-        ></render-fn-wrapper>
+        <component
+            v-for="slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, pageName: 'asset-page', asset })"
+            :key="slotDef.id"
+            :is="slotDef.component"
+            v-bind="slotDef.props"></component>
     </asset-resolver>
-  </div>
+  </q-page>
 </template>
 
 <script>
@@ -34,15 +35,11 @@ export default {
     console.log('$route.params.assetRef', this.$route.params.assetRef);
   },
   onLoad(handle, assetLink) {
-
     handle.defineRoute('net.symbioquine.farmos_asset_link.routes.v0.asset_page', pageRoute => {
       pageRoute.path("/asset/:assetRef");
 
-      pageRoute.componentFn((wrapper, h) =>
-          h(handle.thisPlugin, { wrapper })
-      );
+      pageRoute.component(handle.thisPlugin);
     });
-
   }
 }
 </script>

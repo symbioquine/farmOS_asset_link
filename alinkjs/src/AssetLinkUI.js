@@ -1,27 +1,10 @@
 import {
-  QBtn,
   Dialog,
 } from 'quasar';
 
 export default class AssetLinkUI {
 
-  constructor(app, rootComponent) {
-    this._app = app;
-    this._rootComponent = rootComponent;
-  }
-
-  /**
-   * Provide some basic components to support Asset Link plugins defined as single (uncompiled) JS
-   * files.
-   * 
-   * Commonly accessed via `assetLink.ui.c` e.g. `h(assetLink.ui.c.VBtn, { props: ...`
-   */
-  get c() {
-    return {
-      QBtn,
-      // VListItem,
-      // VListItemTitle,
-    };
+  constructor() {
   }
 
   /**

@@ -72,7 +72,7 @@ export default class AssetLink {
     this._memory = undefined;
     this._remote = undefined;
 
-    this._ui = new AssetLinkUI(app, rootComponent);
+    this._ui = new AssetLinkUI();
     this._util = new AssetLinkUtil();
   }
 
@@ -541,9 +541,10 @@ export default class AssetLink {
         }
 
         return contexts.map((c, idx) => ({
-            id: contexts.length === 1 ? a.id : (a.id + '.' + idx),
-            componentFn: (wrapper, h, children) => a.componentFn(wrapper, h, c, children),
+            id: contexts.length === 1 ? a.name : (a.name + '.' + idx),
             weight: a.weightFn(c),
+            component: a.component,
+            props: c,
         }));
 
       })

@@ -5,7 +5,6 @@
       :nodes="pluginListsTree"
       node-key="label"
       default-expand-all
-      icon='mdi-play'
       dense
     >
       <template v-slot:default-header="prop">
@@ -90,6 +89,9 @@
 </template>
 
 <script>
+import { h } from 'vue';
+import { QItem, QItemSection } from 'quasar';
+
 export default {
   inject: ['assetLink'],
 
@@ -214,15 +216,10 @@ export default {
     handle.defineRoute('net.symbioquine.farmos_asset_link.routes.v0.manage_plugins', pageRoute => {
       pageRoute.path("/manage-plugins");
 
-      pageRoute.componentFn((wrapper, h) =>
-        h(handle.thisPlugin, {})
-      );
+      pageRoute.component(handle.thisPlugin);
     });
 
     const createDrupalUrl = assetLink.util.createDrupalUrl;
-
-    const VListItem = assetLink.ui.c.VListItem;
-    const VListItemTitle = assetLink.ui.c.VListItemTitle;
 
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.manage_plugins', slot => {
       slot.type('config-action');
@@ -231,9 +228,9 @@ export default {
 
       const targetUrl = createDrupalUrl(`/alink/manage-plugins`).toString();
 
-      slot.componentFn((wrapper, h, context) =>
-        h(VListItem, { to: "/manage-plugins", href: targetUrl }, [
-            h(VListItemTitle, {}, "Manage Plugins"),
+      slot.component(() =>
+        h(QItem, { to: "/manage-plugins", href: targetUrl }, [
+            h(QItemSection, {}, "Manage Plugins"),
         ])
       );
     });

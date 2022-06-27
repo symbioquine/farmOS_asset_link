@@ -1,20 +1,33 @@
 <template>
-  <v-row no-gutters class="asset-visual-carousel" v-if="carouselItems.length">
-    <v-col
+  <div no-gutters class="row asset-visual-carousel" v-if="carouselItems.length">
+    <div class="col"
       md="6"
       offset-md="3"
     >
-      <v-carousel v-model="carouselPosition" height="200" class="ml-2 mt-8" hide-delimiter-background show-arrows-on-hover>
-        <render-fn-wrapper
+      <q-carousel class="q-ml-md q-mt-lg"
+        v-model="carouselPosition"
+        swipeable
+        animated
+        control-type="flat"
+        navigation
+        padding
+        :arrows="false"
+        height="200px"
+      >
+        <component
             v-for="carouselItemDef in carouselItems"
             :key="carouselItemDef.id"
-            :render-fn="carouselItemDef.componentFn"></render-fn-wrapper>
-      </v-carousel>
-    </v-col>
-  </v-row>
+            :is="carouselItemDef.component"
+            :name="carouselItemDef.id"
+            v-bind="carouselItemDef.props"></component>
+      </q-carousel>
+    </div>
+  </div>
 </template>
 
 <script>
+import { ref } from 'vue';
+
 export default {
   props: {
     asset: {
@@ -24,15 +37,26 @@ export default {
   },
   inject: ['assetLink'],
   data: () => ({
-    carouselPosition: 0,
+    carouselPosition: ref(undefined),
   }),
   computed: {
     carouselItems() {
       return this.assetLink.getSlots({ type: 'asset-visual-carousel-item', route: this.$route, asset: this.asset });
     },
   },
+  watch: {
+    carouselItems: {
+      handler(items) {
+        if (this.carouselItems.length) {
+          this.carouselPosition = this.carouselItems[0].id;
+        } else {
+          this.carouselPosition = undefined;
+        }
+      },
+      immediate: true,
+    },
+  },
   onLoad(handle) {
-
     handle.defineSlot('net.symbioquine.farmos_asset_link.slots.v0.visual_carousel', slot => {
       slot.type('page-slot');
 
@@ -40,21 +64,8 @@ export default {
 
       slot.weight(50);
 
-      slot.componentFn((wrapper, h, context) => {
-        return h(handle.thisPlugin, { asset: context.asset });
-      });
-
+      slot.component(handle.thisPlugin);
     });
-
   }
 }
 </script>
-
-<style>
-/* TODO: Get this working... minor, but it looks a bit better
- * with the progress indicator a shifted up a little.
- */
-.asset-visual-carousel .v-carousel__controls {
-  bottom: 10px;
-}
-</style>

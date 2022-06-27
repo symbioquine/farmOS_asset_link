@@ -203,7 +203,7 @@ export default class AssetLinkPluginLoaderCore {
 
     this.vm.plugins.push(plugin);
 
-    console.log(plugin);
+    // console.log(plugin);
 
     if (typeof plugin.onLoad === 'function') {
       const handle = new AssetLinkPluginHandle(plugin, this.vm, this._eventBus);
@@ -305,15 +305,19 @@ class AssetLinkPluginHandle {
         path(path) {
           routeDef.path = path;
         },
-        componentFn(componentFn) {
-          routeDef.componentFn = componentFn;
+        component(component) {
+          routeDef.component = component;
         },
     };
 
     routeDefiner(routeHandle);
 
-    const missingFields = Object.entries({'path': 'string', 'componentFn': 'function'})
+    const missingFields = Object.entries({'path': 'string'})
       .filter(([attr, expectedType]) => typeof routeDef[attr] !== expectedType);
+
+    if (!['object', 'function'].includes(typeof routeDef.component)) {
+      missingFields.push(['component', '(object|function)?']);
+    }
 
     if (missingFields.length) {
       console.log(`Route '${routeName}' is invalid due to missing or mismatched types for fields: ${JSON.stringify(missingFields)}`, routeDef);
@@ -340,14 +344,14 @@ class AssetLinkPluginHandle {
         weight(weightFn) {
           slotDef.weightFn = weightFn;
         },
-        componentFn(componentFn) {
-          slotDef.componentFn = componentFn;
+        component(component) {
+          slotDef.component = component;
         },
     };
 
     slotDefiner(slotHandle);
 
-    let missingFields = Object.entries({'type': 'string', 'predicateFn': 'function', 'componentFn': 'function'})
+    let missingFields = Object.entries({'type': 'string', 'predicateFn': 'function'})
       .filter(([attr, expectedType]) => typeof slotDef[attr] !== expectedType);
 
     if (!['undefined', 'function'].includes(typeof slotDef.contextMultiplexerFn)) {
@@ -356,6 +360,10 @@ class AssetLinkPluginHandle {
 
     if (!['undefined', 'function', 'number'].includes(typeof slotDef.weightFn)) {
       missingFields.push(['weightFn', '(function|number)?']);
+    }
+
+    if (!['object', 'function'].includes(typeof slotDef.component)) {
+      missingFields.push(['component', '(object|function)?']);
     }
 
     if (missingFields.length) {
@@ -394,18 +402,22 @@ class AssetLinkPluginHandle {
         weight(weightFn) {
           widgetDecoratorDef.weightFn = weightFn;
         },
-        componentFn(componentFn) {
-          widgetDecoratorDef.componentFn = componentFn;
+        component(component) {
+          widgetDecoratorDef.component = component;
         },
     };
 
     widgetDecoratorDefiner(widgetDecoratorHandle);
 
-    const missingFields = Object.entries({'targetWidgetName': 'string', 'predicateFn': 'function', 'componentFn': 'function'})
+    const missingFields = Object.entries({'targetWidgetName': 'string', 'predicateFn': 'function'})
       .filter(([attr, expectedType]) => typeof widgetDecoratorDef[attr] !== expectedType);
 
     if (!['undefined', 'function', 'number'].includes(typeof widgetDecoratorDef.weightFn)) {
       missingFields.push(['weightFn', '(function|number)?']);
+    }
+
+    if (!['object', 'function'].includes(typeof widgetDecoratorDef.component)) {
+      missingFields.push(['component', '(object|function)?']);
     }
 
     if (missingFields.length) {

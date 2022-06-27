@@ -1,22 +1,17 @@
 <template>
-  <span><slot></slot> <v-icon>mdi-archive-clock</v-icon></span>
+  <span><slot></slot> <q-icon name="mdi-archive-clock" /></span>
 </template>
 
 <script>
 export default {
   onLoad(handle) {
+    handle.defineWidgetDecorator('net.symbioquine.farmos_asset_link.widget_decorator.v0.asset_name_with_archived', widgetDecorator => {
+      widgetDecorator.targetWidgetName('asset-name');
 
-    handle.defineWidgetDecorator('net.symbioquine.farmos_asset_link.widget_decorator.v0.asset_name_with_archived', anwaWidgetDecorator => {
-      anwaWidgetDecorator.targetWidgetName('asset-name');
+      widgetDecorator.appliesIf(context => context.asset.attributes.status === 'archived');
 
-      anwaWidgetDecorator.appliesIf(context => context.asset.attributes.status === 'archived');
-
-      anwaWidgetDecorator.componentFn((wrapper, h, context, children) => {
-        return h(handle.thisPlugin, { asset: context.asset }, children);
-      });
-
+      widgetDecorator.component(handle.thisPlugin);
     });
-
   }
 }
 </script>

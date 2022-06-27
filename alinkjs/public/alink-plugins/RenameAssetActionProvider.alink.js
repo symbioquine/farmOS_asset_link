@@ -1,3 +1,4 @@
+import { h } from 'vue';
 import { QBtn } from 'quasar';
 
 export default class RenameAssetActionProvider {
@@ -38,8 +39,8 @@ export default class RenameAssetActionProvider {
 
       };
 
-      renameAction.componentFn((wrapper, h, { asset }) =>
-        h(QBtn, { block: true, color: 'secondary', on: { click: () => doActionWorkflow(asset) }, 'class': 'text-none' },  "Rename" ));
+      renameAction.component(({ asset }) =>
+        h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'class': 'text-none' },  "Rename" ));
 
     });
 

@@ -18,18 +18,13 @@ export default {
     }
   },
   onLoad(handle) {
+    handle.defineWidgetDecorator('net.symbioquine.farmos_asset_link.widget_decorator.v0.asset_name_with_sex', widgetDecorator => {
+      widgetDecorator.targetWidgetName('asset-name');
 
-    handle.defineWidgetDecorator('net.symbioquine.farmos_asset_link.widget_decorator.v0.asset_name_with_sex', anwsWidgetDecorator => {
-      anwsWidgetDecorator.targetWidgetName('asset-name');
+      widgetDecorator.appliesIf(context => !!context.asset.attributes.sex);
 
-      anwsWidgetDecorator.appliesIf(context => !!context.asset.attributes.sex);
-
-      anwsWidgetDecorator.componentFn((wrapper, h, context, children) => {
-        return h(handle.thisPlugin, { asset: context.asset }, children);
-      });
-
+      widgetDecorator.component(handle.thisPlugin);
     });
-
   }
 }
 </script>

@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import { h } from 'vue';
 import { QBtn } from 'quasar';
 
 export default {
@@ -66,9 +67,8 @@ export default {
             {label: movementLog.attributes.name});
       };
 
-      moveAction.componentFn((wrapper, h, { asset }) =>
+      moveAction.component(({ asset }) =>
         h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'class': 'text-none' },  "Move" ));
-
     });
 
   }

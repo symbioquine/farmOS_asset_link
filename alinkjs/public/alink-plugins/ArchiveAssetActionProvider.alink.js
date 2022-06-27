@@ -1,7 +1,9 @@
+import { h } from 'vue';
+import { QBtn } from 'quasar';
+
 export default class ArchiveAssetActionProvider {
   static onLoad(handle, assetLink) {
 
-    const QBtn = assetLink.ui.c.QBtn;
     const formatRFC3339 = assetLink.util.formatRFC3339;
 
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.archive', archiveAction => {
@@ -29,7 +31,7 @@ export default class ArchiveAssetActionProvider {
 
       };
 
-      archiveAction.componentFn((wrapper, h, { asset }) =>
+      archiveAction.component(({ asset }) =>
         h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'class': 'text-none' },  "Archive" ));
 
     });
@@ -59,10 +61,8 @@ export default class ArchiveAssetActionProvider {
 
       };
 
-      unarchiveAction.componentFn((wrapper, h, { asset }) =>
+      unarchiveAction.component(({ asset }) =>
         h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'class': 'text-none' },  "Unarchive" ));
-
     });
-
   }
 }
