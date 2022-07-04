@@ -8,8 +8,6 @@ export default ({ app }) => {
     // "./components/Fruits.vue" will become "Fruits"
     const componentName = path.split('/').pop().replace(/\.\w+$/, '');
 
-    console.log("auto-importing:", componentName);
-
     // Register component on this Vue instance
     app.component(componentName, definition.default);
   });

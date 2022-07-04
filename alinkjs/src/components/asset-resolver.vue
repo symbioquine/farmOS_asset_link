@@ -42,7 +42,6 @@ const resolveAsset = async () => {
 };
 
 const onAssetChanged = (assetType, assetId) => {
-  console.log('onAssetChanged', assetType, assetId);
   const resolvedAsset = this.resolvedAsset;
   if (resolvedAsset.value && resolvedAsset.value.type === assetType && resolvedAsset.value.id === assetId) {
     resolveAsset();
@@ -51,7 +50,6 @@ const onAssetChanged = (assetType, assetId) => {
 
 let unsubber;
 onMounted(() => {
-  console.log("asset-resolver @onMounted");
   resolveAsset();
   unsubber = assetLink.eventBus.$on('changed:asset', onAssetChanged);
 });

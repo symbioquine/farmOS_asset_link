@@ -14,6 +14,7 @@ export default class AssetLinkPluginLoaderCore {
   constructor(assetLink) {
     this._assetLink = assetLink;
     this._store = assetLink._store;
+    this._devToolsApi = assetLink._devToolsApi;
 
     this._vm = reactive({
       plugins: [],
@@ -44,7 +45,19 @@ export default class AssetLinkPluginLoaderCore {
   async loadPlugin(pluginUrl, opts) {
     const options = opts || {};
 
-    const startTime = performance.now();
+    const pluginFilename = pluginUrl.pathname.split('/').pop();
+    const pluginBaseName = pluginFilename.split('.alink.')[0];
+    const pluginLoadingOccurrenceId = uuidv4();
+    const pluginOccurrenceId = `${hyphenate(pluginBaseName)}-${pluginLoadingOccurrenceId}`;
+
+    const loadingEventGroup = this._devToolsApi.startTimelineEventGroup({
+      data: {
+        pluginUrl: pluginUrl.toString(),
+      },
+      title: `loading plugin ${pluginFilename}`,
+      subtitle: pluginUrl.toString(),
+      groupId: `loading-plugin-${pluginLoadingOccurrenceId}`,
+    });
 
     let pluginInstance = undefined;
 
@@ -156,10 +169,7 @@ export default class AssetLinkPluginLoaderCore {
         }
 
         if (!pluginInstance.name) {
-          //pluginInstance.name = `unnamed-sfc-plugin-${uuidv4()}`;
-          const pluginFilename = pluginUrl.pathname.split('/').pop();
-          const pluginBaseName = pluginFilename.split('.alink.')[0];
-          pluginInstance.name = `${hyphenate(pluginBaseName)}-${uuidv4()}`;
+          pluginInstance.name = pluginOccurrenceId;
         }
 
         // if (usedVuetifyTags.length && !pluginInstance.components) pluginInstance.components = {};
@@ -185,8 +195,7 @@ export default class AssetLinkPluginLoaderCore {
       pluginInstance.error = error;
       this.registerPlugin(pluginInstance);
     } finally {
-      const endTime = performance.now();
-      console.log(`Loading plugin ${pluginUrl} took ${endTime - startTime} milliseconds`);
+      loadingEventGroup.end();
     }
   }
 

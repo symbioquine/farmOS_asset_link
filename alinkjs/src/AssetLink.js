@@ -12,6 +12,7 @@ import DrupalSyncQueryOperators from '@/DrupalSyncQueryOperators';
 import localforage from 'localforage';
 
 import fetch from 'cross-fetch';
+import { v4 as uuidv4 } from 'uuid';
 
 import AssetLinkUI from '@/AssetLinkUI';
 import AssetLinkUtil from '@/AssetLinkUtil';
@@ -36,9 +37,9 @@ const fetchJson = (url, args) => fetch(url, args).then(response => response.json
  */
 export default class AssetLink {
 
-  constructor(app, rootComponent) {
-    this._app = app;
+  constructor(rootComponent, devToolsApi) {
     this._rootComponent = rootComponent;
+    this._devToolsApi = devToolsApi;
     this._vm = reactive({
       booted: false,
       bootProgress: 0,
@@ -74,13 +75,6 @@ export default class AssetLink {
 
     this._ui = new AssetLinkUI();
     this._util = new AssetLinkUtil();
-  }
-
-  /**
-   * The Vue app instance.
-   */
-  get app() {
-    return this._app;
   }
 
   /**
@@ -169,6 +163,12 @@ export default class AssetLink {
 
   /* eslint-disable no-console,no-unused-vars */
   async boot() {
+    const bootingEventGroup = this._devToolsApi.startTimelineEventGroup({
+      data: {},
+      title: `booting`,
+      groupId: `booting-${uuidv4()}`,
+    });
+
     this._connectionStatus.start();
 
     this.vm.bootText = "Initializing storage";
@@ -341,6 +341,8 @@ export default class AssetLink {
       this._precache();
     }
 
+    bootingEventGroup.end();
+
     return true;
   }
 
@@ -354,34 +356,45 @@ export default class AssetLink {
   }
 
   async _precache() {
-    // Precache the current page's asset
-    const matches = window.location.href.match(/https?:\/\/.*\/asset\/(\d+)/);
-    if (matches && matches.length >= 2) {
-      const thisAsset = await this.resolveAsset(matches[1]);
-      console.log("thisAsset=", thisAsset);
+    const precachingEventGroup = this._devToolsApi.startTimelineEventGroup({
+      data: {},
+      title: `precaching`,
+      groupId: `precaching-${uuidv4()}`,
+    });
+
+    try {
+
+      // Precache the current page's asset
+      const matches = window.location.href.match(/https?:\/\/.*\/asset\/(\d+)/);
+      if (matches && matches.length >= 2) {
+        await this.resolveAsset(matches[1]);
+      }
+
+      const timestamp = currentEpochSecond();
+
+      const lastPrecacheTimeKey = `asset-link-last-precache-time`;
+
+      const lastPrecacheTime = await this._store.getItem(lastPrecacheTimeKey);
+
+      if (lastPrecacheTime && (timestamp - lastPrecacheTime) < 900) {
+        console.log("Skipping Asset Link precaching because it was done recently...");
+        return;
+      }
+
+      // Precache recently changed assets
+      const assetTypes = (await this.getAssetTypes()).map(t => t.attributes.drupal_internal__id);
+
+      await this._memory.query((q) => assetTypes.map(assetType => q.findRecords(`asset--${assetType}`)
+          .sort('-changed')
+          .page({ offset: 0, limit: 100 })));
+
+      // TODO: Consider also precaching recently changed and recent/upcoming logs
+
+      await this._store.setItem(lastPrecacheTimeKey, timestamp);
+
+    } finally {
+      precachingEventGroup.end();
     }
-
-    const timestamp = currentEpochSecond();
-
-    const lastPrecacheTimeKey = `asset-link-last-precache-time`;
-
-    const lastPrecacheTime = await this._store.getItem(lastPrecacheTimeKey);
-
-    if (lastPrecacheTime && (timestamp - lastPrecacheTime) < 900) {
-      console.log("Skipping Asset Link precaching because it was done recently...");
-      return;
-    }
-
-    // Precache recently changed assets
-    const assetTypes = (await this.getAssetTypes()).map(t => t.attributes.drupal_internal__id);
-
-    await this._memory.query((q) => assetTypes.map(assetType => q.findRecords(`asset--${assetType}`)
-        .sort('-changed')
-        .page({ offset: 0, limit: 100 })));
-
-    // TODO: Consider also precaching recently changed and recent/upcoming logs
-
-    await this._store.setItem(lastPrecacheTimeKey, timestamp);
   }
 
   /**

@@ -27,7 +27,22 @@
     <farmos-sync-tray ref="syncTray"></farmos-sync-tray>
 
     <q-page-container>
-      <router-view />
+      <router-view v-if="assetLink.vm.booted" />
+
+      <q-inner-loading :showing="!assetLink.vm.booted">
+        <q-circular-progress
+          show-value
+          font-size="16px"
+          class="text-red q-ma-md"
+          :value="assetLink.vm.bootProgress"
+          size="100px"
+          :thickness="0.1"
+          color="#2E7D32"
+          track-color="grey-3"
+        >
+          {{ assetLink.vm.bootProgress }}%
+        </q-circular-progress>
+      </q-inner-loading>
     </q-page-container>
   </q-layout>
 </template>
@@ -54,13 +69,14 @@ if (import.meta.hot) {
 export default defineComponent({
   name: 'App',
   setup (props, { expose }) {
-    const app = inject('app');
     const rootComponent = getCurrentInstance();
 
     const router = useRouter();
     const route = useRoute();
 
-    const assetLink = NonReactiveAssetLinkDecorator.decorate(new AssetLink(app, rootComponent));
+    const devToolsApi = inject('devToolsApi');
+
+    const assetLink = NonReactiveAssetLinkDecorator.decorate(new AssetLink(rootComponent, devToolsApi));
 
     provide('assetLink', assetLink);
 
@@ -75,11 +91,10 @@ export default defineComponent({
     expose({
       assetLink,
       async addRoute(routeDef) {
-        console.log("Adding route:", routeDef.name);
         const currentRoute = route.name;
         const currentRoutePath = route.path;
 
-        router.addRoute({
+        await router.addRoute({
           name: routeDef.name,
           path: routeDef.path,
           component: routeDef.component,
@@ -89,10 +104,9 @@ export default defineComponent({
         const resolved = router.resolve(currentRoutePath);
 
         if (resolved.name === routeDef.name) {
-          await router.replace('/');
+          // await router.replace('/');
           await router.replace(currentRoutePath);
         }
-        console.log("Done adding route:", routeDef.name);
       },
       /* eslint-disable no-console,no-unused-vars */
       removeRoute(routeDef) {
