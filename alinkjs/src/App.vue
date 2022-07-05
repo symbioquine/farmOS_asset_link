@@ -27,31 +27,47 @@
     <farmos-sync-tray ref="syncTray"></farmos-sync-tray>
 
     <q-page-container>
-      <router-view v-if="assetLink.vm.booted" />
 
-      <q-inner-loading :showing="!assetLink.vm.booted">
-        <q-circular-progress
-          show-value
-          font-size="16px"
-          class="text-red q-ma-md"
-          :value="assetLink.vm.bootProgress"
-          size="100px"
-          :thickness="0.1"
-          color="#2E7D32"
-          track-color="grey-3"
-        >
-          {{ assetLink.vm.bootProgress }}%
-        </q-circular-progress>
-      </q-inner-loading>
+      <q-banner inline-actions class="text-white bg-orange-10" v-if="assetLink.connectionStatus.canReachFarmOS.value && !assetLink.connectionStatus.isLoggedIn.value">
+        You are not logged in to farmOS.
+        <template v-slot:action>
+          <q-btn flat color="white" icon-right="mdi-account-key" label="Log in" :href="farmOSLoginUrl" />
+        </template>
+      </q-banner>
+
+      <q-page>
+        <router-view v-if="assetLink.vm.booted" />
+
+        <q-inner-loading :showing="!assetLink.vm.booted">
+          <q-circular-progress
+            show-value
+            font-size="16px"
+            class="text-red q-ma-md"
+            :value="assetLink.vm.bootProgress"
+            size="100px"
+            :thickness="0.25"
+            color="#2E7D32"
+            track-color="grey-3"
+          >
+            {{ assetLink.vm.bootProgress }}%
+          </q-circular-progress>
+          <span v-if="assetLink.vm.bootFailed" class="text-italic text-red-12">{{ assetLink.vm.bootText }}</span>
+          <span v-else class="text-italic">{{ assetLink.vm.bootText }}</span>
+        </q-inner-loading>
+
+      </q-page>
+
     </q-page-container>
+
   </q-layout>
 </template>
 
 <script>
-import { defineComponent, defineAsyncComponent, inject, getCurrentInstance, provide, computed } from 'vue'
+import { defineComponent, defineAsyncComponent, inject, getCurrentInstance, provide, computed, watch, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import AssetLink from '@/AssetLink';
+import createDrupalUrl from '@/createDrupalUrl';
 import NonReactiveAssetLinkDecorator from '@/NonReactiveAssetLinkDecorator';
 
 if (import.meta.hot) {
@@ -88,6 +104,11 @@ export default defineComponent({
       return assetLink.getSlots({ type: 'config-action', route });
     });
 
+    const farmOSLoginUrl = ref(null);
+    watch(route, () => {
+      farmOSLoginUrl.value = createDrupalUrl(`/user/login?destination=${window.location.pathname}`);
+    }, { immediate: true })
+
     expose({
       assetLink,
       async addRoute(routeDef) {
@@ -116,6 +137,7 @@ export default defineComponent({
     return {
       assetLink,
       configActionDefs,
+      farmOSLoginUrl,
     };
   },
   created () {

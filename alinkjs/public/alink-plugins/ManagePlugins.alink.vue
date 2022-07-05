@@ -37,7 +37,10 @@
 
       <template v-slot:default-body="prop">
         <div v-if="prop.node.nodeType === 'plugin-list' && !prop.node.children.length" class="text-italic q-ml-lg">This plugin list is empty</div>
-        <div v-if="prop.node.error" class="text-italic text-red-12 q-ml-lg">{{ prop.node.error }}</div>
+        <div v-if="prop.node.error" class="q-ml-lg">
+          <span v-if="prop.node.nodeType === 'plugin-list' && prop.node.cachedTimestamp" class="q-mr-xs">Using stale cached list:</span>
+          <span class="text-italic text-red-12">{{ prop.node.error }}</span>
+        </div>
       </template>
     </q-tree>
 
@@ -190,7 +193,12 @@ export default {
           sourceUrl: pluginList.sourceUrl,
           isDefault: pluginList.isDefault,
           isLocal: pluginList.isLocal,
+          cachedTimestamp: pluginList.cachedTimestamp,
         };
+
+        if (pluginList.httpStatus && pluginList.httpStatus >= 400) {
+          listRoot.error = `HTTP Error ${pluginList.httpStatus}: ${pluginList.httpStatusText}`;
+        }
 
         pluginList.plugins.forEach(plugin => {
           const error = this.getPluginError(plugin);

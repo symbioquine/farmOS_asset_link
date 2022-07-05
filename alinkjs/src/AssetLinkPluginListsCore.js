@@ -3,6 +3,7 @@ import { reactive } from 'vue';
 import createDrupalUrl from '@/createDrupalUrl';
 import currentEpochSecond from '@/util/currentEpochSecond';
 import EventBus from '@/util/EventBus';
+import DefaultPluginListLoadingFailure from '@/DefaultPluginListLoadingFailure';
 import HttpAccessDeniedException from '@/HttpAccessDeniedException';
 
 export default class AssetLinkPluginListsCore {
@@ -60,9 +61,15 @@ export default class AssetLinkPluginListsCore {
           ...this._extraPluginLists,
         ]) {
 
-      const pluginListView = await pluginList.load();
+      try {
+        const pluginListView = await pluginList.load();
+        this._updatePluginListViewInViewModel(pluginListView);
+      } catch (e) {
+        if (pluginList.isDefault) {
+          throw new DefaultPluginListLoadingFailure(`Failed to load default plugin list: ${e.message}`, { cause: e });
+        }
+      }
 
-      this._updatePluginListViewInViewModel(pluginListView);
     }
   }
 
@@ -252,6 +259,14 @@ class HttpPluginList {
     this._latestPluginListView = undefined;
   }
 
+  get isDefault() {
+    return this._isDefault;
+  }
+
+  get isLocal() {
+    return this._isLocal;
+  }
+
   async load(skipCache) {
     this._latestPluginListView = postProcessPluginList(await this._getHttpPluginList(skipCache), this._isDefault, this._isLocal, this._url);
 
@@ -279,22 +294,38 @@ class HttpPluginList {
 
     const timestamp = currentEpochSecond();
 
-    if (cacheItem && (timestamp - cacheItem.timestamp) < 900) {
-      return cacheItem.value;
+    let cachedPluginList = undefined;
+    if (cacheItem) {
+      cachedPluginList = cacheItem.value;
+      cachedPluginList.cachedTimestamp = cacheItem.timestamp;
+    }
+
+    if (cachedPluginList && (timestamp - cachedPluginList.cachedTimestamp) < 900) {
+      return cachedPluginList;
     }
 
     const pluginListRes = await fetch(this._url);
 
     console.log(pluginListRes);
-    if (pluginListRes.status === 403) {
-      throw new HttpAccessDeniedException(`HTTP Error ${pluginListRes.status}: ${pluginListRes.statusText}`);
-    } else if (!pluginListRes.ok) {
+
+    if (!pluginListRes.ok) {
+      if (cachedPluginList) {
+        cachedPluginList.httpStatus = pluginListRes.status;
+        cachedPluginList.httpStatusText = pluginListRes.statusText;
+        return cachedPluginList;
+      }
+
+      if (pluginListRes.status === 403) {
+        throw new HttpAccessDeniedException(`HTTP Error ${pluginListRes.status}: ${pluginListRes.statusText}`);
+      }
       throw new Error(`HTTP Error ${pluginListRes.status}: ${pluginListRes.statusText}`);
     }
 
     const pluginList = await pluginListRes.json();
 
     await this._store.setItem(this._storeKey, {key: this._storeKey, timestamp, value: pluginList});
+
+    pluginList.cachedTimestamp = timestamp;
 
     return pluginList;
   }
@@ -309,6 +340,14 @@ class LocalPluginList {
     this._isDefault = false;
     this._isLocal = true;
     this._pluginReferenceTracker = pluginReferenceTracker;
+  }
+
+  get isDefault() {
+    return this._isDefault;
+  }
+
+  get isLocal() {
+    return this._isLocal;
   }
 
   async load() {

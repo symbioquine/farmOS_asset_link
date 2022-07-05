@@ -21,6 +21,7 @@ import FarmOSConnectionStatusDetector from '@/FarmOSConnectionStatusDetector';
 import PeekableAsyncIterator from '@/PeekableAsyncIterator';
 import AssetLinkPluginListsCore from '@/AssetLinkPluginListsCore';
 import AssetLinkPluginLoaderCore from '@/AssetLinkPluginLoaderCore';
+import HttpAccessDeniedException from '@/HttpAccessDeniedException';
 
 import currentEpochSecond from '@/util/currentEpochSecond';
 import EventBus from '@/util/EventBus';
@@ -44,6 +45,7 @@ export default class AssetLink {
       booted: false,
       bootProgress: 0,
       bootText: "Starting",
+      bootFailed: false,
 
       pendingUpdates: [],
 
@@ -200,7 +202,16 @@ export default class AssetLink {
     });
 
     await this._cores.pluginLoader.boot();
-    await this._cores.pluginLists.boot();
+    try {
+      await this._cores.pluginLists.boot();
+    } catch (e) {
+      if (e.cause instanceof HttpAccessDeniedException) {
+        // TODO: Help the user get logged in
+      }
+      this.vm.bootText = e.message;
+      this.vm.bootFailed = true;
+      return;
+    }
 
     this.vm.bootText = "Loading models...";
     this._models = await this._loadModels();

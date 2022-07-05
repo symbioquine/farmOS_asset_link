@@ -21,11 +21,11 @@ const statusIcon = computed(() => {
     return "mdi-cloud-off-outline";
   }
 
-  if (!connectionStatus.canReachFarmOS) {
+  if (!connectionStatus.canReachFarmOS.value) {
     return "mdi-cloud-alert";
   }
 
-  if (!connectionStatus.isLoggedIn) {
+  if (!connectionStatus.isLoggedIn.value) {
     return "mdi-cloud-lock";
   }
 
