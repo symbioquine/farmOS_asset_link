@@ -1,4 +1,5 @@
 import * as Vue from 'vue';
+import * as VueRouter from 'vue-router';
 import * as Quasar from 'quasar';
 import { reactive } from 'vue';
 
@@ -6,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import EventBus from '@/util/EventBus';
 
 import { loadModule } from 'vue3-sfc-loader/dist/vue3-sfc-loader.esm.js';
+import { parseComponent } from 'vue-template-compiler';
 
 import currentEpochSecond from '@/util/currentEpochSecond';
 
@@ -66,65 +68,90 @@ export default class AssetLinkPluginLoaderCore {
 
       const rawPluginSource = await fetch(pluginDataUrl).then(r => r.text());
 
+      let pluginDecorator = p => p;
+
       if (pluginUrl.pathname.endsWith('alink.js') || pluginUrl.pathname.endsWith('alink.vue')) {
         const pluginUrlWithoutParams = new URL(pluginUrl.toString());
         pluginUrlWithoutParams.search = '';
 
-        // const vuetify = await import('vuetify/lib');
-
-        const vuetifyComponents = {};
-        const vuetifyDirectives = {};
-
-        // Object.entries(vuetify).forEach(([entryName, entry]) => {
-        //   if (Object.prototype.hasOwnProperty.call(entry, 'component')) {
-        //     vuetifyComponents[entryName] = entry;
-        //   } else if (['bind', 'inserted', 'update', 'componentUpdated', 'unbind'].find(directiveHook => Object.prototype.hasOwnProperty.call(entry, directiveHook))) {
-        //     vuetifyDirectives[entryName] = entry;
-        //   }
-        // });
-
         let rawPluginFileData = await fetch(pluginDataUrl).then(r => r.text());
 
-        // Roughly based on https://harlanzw.com/blog/vue-automatic-component-imports/
-        // and https://github.com/vuetifyjs/vuetify-loader/blob/9c828d72354d5c37ec97eb58badb9e164451e802/lib/loader.js#L110-L144
-        // const compiler = await import('vue-template-compiler');
+        if (pluginUrl.pathname.endsWith('alink.vue')) {
+          const component = parseComponent(rawPluginFileData);
 
-        const tags = new Set()
-        const attrs = new Set()
-        // const component = compiler.parseComponent(rawPluginFileData);
+          if (component.errors.length > 0) {
+            throw new Error(`Could not parse component plugin: ${component.errors.join('\n')}`);
+          }
 
-        // if (component.errors.length > 0) {
-        //   throw new Error(`Could not parse component plugin: ${component.errors.join('\n')}`);
-        // }
+          if (component.template) {
+            if (component.template.src) {
+              throw new Error(`External component template content is not supported.`);
+            }
 
-        // if (component.template) {
-        //   if (component.template.src) {
-        //     throw new Error(`External component template content is not supported.`);
-        //   }
-        //   compiler.compile(component.template.content, {
-        //     modules: [{
-        //       postTransformNode: node => {
-        //         if ("directives" in node) {
-        //           node.directives.forEach(({ name }) => attrs.add(name))
-        //         }
-        //         tags.add(node.tag)
-        //       }
-        //     }]
-        //   });
-        // }
+            const shorthandSlots = {};
+            for (const [key, value] of Object.entries(component.template.attrs || {})) {
+              if (key.indexOf("alink-slot") !== -1) {
+                const m = key.match(/alink-slot\[([\w\.]+)\]/);
+                if (!m) {
+                  throw new Error(`Plugin slot shorthand must be in the format 'alink-slot[my.unique.identifier]="slot-type"' or 'alink-slot[my.unique.identifier]="slot-type(weight: 99)"'. Got: '${key}="${value}"'`);
+                }
+                const slotName = m[1];
 
-        /* eslint-disable no-unused-vars */
-        // const usedVuetifyTags = Array.from(tags).map(item => [hyphenate(item), capitalize(camelize(item))])
-        //   .filter(([kebabTag, camelTag]) => kebabTag.startsWith('v-') && Object.prototype.hasOwnProperty.call(vuetifyComponents, camelTag))
-        //   .map(([kebabTag, camelTag]) => [camelTag, vuetifyComponents[camelTag]]);
-        // 
-        // const usedVuetifyDirectives = Array.from(attrs).map(item => capitalize(camelize(item)))
-        //   .filter(camelAttr => Object.prototype.hasOwnProperty.call(vuetifyDirectives, camelAttr))
-        //   .map(camelAttr => [camelAttr, vuetifyDirectives[camelAttr]]);
+                let slotType = value;
+                let slotWeight = undefined;
+                if (value.indexOf("(") !== -1 || value.indexOf(")") !== -1) {
+                  const n = value.match(/([^\(]+)\(\s*weight\s*:\s*(\d+)\s*\)/);
+                  if (!n) {
+                    throw new Error(`Plugin slot shorthand must be in the format 'alink-slot[my.unique.identifier]="slot-type"' or 'alink-slot[my.unique.identifier]="slot-type(weight: 99)"'. Got: '${key}="${value}"'`);
+                  }
+                  slotType = n[1];
+                  slotWeight = parseInt(n[2]);
+                }
+
+                shorthandSlots[slotName] = {
+                    type: slotType,
+                    weight: slotWeight,
+                };
+              }
+            }
+
+            if (Object.keys(shorthandSlots).length > 0) {
+              const existingPluginDecorator = pluginDecorator;
+              pluginDecorator = (pI) => {
+                let p = existingPluginDecorator(pI);
+                const existingOnLoadFn = p.onLoad;
+
+                p.onLoad = (handle, assetLink) => {
+                  if (typeof existingOnLoadFn === 'function') {
+                    existingOnLoadFn(handle, assetLink);
+                  }
+
+                  for (const [slotName, slotParams] of Object.entries(shorthandSlots)) {
+                    handle.defineSlot(slotName, slot => {
+                      slot.type(slotParams.type);
+                      if (slotParams.weight !== undefined) {
+                        slot.weight(slotParams.weight);
+                      }
+                      slot.component(handle.thisPlugin);
+                    });
+                  }
+
+                };
+
+                return p;
+              };
+            }
+
+          }
+
+          // console.log(pluginUrl, component);
+        }
+
 
         if (!this.moduleCache) {
           this.moduleCache = Object.assign(Object.create(null), {
             vue: Vue,
+            'vue-router': VueRouter,
             'quasar': Quasar,
 
             // TODO: Figure out how to make loading these cleaner/on-demand
@@ -172,14 +199,8 @@ export default class AssetLinkPluginLoaderCore {
           pluginInstance.name = pluginOccurrenceId;
         }
 
-        // if (usedVuetifyTags.length && !pluginInstance.components) pluginInstance.components = {};
-        // usedVuetifyTags.filter(t => !pluginInstance.components[t[0]]).forEach(t => pluginInstance.components[t[0]] = t[1]);
-        // 
-        // if (usedVuetifyDirectives.length && !pluginInstance.directives) pluginInstance.directives = {};
-        // usedVuetifyDirectives.filter(t => !pluginInstance.directives[t[0]]).forEach(t => pluginInstance.directives[t[0]] = t[1]);
+        pluginDecorator(pluginInstance);
 
-        // TODO: Determine if this is even necessary
-        // this._assetLink.app.component(pluginInstance.name, pluginInstance);
       } else {
         pluginInstance = {};
       }
@@ -240,7 +261,7 @@ export default class AssetLinkPluginLoaderCore {
 
     const plugin = this.vm.plugins[pluginIdx];
 
-    if (typeof plugin.onUnload === 'function') {
+    if (plugin && typeof plugin.onUnload === 'function') {
       plugin.onUnload(this._assetLink);
     }
 
@@ -360,8 +381,12 @@ class AssetLinkPluginHandle {
 
     slotDefiner(slotHandle);
 
-    let missingFields = Object.entries({'type': 'string', 'predicateFn': 'function'})
+    let missingFields = Object.entries({'type': 'string'})
       .filter(([attr, expectedType]) => typeof slotDef[attr] !== expectedType);
+
+    if (!['undefined', 'function'].includes(typeof slotDef.predicateFn)) {
+      missingFields.push(['predicateFn', 'function?']);
+    }
 
     if (!['undefined', 'function'].includes(typeof slotDef.contextMultiplexerFn)) {
       missingFields.push(['contextMultiplexerFn', 'function?']);
@@ -380,7 +405,10 @@ class AssetLinkPluginHandle {
       return;
     }
 
-    const providedPredicateFn = slotDef.predicateFn;
+    let providedPredicateFn = slotDef.predicateFn;
+    if (!providedPredicateFn) {
+      providedPredicateFn = () => true
+    }
 
     // Decorate the predicate function to make the slots automatically filtered by type
     slotDef.predicateFn = (context) => context.type === slotDef.type && providedPredicateFn(context);

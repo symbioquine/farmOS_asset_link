@@ -1,11 +1,11 @@
 <template>
   <template v-if="pendingUpdateCount > 0">
-    <q-btn flat dense :icon="statusIcon" class="q-ml-md">
+    <q-btn flat dense :icon="statusIcon" class="q-mr-sm">
       <q-badge color="red" floating>{{ assetLink.vm.pendingUpdates.length }}</q-badge>
     </q-btn>
   </template>
   <template v-else>
-    <q-btn flat dense :icon="statusIcon" class="q-ml-md"></q-btn>
+    <q-btn flat dense :icon="statusIcon" class="q-mr-sm"></q-btn>
   </template>
 </template>
 

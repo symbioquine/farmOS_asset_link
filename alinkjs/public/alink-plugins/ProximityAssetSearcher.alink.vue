@@ -1,9 +1,42 @@
+<template>
+  <q-btn
+    outlined
+    x-large
+    fab
+    color="indigo"
+    :icon="icon"
+    :value="'proximity-search'"
+    @click="currentSearchMethod === 'proximity-search' && tryGetLocation()"></q-btn>
+</template>
+
+<script setup>
+import { computed } from 'vue';
+
+const props = defineProps({
+  currentSearchMethod: {
+    type: String,
+    required: true,
+  },
+});
+
+const icon = computed(() => {
+  return props.currentSearchMethod === 'proximity-search' ? 'mdi-map-marker-plus' : 'mdi-map-marker-radius';
+});
+</script>
+
+<script>
 /**
  * Searches for assets by their proximity to a given location.
  */
-export default class ProximityAssetSearcher {
+export default {
+  static onLoad(handle) {
+    handle.defineSlot('net.symbioquine.farmos_asset_link.asset_search.v0.proximity', slot => {
+      slot.type('asset-search-type');
+      slot.component(handle.thisPlugin);;
+    });
+  },
 
-  searchAssets(assetLink, searchRequest, searchPhase) {
+  static searchAssets(assetLink, searchRequest, searchPhase) {
     if (searchRequest.type !== 'proximity-search') {
       return undefined;
     }
@@ -42,10 +75,10 @@ export default class ProximityAssetSearcher {
     }
 
     return iterativelyWideningSearch();
-  }
+  },
 
   /* eslint-disable class-methods-use-this */
-  async _searchAssetsWithGeohashPrefix(assetLink, searchRequest, searchPhase, ghashPrefix, excludedGhashPrefix) {
+  static async _searchAssetsWithGeohashPrefix(assetLink, searchRequest, searchPhase, ghashPrefix, excludedGhashPrefix) {
 
     const assetTypes = (await assetLink.getAssetTypes()).map(t => t.attributes.drupal_internal__id);
 
@@ -88,3 +121,4 @@ export default class ProximityAssetSearcher {
   }
 
 }
+</script>

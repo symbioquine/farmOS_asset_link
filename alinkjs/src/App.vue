@@ -9,17 +9,11 @@
 
         <farmos-sync-icon @click.stop="$refs.syncTray.toggle()"></farmos-sync-icon>
 
-        <q-btn flat padding="xs" icon="mdi-cog" class="q-ml-sm" @click.stop v-if="configActionDefs.length">
-          <q-menu>
-            <q-list style="min-width: 200px">
-              <component
-                  v-for="slotDef in configActionDefs"
-                  :key="slotDef.id"
-                  :is="slotDef.component"
-                  v-bind="slotDef.props"></component>
-            </q-list>
-          </q-menu>
-        </q-btn>
+        <component
+            v-for="slotDef in assetLink.getSlots({ type: 'toolbar-item', route })"
+            :key="slotDef.id"
+            :is="slotDef.component"
+            v-bind="slotDef.props"></component>
 
       </q-toolbar>
     </q-header>
@@ -31,7 +25,7 @@
       <q-banner inline-actions class="text-white bg-orange-10" v-if="assetLink.connectionStatus.canReachFarmOS.value && !assetLink.connectionStatus.isLoggedIn.value">
         You are not logged in to farmOS.
         <template v-slot:action>
-          <q-btn flat color="white" icon-right="mdi-account-key" label="Log in" :href="farmOSLoginUrl" />
+          <q-btn flat dense color="white" icon-right="mdi-account-key" label="Log in" :href="farmOSLoginUrl" />
         </template>
       </q-banner>
 
@@ -135,8 +129,8 @@ export default defineComponent({
       },
     });
     return {
+      route,
       assetLink,
-      configActionDefs,
       farmOSLoginUrl,
     };
   },
