@@ -13,7 +13,8 @@
             v-for="slotDef in assetLink.getSlots({ type: 'toolbar-item', route })"
             :key="slotDef.id"
             :is="slotDef.component"
-            v-bind="slotDef.props"></component>
+            v-bind="slotDef.props"
+            class="q-mr-sm"></component>
 
       </q-toolbar>
     </q-header>

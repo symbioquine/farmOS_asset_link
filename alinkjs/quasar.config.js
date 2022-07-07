@@ -13,6 +13,7 @@ const { configure } = require('quasar/wrappers');
 const { NodeGlobalsPolyfillPlugin } = require('@esbuild-plugins/node-globals-polyfill');
 const fs = require('fs');
 const path = require('path');
+const yaml = require('js-yaml');
 
 const DEV_PROXY_TARGET = process.env.ASSET_LINK_DEV_PROXY_TARGET || 'http://localhost';
 
@@ -57,6 +58,37 @@ function AssetLinkPluginHotReload() {
       }
     },
   }
+}
+
+/**
+ * Custom plugin to generate configuration entity yml files for each of our included
+ * default Asset Link plugins.
+ */
+function GenerateDefaultPluginConfigYmlFilesRollupPlugin() {
+  return {
+    name: 'asset-link-generate-default-plugin-yml-files',
+    buildStart() {
+      const configOutputDir = `${__dirname}/../farmos_asset_link/config/install`;
+
+      if (!fs.existsSync(configOutputDir)) {
+        fs.mkdirSync(configOutputDir, { recursive: true });
+      }
+
+      fs.readdirSync(`${__dirname}/public/alink-plugins`).forEach(filename => {
+        const nameWithoutExt = filename.replace(/(\.[^.]+)*$/, '');
+
+        const configOutputFilename = `${configOutputDir}/farmos_asset_link.asset_link_default_plugin.${nameWithoutExt}.yml`;
+
+        fs.writeFileSync(configOutputFilename, yaml.dump({
+          langcode: 'en',
+          status: true,
+          id: nameWithoutExt,
+          dependencies: { enforced: { module: [ 'farmos_asset_link' ] } },
+          url: `{base_path}alink/alink-plugins/${filename}`,
+        }));
+      });
+    },
+  };
 }
 
 
@@ -131,6 +163,7 @@ module.exports = configure(function (/* ctx */) {
         viteConf.resolve.alias['@'] = path.resolve(__dirname, './src');
 
         viteConf.plugins.push(AssetLinkPluginHotReload());
+        viteConf.plugins.push(GenerateDefaultPluginConfigYmlFilesRollupPlugin());
         viteConf.plugins.push(Components({ /* options */ }));
 
         viteConf.build.rollupOptions = {

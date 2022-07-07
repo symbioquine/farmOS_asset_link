@@ -1,49 +1,47 @@
 <template>
-  <v-card>
-    <v-card-title class="text-h5 grey lighten-2">
+  <q-card>
+    <q-card-title class="text-h5 grey lighten-2">
       {{ title }}
-    </v-card-title>
+    </q-card-title>
 
     <div class="text-center my-4">
-      <v-btn-toggle v-model="currentSearchMethod" mandatory>
-        <v-btn
+      <q-btn-toggle q-model="currentSearchMethod" mandatory>
+        <q-btn
           outlined
           x-large
           fab
           color="indigo"
           :value="'text-search'">
-          <v-icon>mdi-keyboard-outline</v-icon>
-        </v-btn>
-        <v-btn
+          <q-icon>mdi-keyboard-outline</q-icon>
+        </q-btn>
+        <q-btn
           outlined
           x-large
           fab
           color="indigo"
           :value="'scan-qr-code'">
-          <v-icon>mdi-qrcode-scan</v-icon>
-        </v-btn>
-        <v-btn
+          <q-icon>mdi-qrcode-scan</q-icon>
+        </q-btn>
+        <q-btn
           outlined
           x-large
           fab
           color="indigo"
           :value="'proximity-search'"
           @click="currentSearchMethod === 'proximity-search' && tryGetLocation()">
-          <v-icon>{{ currentSearchMethod === 'proximity-search' ? 'mdi-map-marker-plus' : 'mdi-map-marker-radius' }}</v-icon>
-        </v-btn>
-      </v-btn-toggle>
+          <q-icon>{{ currentSearchMethod === 'proximity-search' ? 'mdi-map-marker-plus' : 'mdi-map-marker-radius' }}</q-icon>
+        </q-btn>
+      </q-btn-toggle>
     </div>
 
-    <qr-code-scanner v-if="currentSearchMethod == 'scan-qr-code'" @qr-code-scanned="qrCodeScanned($event)" @qr-code-err="qrCodeErr"></qr-code-scanner>
+    <qr-code-scanner q-if="currentSearchMethod == 'scan-qr-code'" @qr-code-scanned="qrCodeScanned($event)" @qr-code-err="qrCodeErr"></qr-code-scanner>
 
-    <div v-if="currentSearchMethod == 'proximity-search'" ref="map-div"></div>
+    <q-divider></q-divider>
 
-    <v-divider></v-divider>
-
-    <v-container fluid>
-      <v-textarea
+    <q-container fluid>
+      <q-textarea
         :loading="isSearchingAssets"
-        v-model="searchText"
+        q-model="searchText"
         :label="inputLabel"
         :placeholder="inputPlaceholder"
         prepend-icon="mdi-magnify"
@@ -53,42 +51,42 @@
         ref="searchInput"
         @focus="currentSearchMethod='text-search'"
         @input="onTextSearchInput"
-      ></v-textarea>
+      ></q-textarea>
 
-      <v-list dense>
-        <v-subheader v-if="assetLink.viewModel.connectionStatus.isOnline">Results</v-subheader>
-        <v-subheader v-else>Offline results (May be stale/incomplete)</v-subheader>
-        <v-list-item-group
-          v-model="selectedItems"
+      <q-list dense>
+        <q-subheader q-if="assetLink.connectionStatus.isOnline">Results</q-subheader>
+        <q-subheader q-else>Offline results (May be stale/incomplete)</q-subheader>
+        <q-list-item-group
+          q-model="selectedItems"
           color="primary"
           :multiple="selectMultiple"
         >
-          <v-list-item v-for="(item, i) in searchResultEntries" :key="i">
-            <v-list-item-icon>
-              <v-icon>mdi-tree</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title v-text="item.asset.attributes.name"></v-list-item-title>
-              <v-list-item-subtitle v-text="item.weightText"></v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list-item-group>
-      </v-list>
+          <q-list-item q-for="(item, i) in searchResultEntries" :key="i">
+            <q-list-item-icon>
+              <q-icon>mdi-tree</q-icon>
+            </q-list-item-icon>
+            <q-list-item-content>
+              <q-list-item-title q-text="item.asset.attributes.name"></q-list-item-title>
+              <q-list-item-subtitle q-text="item.weightText"></q-list-item-subtitle>
+            </q-list-item-content>
+          </q-list-item>
+        </q-list-item-group>
+      </q-list>
 
-    </v-container>
+    </q-container>
 
-    <v-divider></v-divider>
+    <q-divider></q-divider>
 
-    <v-card-actions>
-      <v-btn color="normal" text @click="onCancel()">
+    <q-card-actions>
+      <q-btn color="normal" text @click="onCancel()">
         Cancel
-      </v-btn>
-      <v-spacer></v-spacer>
-      <v-btn color="primary" text @click="onAccept()" :disabled="!hasAssetSelection">
+      </q-btn>
+      <q-spacer></q-spacer>
+      <q-btn color="primary" text @click="onAccept()" :disabled="!hasAssetSelection">
         {{ confirmLabel }}
-      </v-btn>
-    </v-card-actions>
-  </v-card>
+      </q-btn>
+    </q-card-actions>
+  </q-card>
 </template>
 
 <script>
@@ -194,7 +192,7 @@ export default {
       try {
         pos = await getGeoPosition(geolocationOpts);
       } catch (e) {
-        this.assetLink.viewModel.messages.push({text: `Failed to get geolocation: ${e.message}`, type: "error"});
+        this.assetLink.vm.messages.push({text: `Failed to get geolocation: ${e.message}`, type: "error"});
         console.log(e);
       }
 
@@ -235,7 +233,7 @@ export default {
 
       let assetSearchResultCursor = this.assetLink.searchAssets(this.searchRequest, 'local');
 
-      if (this.assetLink.viewModel.connectionStatus.isOnline) {
+      if (this.assetLink.vm.connectionStatus.isOnline) {
         assetSearchResultCursor = new RacingLocalRemoteAsyncIterator(
             assetSearchResultCursor,
             this.assetLink.searchAssets(this.searchRequest, 'remote'),
