@@ -54,28 +54,15 @@ Additionally, plugins may be added locally to a plugin list in browser storage.
 
 > `indexeddb://asset-link/data/local-plugin-list.repo.json`
 
-## Plugin Dependencies
-
-Asset Link Plugins can be loaded/unloaded/reloaded at any time - though normally they change infrequently. As such, dependencies
-between plugins must be flexible.
-
-To achieve that flexibility, Asset Link employs a loose dependency model. Asset Link facilitates a few types of dependencies
-explicitly - such as those related to rendering and to searching farmOS data. Beyond that, plugins can access each other via
-the `AssetLink` class `plugins` property which contains a list of all the currently loaded plugins. Since plugins can be loaded
-in any order or change at any time, such access should either be stateless or should respond to changes in that list of plugins
-appropriately.
-
-https://v2.vuejs.org/v2/api/#vm-watch
-
 ## Plugin Structure
 
 ### Javascript
 
-When a Javascript plugin is loaded, it is instantiated and the `onLoad` method is invoked so it can perform any required setup.
+When a Javascript plugin is loaded, the static `onLoad` method of the default export is invoked so it can perform any required setup.
 
 ```javascript
 export default class MyPluginA {
-  onLoad(handle, assetLink) {
+  static onLoad(handle, assetLink) {
     // Do something to set up...
   }
 
@@ -85,7 +72,7 @@ export default class MyPluginA {
 
 ### Vue
 
-When a Vue.js plugin is loaded, the "plugin instance" is the uninstantiated Vue component. In particular this means the `onLoad` method
+When a Vue.js plugin is loaded, the "plugin instance" is the uninstantiated Vue component. This means the `onLoad` method
 is static on the top-level exported object, **not** within `methods` - as is used in Vue to define methods on the component itself.
 
 ```vue
@@ -105,7 +92,7 @@ export default {
 
 ### Handle Object
 
-The handle object which is passed into plugin's `onLoad` methods is an instance of [AssetLinkPluginHandle](TODO). It provides some helpers
+The handle object which is passed into plugins' `onLoad` method is an instance of [AssetLinkPluginHandle](TODO). It provides some helpers
 with validation for hooking into Asset Link's pluggable rendering system.
 
 Importantly, the component class itself must be accessed via the `AssetLinkPluginHandle::thisPlugin` property.
@@ -130,15 +117,13 @@ routes/pages > slots > widgets
 Plugins can define URL Paths (routes) within Asset Link - e.g. `https://my-farmos-server.example.com/alink/my-page/tuesday`.
 
 ```javascript
-  onLoad(handle, assetLink) {
+  static onLoad(handle, assetLink) {
 
     handle.defineRoute('com.example.farmos_asset_link.routes.v0.my_page', pageRoute => {
-      // See https://v3.router.vuejs.org/guide/essentials/dynamic-matching.html for route path format
+      // See https://router.vuejs.org/guide/essentials/dynamic-matching.html for route path format
       pageRoute.path("/my-page/:arg");
 
-      // `wrapper` is the component which is delegating to this render function
-      // `h` (a.k.a. `createElement`) is Vue.js' Virtual DOM rendering function
-      pageRoute.componentFn((wrapper, h) => h(SomeVueComponent));
+      pageRoute.component(SomeVueComponent);
     });
 
   }
@@ -147,29 +132,61 @@ Plugins can define URL Paths (routes) within Asset Link - e.g. `https://my-farmo
 ### Slots
 
 ```javascript
-  onLoad(handle) {
+  static onLoad(handle) {
 
     handle.defineSlot('com.example.farmos_asset_link.slots.v0.my_slot', pageSlot => {
       pageSlot.type('page-slot');
 
       pageSlot.showIf(context => context.pageName === 'asset-page');
 
-      pageSlot.componentFn((wrapper, h, context) => {
-        return h(SomeVueComponent});
-      });
+      pageSlot.component(SomeVueComponent);
 
     });
 
   }
 ```
 
+#### Shorthand
+
+Asset Link also provides a shorthand for defining simple slots. Instead of the following;
+
+```vue
+<template>
+  <q-btn flat dense to="/another/asset-link-page" icon="mdi-alarm-bell"></q-btn>
+</template>
+
+<script>
+export default {
+  onLoad(handle, assetLink) {
+
+    handle.defineSlot('com.example.farmos_asset_link.slots.v0.my_slot', slot => {
+      slot.type('toolbar-item');
+
+      slot.component(handle.thisPlugin);
+    });
+
+  }
+}
+</script>
+```
+
+The same slot can be defined via an attribute on the `<template>` tag;
+
+```vue
+<template
+    alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]="toolbar-item">
+  <q-btn flat dense to="/another/asset-link-page" icon="mdi-alarm-bell"></q-btn>
+</template>
+```
+
 #### Consuming Slots
 
 ```vue
-<render-fn-wrapper
-  v-for="slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, pageName: 'asset-page', asset })" :key="slotDef.id"
-  :render-fn="slotDef.componentFn"
-></render-fn-wrapper>
+<component
+    v-for="slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, pageName: 'asset-page', asset })"
+    :key="slotDef.id"
+    :is="slotDef.component"
+    v-bind="slotDef.props"></component>
 ```
 
 ### Widget Decorators
@@ -188,10 +205,7 @@ export default {
 
       widgetDecorator.appliesIf(context => context.asset.attributes.status !== 'archived');
 
-      widgetDecorator.componentFn((wrapper, h, context, children) => {
-        return h(handle.thisPlugin, { props: { asset: context.asset } }, children);
-      });
-
+      widgetDecorator.component(handle.thisPlugin);
     });
 
   }
@@ -199,15 +213,54 @@ export default {
 </script>
 ```
 
-***Note:** The above example uses a Vue.js slot to render the content it is decorating which is passed through the component
-function via the `children` argument. The slot concept seen here is different from Asset Link slots.*
+***Note:** The above example uses a Vue.js slot to render the content it is decorating. The slot concept
+seen here is different from Asset Link slots.*
 
 #### Consuming Widget Decorators
 
 ```vue
-  <h2>Asset: <render-widget
-        name="asset-name"
-        :context="{ asset }"
-        >{{ asset.attributes.name }}</render-widget>
-  </h2>
+<h2>Asset: <render-widget
+      name="asset-name"
+      :context="{ asset }"
+      >{{ asset.attributes.name }}</render-widget>
+</h2>
+```
+
+## Plugin Dependencies
+
+Asset Link Plugins can be loaded/unloaded/reloaded at any time - though normally they change infrequently. As such, dependencies
+between plugins must be flexible.
+
+To achieve that flexibility, Asset Link employs a loose dependency model. Asset Link facilitates a few types of dependencies
+explicitly - such as those related to rendering and to searching farmOS data. Beyond that, plugins can form more complex
+dependencies via plugin ingestion.
+
+### Plugin Ingestion
+
+In its `onLoad` method a plugin may choose to be notified about every other plugin by defining a plugin ingestor;
+
+```javascript
+    handle.definePluginIngestor(pluginIngestor => {
+      pluginIngestor.onEveryPlugin(plugin => {
+        // Do something with every other plugin...
+      });
+    });
+```
+
+The method passed to `pluginIngestor.onEveryPlugin` here will be called once immediately for each plugin that is already loaded and
+later when any new plugins are loaded.
+
+Notably, defining a plugin ingestor does not currently provide a way to subscribe to plugins being unloaded. Instead most side-effects
+should occur via an "attributed handle";
+
+```javascript
+    handle.definePluginIngestor(pluginIngestor => {
+      pluginIngestor.onEveryPlugin(plugin => {
+
+        handle.onBehalfOf(plugin, attributedHandle => {
+          // Asset Link will manage the lifecycle of routes/slots/etc defined via attributedHandle
+        });
+
+      });
+    });
 ```
