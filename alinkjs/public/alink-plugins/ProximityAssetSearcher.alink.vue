@@ -1,14 +1,3 @@
-<template>
-  <q-btn
-    outlined
-    x-large
-    fab
-    color="indigo"
-    :icon="icon"
-    :value="'proximity-search'"
-    @click="currentSearchMethod === 'proximity-search' && tryGetLocation()"></q-btn>
-</template>
-
 <script setup>
 import { computed } from 'vue';
 
@@ -24,19 +13,46 @@ const icon = computed(() => {
 });
 </script>
 
+<template alink-slot[net.symbioquine.farmos_asset_link.asset_search.v0.proximity]="asset-search-method(weight: 150)">
+  <search-method
+    name="proximity-search"
+    :icon="icon">
+
+    <template #search-interface>
+      <div class="q-pa-md">
+        <q-card>
+          <q-item>
+
+            <q-item-section>
+              <q-item-label>
+                <q-skeleton type="text" />
+              </q-item-label>
+              <q-item-label caption>
+                <q-skeleton type="text" />
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+    
+          <q-skeleton height="200px" square />
+    
+          <q-card-actions align="right" class="q-gutter-md">
+            <q-skeleton type="QBtn" />
+            <q-skeleton type="QBtn" />
+          </q-card-actions>
+        </q-card>
+      </div>
+    </template>
+
+  </search-method>
+
+</template>
+
 <script>
 /**
  * Searches for assets by their proximity to a given location.
  */
 export default {
-  static onLoad(handle) {
-    handle.defineSlot('net.symbioquine.farmos_asset_link.asset_search.v0.proximity', slot => {
-      slot.type('asset-search-type');
-      slot.component(handle.thisPlugin);;
-    });
-  },
-
-  static searchAssets(assetLink, searchRequest, searchPhase) {
+  searchAssets(assetLink, searchRequest, searchPhase) {
     if (searchRequest.type !== 'proximity-search') {
       return undefined;
     }
@@ -78,7 +94,7 @@ export default {
   },
 
   /* eslint-disable class-methods-use-this */
-  static async _searchAssetsWithGeohashPrefix(assetLink, searchRequest, searchPhase, ghashPrefix, excludedGhashPrefix) {
+  async _searchAssetsWithGeohashPrefix(assetLink, searchRequest, searchPhase, ghashPrefix, excludedGhashPrefix) {
 
     const assetTypes = (await assetLink.getAssetTypes()).map(t => t.attributes.drupal_internal__id);
 

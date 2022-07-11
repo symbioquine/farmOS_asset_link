@@ -1,4 +1,4 @@
-import { defineComponent, h } from 'vue'
+import { defineComponent, h } from 'vue';
 
 const RenderWidget = defineComponent({
   props: {

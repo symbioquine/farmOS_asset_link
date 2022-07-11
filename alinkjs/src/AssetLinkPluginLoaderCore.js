@@ -9,6 +9,8 @@ import EventBus from '@/util/EventBus';
 import { loadModule } from 'vue3-sfc-loader/dist/vue3-sfc-loader.esm.js';
 import { parseComponent } from 'vue-template-compiler';
 
+import VuePluginShorthandDecorator from '@/VuePluginShorthandDecorator';
+
 import currentEpochSecond from '@/util/currentEpochSecond';
 
 export default class AssetLinkPluginLoaderCore {
@@ -87,66 +89,10 @@ export default class AssetLinkPluginLoaderCore {
             if (component.template.src) {
               throw new Error(`External component template content is not supported.`);
             }
-
-            const shorthandSlots = {};
-            for (const [key, value] of Object.entries(component.template.attrs || {})) {
-              if (key.indexOf("alink-slot") !== -1) {
-                const m = key.match(/alink-slot\[([\w\.]+)\]/);
-                if (!m) {
-                  throw new Error(`Plugin slot shorthand must be in the format 'alink-slot[my.unique.identifier]="slot-type"' or 'alink-slot[my.unique.identifier]="slot-type(weight: 99)"'. Got: '${key}="${value}"'`);
-                }
-                const slotName = m[1];
-
-                let slotType = value;
-                let slotWeight = undefined;
-                if (value.indexOf("(") !== -1 || value.indexOf(")") !== -1) {
-                  const n = value.match(/([^\(]+)\(\s*weight\s*:\s*(\d+)\s*\)/);
-                  if (!n) {
-                    throw new Error(`Plugin slot shorthand must be in the format 'alink-slot[my.unique.identifier]="slot-type"' or 'alink-slot[my.unique.identifier]="slot-type(weight: 99)"'. Got: '${key}="${value}"'`);
-                  }
-                  slotType = n[1];
-                  slotWeight = parseInt(n[2]);
-                }
-
-                shorthandSlots[slotName] = {
-                    type: slotType,
-                    weight: slotWeight,
-                };
-              }
-            }
-
-            if (Object.keys(shorthandSlots).length > 0) {
-              const existingPluginDecorator = pluginDecorator;
-              pluginDecorator = (pI) => {
-                let p = existingPluginDecorator(pI);
-                const existingOnLoadFn = p.onLoad;
-
-                p.onLoad = (handle, assetLink) => {
-                  if (typeof existingOnLoadFn === 'function') {
-                    existingOnLoadFn(handle, assetLink);
-                  }
-
-                  for (const [slotName, slotParams] of Object.entries(shorthandSlots)) {
-                    handle.defineSlot(slotName, slot => {
-                      slot.type(slotParams.type);
-                      if (slotParams.weight !== undefined) {
-                        slot.weight(slotParams.weight);
-                      }
-                      slot.component(handle.thisPlugin);
-                    });
-                  }
-
-                };
-
-                return p;
-              };
-            }
-
           }
 
-          // console.log(pluginUrl, component);
+          pluginDecorator = VuePluginShorthandDecorator.composeDecorator(pluginDecorator, component);
         }
-
 
         if (!this.moduleCache) {
           this.moduleCache = Object.assign(Object.create(null), {

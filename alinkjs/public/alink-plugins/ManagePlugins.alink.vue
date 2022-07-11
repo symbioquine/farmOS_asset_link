@@ -1,4 +1,4 @@
-<template>
+<template alink-route[net.symbioquine.farmos_asset_link.routes.v0.manage_plugins]="/manage-plugins">
   <q-page padding class="manage-plugins">
 
     <q-tree
@@ -221,12 +221,6 @@ export default {
   },
 
   onLoad(handle, assetLink) {
-    handle.defineRoute('net.symbioquine.farmos_asset_link.routes.v0.manage_plugins', pageRoute => {
-      pageRoute.path("/manage-plugins");
-
-      pageRoute.component(handle.thisPlugin);
-    });
-
     const createDrupalUrl = assetLink.util.createDrupalUrl;
 
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.manage_plugins', slot => {

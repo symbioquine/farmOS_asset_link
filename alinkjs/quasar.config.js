@@ -12,6 +12,7 @@ const Components = require('unplugin-vue-components/vite');
 const { configure } = require('quasar/wrappers');
 const { NodeGlobalsPolyfillPlugin } = require('@esbuild-plugins/node-globals-polyfill');
 const fs = require('fs');
+const glob = require("glob");
 const path = require('path');
 const yaml = require('js-yaml');
 
@@ -70,10 +71,17 @@ function GenerateDefaultPluginConfigYmlFilesRollupPlugin() {
     buildStart() {
       const configOutputDir = `${__dirname}/../farmos_asset_link/config/install`;
 
+      // Make the directory if it doesn't already exist
       if (!fs.existsSync(configOutputDir)) {
         fs.mkdirSync(configOutputDir, { recursive: true });
       }
 
+      // Clean up any existing default plugin configs
+      glob.sync(`${configOutputDir}/farmos_asset_link.asset_link_default_plugin.*.yml`).forEach(file => {
+        fs.unlinkSync(file);
+      });
+
+      // Write a new default configuration file for each of our included plugins
       fs.readdirSync(`${__dirname}/public/alink-plugins`).forEach(filename => {
         const nameWithoutExt = filename.replace(/(\.[^.]+)*$/, '');
 
@@ -156,7 +164,8 @@ module.exports = configure(function (/* ctx */) {
       // ignorePublicFolder: true,
       // minify: false,
       // polyfillModulePreload: true,
-      // distDir
+
+      distDir: '../farmos_asset_link/asset-link-dist/',
 
       extendViteConf (viteConf) {
         viteConf.resolve.alias.path = 'path-browserify';

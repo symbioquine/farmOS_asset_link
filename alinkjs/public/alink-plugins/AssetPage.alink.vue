@@ -1,4 +1,4 @@
-<template>
+<template alink-route[net.symbioquine.farmos_asset_link.routes.v0.asset_page]="/asset/:assetRef">
   <q-page padding class="text-left">
     <asset-resolver :asset-ref="$route.params.assetRef" #default="{ asset }">
         <h4 class="q-my-sm">Asset: <render-widget
@@ -31,15 +31,5 @@ export default {
       this.wrapper.$emit('expose-meta-actions', metaActionDefs);
     },
   },
-  onMounted() {
-    console.log('$route.params.assetRef', this.$route.params.assetRef);
-  },
-  onLoad(handle, assetLink) {
-    handle.defineRoute('net.symbioquine.farmos_asset_link.routes.v0.asset_page', pageRoute => {
-      pageRoute.path("/asset/:assetRef");
-
-      pageRoute.component(handle.thisPlugin);
-    });
-  }
 }
 </script>

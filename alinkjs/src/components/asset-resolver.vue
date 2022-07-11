@@ -16,7 +16,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['asset-resolved'])
+const emit = defineEmits(['asset-resolved']);
 
 const assetLink = inject('assetLink');
 
