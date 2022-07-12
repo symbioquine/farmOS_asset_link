@@ -218,7 +218,7 @@ module.exports = configure(function (/* ctx */) {
         }
       },
       headers: {
-        'Set-Cookie': 'assetLinkDrupalBasePath=/; path=/',
+        'Set-Cookie': 'assetLinkDrupalBasePath=/; path=/; SameSite=Lax',
       },
     },
 

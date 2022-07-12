@@ -282,7 +282,7 @@ class AssetLinkPluginHandle {
           routeDef.path = path;
         },
         component(component) {
-          routeDef.component = component;
+          routeDef.component = Vue.markRaw(component);
         },
     };
 
@@ -321,7 +321,7 @@ class AssetLinkPluginHandle {
           slotDef.weightFn = weightFn;
         },
         component(component) {
-          slotDef.component = component;
+          slotDef.component = Vue.markRaw(component);
         },
     };
 
@@ -386,7 +386,7 @@ class AssetLinkPluginHandle {
           widgetDecoratorDef.weightFn = weightFn;
         },
         component(component) {
-          widgetDecoratorDef.component = component;
+          widgetDecoratorDef.component = Vue.markRaw(component);
         },
     };
 

@@ -96,7 +96,9 @@ export default defineComponent({
         return [];
       }
 
-      return assetLink.getSlots({ type: 'config-action', route });
+      return [];
+      // const m = assetLink.getSlots({ type: 'config-action', route });
+      // return m.length ? [] : new Array();
     });
 
     const farmOSLoginUrl = ref(null);

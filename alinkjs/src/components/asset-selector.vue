@@ -37,7 +37,6 @@ watch(currentSearchMethod, () => emit('searchMethodChanged', currentSearchMethod
         v-for="slotDef in searchMethodTileDefs"
         :key="slotDef.id"
         :is="slotDef.component"
-        v-bind="{ currentSearchMethod, ...slotDef.props }"
       ></component>
 
   </search-method-tile-tabber>

@@ -91,9 +91,9 @@ const SearchMethodTileTabber = defineComponent({
 
       const children = [];
 
-      children.push(h(QBtnGroup, { push: true, spread: true }, buttonGroupChildren));
+      children.push(h(QBtnGroup, { push: true, spread: true }, () => buttonGroupChildren));
 
-      children.push(h('div', { class: "q-my-md" }, [ slotsContents ]));
+      children.push(h('div', { class: "q-my-md" }, slotsContents));
 
       return h('div', { class: "text-center q-ma-md" }, children);
     };

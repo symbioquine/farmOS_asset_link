@@ -1,15 +1,10 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 
-const props = defineProps({
-  currentSearchMethod: {
-    type: String,
-    required: true,
-  },
-});
+const currentSearchMethod = inject('currentSearchMethod');
 
 const icon = computed(() => {
-  return props.currentSearchMethod === 'proximity-search' ? 'mdi-map-marker-plus' : 'mdi-map-marker-radius';
+  return currentSearchMethod === 'proximity-search' ? 'mdi-map-marker-plus' : 'mdi-map-marker-radius';
 });
 </script>
 
