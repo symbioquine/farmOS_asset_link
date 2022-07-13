@@ -16,6 +16,18 @@
             v-bind="slotDef.props"
             class="q-mr-sm"></component>
 
+        <q-btn flat padding="xs" icon="mdi-dots-vertical" @click.stop v-if="metaActionDefs.length">
+          <q-menu>
+            <q-list style="min-width: 200px">
+              <component
+                  v-for="slotDef in metaActionDefs"
+                  :key="slotDef.id"
+                  :is="slotDef.component"
+                  v-bind="slotDef.props"></component>
+            </q-list>
+          </q-menu>
+        </q-btn>
+
       </q-toolbar>
     </q-header>
 
@@ -31,7 +43,7 @@
       </q-banner>
 
       <q-page>
-        <router-view v-if="assetLink.vm.booted" />
+        <router-view v-if="assetLink.vm.booted" @expose-meta-actions="metaActionDefs = $event" />
 
         <q-inner-loading :showing="!assetLink.vm.booted">
           <q-circular-progress
@@ -91,15 +103,7 @@ export default defineComponent({
 
     provide('assetLink', assetLink);
 
-    const configActionDefs = computed(() => {
-      if (!assetLink.vm.booted) {
-        return [];
-      }
-
-      return [];
-      // const m = assetLink.getSlots({ type: 'config-action', route });
-      // return m.length ? [] : new Array();
-    });
+    const metaActionDefs = ref([]);
 
     const farmOSLoginUrl = ref(null);
     watch(route, () => {
@@ -135,6 +139,7 @@ export default defineComponent({
       route,
       assetLink,
       farmOSLoginUrl,
+      metaActionDefs,
     };
   },
   created () {

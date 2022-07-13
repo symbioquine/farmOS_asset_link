@@ -226,8 +226,6 @@ export default {
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.manage_plugins', slot => {
       slot.type('config-action');
 
-      slot.showIf(context => true);
-
       const targetUrl = createDrupalUrl(`/alink/manage-plugins`).toString();
 
       slot.component(() =>
