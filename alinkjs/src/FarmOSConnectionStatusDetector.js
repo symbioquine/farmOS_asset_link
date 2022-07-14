@@ -22,7 +22,7 @@ export default class FarmOSConnectionStatusDetector {
     this.$_running = false;
     this.$_barrier = new Barrier();
 
-    this.hasNetworkConnection = window.navigator.onLine;
+    this.hasNetworkConnection = ref(window.navigator.onLine);
     this.canReachFarmOS = ref(null);
     this.isLoggedIn = ref(null);
     this.isOnline = computed(() => {
@@ -36,7 +36,7 @@ export default class FarmOSConnectionStatusDetector {
       this.canReachFarmOS.value = false;
     });
     window.addEventListener('online', () => {
-      this.hasNetworkConnection = true;
+      this.hasNetworkConnection.value = true;
       this.$_barrier.release();
     });
     if (window.navigator && window.navigator.connection) {
@@ -89,7 +89,7 @@ export default class FarmOSConnectionStatusDetector {
   }
 
   async $_checkConnectionStatus() {
-    if (!this.hasNetworkConnection) {
+    if (!this.hasNetworkConnection.value) {
       return;
     }
 

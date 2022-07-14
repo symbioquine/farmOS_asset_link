@@ -41,12 +41,12 @@ const resolveAsset = async () => {
   }
 };
 
-const onAssetChanged = (assetType, assetId) => {
-  const resolvedAsset = this.resolvedAsset;
+const onAssetChanged = ({ assetType, assetId }) => {
   if (resolvedAsset.value && resolvedAsset.value.type === assetType && resolvedAsset.value.id === assetId) {
     resolveAsset();
   }
 };
+
 
 let unsubber;
 onMounted(() => {

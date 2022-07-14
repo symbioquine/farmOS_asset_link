@@ -322,7 +322,7 @@ export default class AssetLink {
       console.log('_memory::update', update);
 
       if (update.operations.op === 'updateRecord' && update.operations.record.type.startsWith('asset--')) {
-        this.eventBus.$emit('changed:asset', update.operations.record.type, update.operations.record.id);
+        this.eventBus.$emit('changed:asset', { assetType: update.operations.record.type, assetId: update.operations.record.id});
       }
 
     });
