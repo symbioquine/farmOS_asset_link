@@ -37,6 +37,7 @@ module.exports = {
         vue: {
           singleton: true,
         },
+        quasar: {},
       },
     }),
     new VueLoaderPlugin(),

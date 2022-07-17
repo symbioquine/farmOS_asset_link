@@ -6,8 +6,11 @@ module.exports = defineConfig({
     process.env.NODE_ENV === "production"
       ? "/__THIS_GETS_REPLACED_AT_RUNTIME_BY_THE_DRUPAL_CONTROLLER__/"
       : "/alink/",
+
   outputDir: "../farmos_asset_link/asset-link-dist/",
-  transpileDependencies: true,
+
+  transpileDependencies: ["quasar"],
+
   configureWebpack: {
     plugins: [
       new ModuleFederationPlugin({
@@ -21,8 +24,16 @@ module.exports = defineConfig({
           vue: {
             singleton: true,
           },
+          quasar: {},
         },
       }),
     ],
+  },
+
+  pluginOptions: {
+    quasar: {
+      importStrategy: "kebab",
+      rtlSupport: false,
+    },
   },
 });
