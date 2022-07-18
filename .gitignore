@@ -4,7 +4,7 @@ devcerts
 
 /docker/db
 /docker/www
-/node_modules
+**/node_modules
 .project
 
 # gitignore template for Drupal 8 projects

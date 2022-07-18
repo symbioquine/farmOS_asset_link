@@ -186,13 +186,13 @@ export default class AssetLink {
     });
 
     this._cores.pluginLoader.eventBus.$on('add-route', routeDef => {
-      if (typeof this.rootComponent.exposed.addRoute === 'function') {
+      if (typeof this.rootComponent.exposed?.addRoute === 'function') {
         this.rootComponent.exposed.addRoute(routeDef);
       }
     });
 
     this._cores.pluginLoader.eventBus.$on('remove-route', routeDef => {
-      if (typeof this.rootComponent.exposed.removeRoute === 'function') {
+      if (typeof this.rootComponent.exposed?.removeRoute === 'function') {
         this.rootComponent.exposed.removeRoute(routeDef);
       }
     });
