@@ -12,6 +12,7 @@ const Components = require('unplugin-vue-components/vite');
 const { configure } = require('quasar/wrappers');
 const { NodeGlobalsPolyfillPlugin } = require('@esbuild-plugins/node-globals-polyfill');
 const fs = require('fs');
+const fse = require('fs-extra');
 const glob = require("glob");
 const path = require('path');
 const yaml = require('js-yaml');
@@ -157,6 +158,44 @@ module.exports = configure(function (/* ctx */) {
 
       // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
+      beforeBuild() {
+        const srcDir = path.resolve(__dirname, '.quasar');
+        const dstDir = path.resolve(__dirname, '.quasar-sidecar');
+
+        fse.copySync(srcDir, dstDir, { overwrite: true }, function (err) {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log("success!");
+          }
+        });
+
+        const qReplace = (filename, dataTransformFn) => {
+          const fullName = path.resolve(dstDir, filename);
+
+          const data = fs.readFileSync(fullName, { encoding: 'utf8' });
+
+          const updatedData = dataTransformFn(data);
+;
+
+          fs.writeFileSync(fullName, updatedData, { encoding: 'utf8' });
+        };
+
+        qReplace('app.js', data => data
+            .replace(/app\/src\/App\.vue/g, 'app/src/FloatingSidebar.vue')
+            .replace(/import createRouter[^\n]*/, '')
+            .replace(/\s*const router[^\n]*/, '')
+            .replace(/\s*typeof createRouter[^\n]*/, '')
+            .replace(/\s*\? await createRouter[^\n]*/, '')
+            .replace(/\s*: createRouter[^\)]*\)/, '')
+            .replace(/\s*router,?/g, ''));
+
+        qReplace('client-entry.js', data => data
+            .replace(/#q-app/g, '#asset-link-floating-sidebar')
+            .replace(/app\.use\(router\)/g, '')
+            .replace(/\s*(return )?router(\.resolve\(url\)\.href)?,?/g, ''));
+      },
+
       publicPath: '/alink',
       // analyze: true,
       // env: {},
@@ -168,6 +207,8 @@ module.exports = configure(function (/* ctx */) {
       distDir: '../farmos_asset_link/asset-link-dist/',
 
       extendViteConf (viteConf) {
+        // console.log(viteConf);
+
         viteConf.resolve.alias.path = 'path-browserify';
         viteConf.resolve.alias['@'] = path.resolve(__dirname, './src');
 
@@ -175,8 +216,21 @@ module.exports = configure(function (/* ctx */) {
         viteConf.plugins.push(GenerateDefaultPluginConfigYmlFilesRollupPlugin());
         viteConf.plugins.push(Components({ /* options */ }));
 
+        viteConf.build.manifest = true;
+
         viteConf.build.rollupOptions = {
+          input: {
+            index: path.resolve(__dirname, 'index.html'),
+            sidecar: path.resolve(__dirname, '.quasar-sidecar/client-entry.js'),
+          },
           output: {
+            entryFileNames: chunkInfo => {
+              // console.log(chunkInfo);
+              if (chunkInfo.facadeModuleId.endsWith('.quasar-sidecar/client-entry.js')) {
+                return "assets/sidecar.js";
+              }
+              return "assets/[name].[hash].js";
+            },
             manualChunks(id) {
               if (id.includes('/node_modules/')) {
                 const modules = ['quasar', '@quasar', 'vue', '@vue']
