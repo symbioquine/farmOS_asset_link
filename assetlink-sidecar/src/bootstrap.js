@@ -3,6 +3,8 @@ import FloatingSidebar from "./FloatingSidebar.vue";
 import { Quasar } from "quasar";
 import quasarUserOptions from "./quasar-user-options";
 
+console.log("Running bootstrap...");
+
 const Content = defineAsyncComponent(() => import("assetlink_core/Content"));
 const Button = defineAsyncComponent(() => import("assetlink_core/Button"));
 
