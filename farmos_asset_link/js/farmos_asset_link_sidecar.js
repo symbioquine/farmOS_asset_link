@@ -10,7 +10,7 @@
   }
 
   const container = document.createElement('div');
-  // container.className = "quasar-style-wrap";
+  container.className = "quasar-style-wrap";
   container.setAttribute('data-quasar', '');
   container.style = "width: 1vw; height: 1vh; position: fixed; top: 0px; left: 0px;";
   document.body.appendChild(container);

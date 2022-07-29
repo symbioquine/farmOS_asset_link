@@ -38,6 +38,7 @@ module.exports = {
           singleton: true,
         },
         quasar: {},
+        assetlink: {},
       },
     }),
     new VueLoaderPlugin(),

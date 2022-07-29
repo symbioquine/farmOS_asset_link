@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "lerna": "^5.1.8"
+  },
+  "name": "farmOS_asset_link",
+  "devDependencies": {
+    "nx": "^14.4.3"
+  }
+}
