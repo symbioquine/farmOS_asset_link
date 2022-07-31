@@ -9,4 +9,15 @@ module.exports = {
       type: "commonjs-module",
     }
   },
+  externalsType: 'commonjs-module',
+  externals: {
+    'vue': 'vue',
+    'vue-router': 'vue-router',
+    'quasar': 'quasar',
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src/'),
+    },
+  },
 };

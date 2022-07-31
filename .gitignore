@@ -1,6 +1,8 @@
 /farmos_asset_link/asset-link-dist
 /farmos_asset_link/config/install/farmos_asset_link.asset_link_default_plugin.*.yml
 devcerts
+**/dist
+lerna-debug.log
 
 /docker/db
 /docker/www

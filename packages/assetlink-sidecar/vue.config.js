@@ -103,9 +103,6 @@ module.exports = defineConfig({
       new ModuleFederationPlugin({
         name: "assetlink_sidecar",
         filename: "remoteEntry.js",
-        // remotes: {
-        //   assetlink_core: `assetlink_core@${BASE_PUBLIC_PATH}core/remoteEntry.js`,
-        // },
         shared: {
           vue: {
             singleton: true,

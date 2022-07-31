@@ -16,10 +16,6 @@ module.exports = defineConfig({
       new ModuleFederationPlugin({
         name: "assetlink",
         filename: "pwa/remoteEntry.js",
-        // remotes: {
-        //   assetlink_core:
-        //     "assetlink_core@/__THIS_GETS_REPLACED_AT_RUNTIME_BY_THE_DRUPAL_CONTROLLER__/core/remoteEntry.js",
-        // },
         shared: {
           vue: {
             singleton: true,
