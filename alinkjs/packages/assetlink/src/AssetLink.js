@@ -7,25 +7,25 @@ import { IndexedDBSource } from '@orbit/indexeddb';
 import { RecordSchema } from '@orbit/records';
 import { MemorySource } from '@orbit/memory';
 
-import DrupalJSONAPISource from 'assetlink/DrupalJSONAPISource';
-import DrupalSyncQueryOperators from 'assetlink/DrupalSyncQueryOperators';
+import DrupalJSONAPISource from '@/DrupalJSONAPISource';
+import DrupalSyncQueryOperators from '@/DrupalSyncQueryOperators';
 
 import localforage from 'localforage';
 
 import fetch from 'cross-fetch';
 import { v4 as uuidv4 } from 'uuid';
 
-import AssetLinkUI from 'assetlink/AssetLinkUI';
-import AssetLinkUtil from 'assetlink/AssetLinkUtil';
-import FarmOSConnectionStatusDetector from 'assetlink/FarmOSConnectionStatusDetector';
-import PeekableAsyncIterator from 'assetlink/PeekableAsyncIterator';
-import AssetLinkPluginListsCore from 'assetlink/AssetLinkPluginListsCore';
-import AssetLinkPluginLoaderCore from 'assetlink/AssetLinkPluginLoaderCore';
-import HttpAccessDeniedException from 'assetlink/HttpAccessDeniedException';
+import AssetLinkUI from '@/AssetLinkUI';
+import AssetLinkUtil from '@/AssetLinkUtil';
+import FarmOSConnectionStatusDetector from '@/FarmOSConnectionStatusDetector';
+import PeekableAsyncIterator from '@/PeekableAsyncIterator';
+import AssetLinkPluginListsCore from '@/AssetLinkPluginListsCore';
+import AssetLinkPluginLoaderCore from '@/AssetLinkPluginLoaderCore';
+import HttpAccessDeniedException from '@/HttpAccessDeniedException';
 
-import createDrupalUrl from 'assetlink/utils/createDrupalUrl';
-import currentEpochSecond from 'assetlink/utils/currentEpochSecond';
-import EventBus from 'assetlink/utils/EventBus';
+import createDrupalUrl from '@/utils/createDrupalUrl';
+import currentEpochSecond from '@/utils/currentEpochSecond';
+import EventBus from '@/utils/EventBus';
 
 const fetchJson = (url, args) => fetch(url, args).then(response => response.json());
 
@@ -166,11 +166,11 @@ export default class AssetLink {
 
   /* eslint-disable no-console,no-unused-vars */
   async boot() {
-    const bootingEventGroup = this._devToolsApi.startTimelineEventGroup({
-      data: {},
-      title: `booting`,
-      groupId: `booting-${uuidv4()}`,
-    });
+    // const bootingEventGroup = this._devToolsApi.startTimelineEventGroup({
+    //   data: {},
+    //   title: `booting`,
+    //   groupId: `booting-${uuidv4()}`,
+    // });
 
     this._connectionStatus.start();
 
@@ -353,7 +353,7 @@ export default class AssetLink {
       this._precache();
     }
 
-    bootingEventGroup.end();
+    // bootingEventGroup.end();
 
     return true;
   }

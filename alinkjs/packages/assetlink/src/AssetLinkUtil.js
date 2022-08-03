@@ -1,5 +1,5 @@
 import { formatRFC3339 } from 'date-fns'
-import createDrupalUrl from 'assetlink/utils/createDrupalUrl';
+import createDrupalUrl from '@/utils/createDrupalUrl';
 import geohash from 'ngeohash';
 import haversine from 'haversine-distance';
 

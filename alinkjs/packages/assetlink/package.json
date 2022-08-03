@@ -2,19 +2,23 @@
   "name": "assetlink",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
   "main": "index.js",
   "publishConfig": {
     "directory": "dist"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf ./dist && cp -r ./src ./dist && cp ./package.json ./dist/"
+    "prepare-dist": "rm -rf ./dist/* && cp ./package.json ./dist/",
+    "build": "npm run prepare-dist && babel src --out-dir dist",
+    "dev": "npm run prepare-dist && babel src --watch --out-dir dist"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/cli": "^7.18.10",
+    "@babel/core": "^7.18.10",
+    "babel-plugin-module-resolver": "^4.1.0",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0"
   },
@@ -30,9 +34,9 @@
     "@orbit/serializers": "^0.17.0",
     "cross-fetch": "^3.1.5",
     "date-fns": "^2.28.0",
+    "haversine-distance": "^1.2.1",
     "js-cookie": "^3.0.1",
     "localforage": "^1.10.0",
-    "haversine-distance": "^1.2.1",
     "ngeohash": "^0.6.3",
     "qr-scanner": "^1.4.1",
     "quasar": "^2.6.0",

@@ -12,6 +12,7 @@ const createDevServerConfig = () => {
 
   let serverConfig = {
     hot: true,
+    watchFiles: ['node_modules/assetlink/**/*'],
     // client: {
     //   webSocketTransport: `${__dirname}/src/alink-plugin-reloading-dev-server-ws-transport`,
     // },
@@ -50,18 +51,23 @@ const createDevServerConfig = () => {
         ws: false,
         target: DEV_PROXY_TARGET,
         context: () => true,
-        headers: {
-          "X-Forwarded-For": `${devHost}:8080`,
-        },
+        secure: targetUrl.protocol === "https",
+        changeOrigin: true,
         bypass: function (req) {
           if (req.path.indexOf("/alink/sidecar") === 0) {
             return req.path;
           }
           console.log(
-            `'${req.path}' is not an alink url - passing to proxy...`
+            `'${req.path}' is not an alink sidecar url - passing to proxy...`
           );
         },
+        onProxyReq: (proxyReq, req, res) => {
+          proxyReq.setHeader('X-Forwarded-For', `${devHost}:${serverPort}`);
+        },
       },
+    },
+    onListening: devServer => {
+      serverPort = devServer.server.address().port;
     },
   };
 
@@ -94,7 +100,7 @@ const BASE_PUBLIC_PATH =
 module.exports = defineConfig({
   publicPath: BASE_PUBLIC_PATH + "sidecar/",
 
-  outputDir: "../../farmos_asset_link/asset-link-dist/sidecar",
+  outputDir: "../../../farmos_asset_link/asset-link-dist/sidecar",
 
   transpileDependencies: ["quasar"],
 

@@ -1,7 +1,7 @@
 import JSONAPISource, { JSONAPISerializers } from '@orbit/jsonapi';
 import { buildSerializerSettingsFor, buildInflector } from '@orbit/serializers';
 
-import DrupalJSONAPIURLBuilder from 'assetlink/DrupalJSONAPIURLBuilder';
+import DrupalJSONAPIURLBuilder from '@/DrupalJSONAPIURLBuilder';
 
 
 /**

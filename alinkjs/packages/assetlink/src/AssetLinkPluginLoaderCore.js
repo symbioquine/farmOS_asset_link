@@ -9,9 +9,9 @@ import EventBus from 'assetlink/utils/EventBus';
 import { loadModule } from 'vue3-sfc-loader/dist/vue3-sfc-loader.esm.js';
 import { parseComponent } from 'vue-template-compiler';
 
-import VuePluginShorthandDecorator from './VuePluginShorthandDecorator';
+import VuePluginShorthandDecorator from '@/VuePluginShorthandDecorator';
 
-import currentEpochSecond from 'assetlink/utils/currentEpochSecond';
+import currentEpochSecond from '@/utils/currentEpochSecond';
 
 export default class AssetLinkPluginLoaderCore {
 
