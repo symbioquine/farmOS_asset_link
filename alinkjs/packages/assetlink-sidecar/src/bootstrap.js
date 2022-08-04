@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import FloatingSidebar from "./FloatingSidebar.vue";
 import { Quasar } from "quasar";
 import quasarUserOptions from "./quasar-user-options";
+import devToolsPlugin from "assetlink/devToolsPlugin";
 
 console.log("Running bootstrap...");
 
@@ -16,5 +17,7 @@ if (!window.assetLinkDrupalBasePath && window.drupalSettings?.path?.baseUrl) {
 }
 
 const app = createApp(FloatingSidebar).use(Quasar, quasarUserOptions);
+
+devToolsPlugin({ app });
 
 app.mount("#asset-link-floating-sidebar");

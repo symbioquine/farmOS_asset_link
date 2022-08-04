@@ -1,109 +1,163 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated class="glossy">
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          @click="leftDrawerOpen = !leftDrawerOpen"
-          aria-label="Menu"
-          icon="menu"
+    <q-header elevated>
+      <q-toolbar class="bg-green text-white">
+        <q-toolbar-title> Asset Link </q-toolbar-title>
+
+        <farmos-sync-icon @click.stop="$refs.syncTray.toggle()" />
+
+        <component
+          :is="slotDef.component"
+          v-for="slotDef in assetLink.getSlots({ type: 'toolbar-item', route })"
+          :key="slotDef.id"
+          v-bind="slotDef.props"
+          class="q-mr-sm"
         />
 
-        <q-toolbar-title> Quasar App </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
+        <q-btn v-if="metaActionDefs.length" flat padding="xs" icon="mdi-dots-vertical" @click.stop>
+          <q-menu>
+            <q-list style="min-width: 200px">
+              <component
+                :is="slotDef.component"
+                v-for="slotDef in metaActionDefs"
+                :key="slotDef.id"
+                v-bind="slotDef.props"
+              />
+            </q-list>
+          </q-menu>
+        </q-btn>
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered class="bg-grey-2">
-      <q-list>
-        <q-item-label header>Essential Links</q-item-label>
-        <q-item clickable tag="a" target="_blank" href="https://quasar.dev">
-          <q-item-section avatar>
-            <q-icon name="school" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Docs</q-item-label>
-            <q-item-label caption>quasar.dev</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item
-          clickable
-          tag="a"
-          target="_blank"
-          href="https://github.com/quasarframework/"
-        >
-          <q-item-section avatar>
-            <q-icon name="code" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Github</q-item-label>
-            <q-item-label caption>github.com/quasarframework</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item
-          clickable
-          tag="a"
-          target="_blank"
-          href="https://chat.quasar.dev"
-        >
-          <q-item-section avatar>
-            <q-icon name="chat" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Discord Chat Channel</q-item-label>
-            <q-item-label caption>chat.quasar.dev</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item
-          clickable
-          tag="a"
-          target="_blank"
-          href="https://forum.quasar.dev"
-        >
-          <q-item-section avatar>
-            <q-icon name="forum" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Forum</q-item-label>
-            <q-item-label caption>forum.quasar.dev</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item
-          clickable
-          tag="a"
-          target="_blank"
-          href="https://twitter.com/quasarframework"
-        >
-          <q-item-section avatar>
-            <q-icon name="rss_feed" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Twitter</q-item-label>
-            <q-item-label caption>@quasarframework</q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-drawer>
+    <farmos-sync-tray ref="syncTray" />
 
     <q-page-container>
-      <router-view></router-view>
+      <q-banner
+        v-if="
+          assetLink.connectionStatus.canReachFarmOS.value &&
+          !assetLink.connectionStatus.isLoggedIn.value
+        "
+        inline-actions
+        class="text-white bg-orange-10"
+      >
+        You are not logged in to farmOS.
+        <template #action>
+          <q-btn
+            flat
+            dense
+            color="white"
+            icon-right="mdi-account-key"
+            label="Log in"
+            :href="farmOSLoginUrl"
+          />
+        </template>
+      </q-banner>
+
+      <q-page>
+        <router-view v-if="assetLink.vm.booted" @expose-meta-actions="metaActionDefs = $event" />
+
+        <q-inner-loading :showing="!assetLink.vm.booted">
+          <q-circular-progress
+            show-value
+            font-size="16px"
+            class="text-red q-ma-md"
+            :value="assetLink.vm.bootProgress"
+            size="100px"
+            :thickness="0.25"
+            color="#2E7D32"
+            track-color="grey-3"
+          >
+            {{ assetLink.vm.bootProgress }}%
+          </q-circular-progress>
+          <span v-if="assetLink.vm.bootFailed" class="text-italic text-red-12">{{
+            assetLink.vm.bootText
+          }}</span>
+          <span v-else class="text-italic">{{ assetLink.vm.bootText }}</span>
+        </q-inner-loading>
+      </q-page>
     </q-page-container>
   </q-layout>
 </template>
 
 <script>
-import { ref } from "vue";
+import { defineComponent, inject, getCurrentInstance, provide, watch, ref } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
-export default {
-  name: "LayoutDefault",
+import AssetLink from "assetlink/AssetLink";
+import createDrupalUrl from "assetlink/utils/createDrupalUrl";
 
-  setup() {
+if (import.meta.hot) {
+  import.meta.hot.on("asset-link-plugin-changed", (data) => {
+    const pluginChangedEvent = new CustomEvent("asset-link-plugin-changed", {
+      detail: {
+        pluginUrl: data.pluginUrl,
+      },
+    });
+
+    window.dispatchEvent(pluginChangedEvent);
+  });
+}
+
+export default defineComponent({
+  name: "App",
+  setup(props, { expose }) {
+    const rootComponent = getCurrentInstance();
+
+    const router = useRouter();
+    const route = useRoute();
+
+    const devToolsApi = inject("devToolsApi");
+
+    const assetLink = new AssetLink(rootComponent, devToolsApi);
+
+    provide("assetLink", assetLink);
+
+    const metaActionDefs = ref([]);
+
+    const farmOSLoginUrl = ref(null);
+    watch(
+      route,
+      () => {
+        farmOSLoginUrl.value = createDrupalUrl(
+          `/user/login?destination=${window.location.pathname}`
+        );
+      },
+      { immediate: true }
+    );
+
+    expose({
+      assetLink,
+      async addRoute(routeDef) {
+        const currentRoutePath = route.path;
+
+        await router.addRoute({
+          name: routeDef.name,
+          path: routeDef.path,
+          component: routeDef.component,
+          props: routeDef.props,
+        });
+
+        const resolved = router.resolve(currentRoutePath);
+
+        if (resolved.name === routeDef.name) {
+          // await router.replace('/');
+          await router.replace(currentRoutePath);
+        }
+      },
+      /* eslint-disable no-console,no-unused-vars */
+      removeRoute(routeDef) {
+        // TODO: Implement
+      },
+    });
     return {
-      leftDrawerOpen: ref(false),
+      route,
+      assetLink,
+      farmOSLoginUrl,
+      metaActionDefs,
     };
   },
-};
+  created() {
+    this.assetLink.boot();
+  },
+});
 </script>

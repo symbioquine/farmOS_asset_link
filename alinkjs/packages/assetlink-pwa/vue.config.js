@@ -1,19 +1,18 @@
 const { defineConfig } = require("@vue/cli-service");
 const { ModuleFederationPlugin } = require("webpack").container;
 
-const DEV_PROXY_TARGET =
-  process.env.ASSET_LINK_DEV_PROXY_TARGET || "http://localhost";
+const DEV_PROXY_TARGET = process.env.ASSET_LINK_DEV_PROXY_TARGET || "http://localhost";
 
 const createDevServerConfig = () => {
   const targetUrl = new URL(DEV_PROXY_TARGET);
 
   const devHost = targetUrl.hostname;
 
-  let serverPort = undefined;
+  let serverPort;
 
-  let serverConfig = {
+  const serverConfig = {
     hot: true,
-    watchFiles: ['node_modules/assetlink/**/*'],
+    watchFiles: ["node_modules/assetlink/**/*"],
     // client: {
     //   webSocketTransport: `${__dirname}/src/alink-plugin-reloading-dev-server-ws-transport`,
     // },
@@ -54,28 +53,26 @@ const createDevServerConfig = () => {
         context: () => true,
         secure: targetUrl.protocol === "https",
         changeOrigin: true,
-        bypass: function (req) {
+        bypass(req) {
           if (req.path.indexOf("/alink/sidecar") === 0) {
             console.log(`'${req.path}' is an alink sidecar url - passing to proxy...`);
             return null;
           }
-          if (req.path.indexOf('/alink/backend') === 0) {
+          if (req.path.indexOf("/alink/backend") === 0) {
             console.log(`'${req.path}' is an alink backend url - passing to proxy...`);
             return null;
           }
           if (req.path.indexOf("/alink") === 0) {
             return req.path;
           }
-          console.log(
-            `'${req.path}' is not an alink url - passing to proxy...`
-          );
+          console.log(`'${req.path}' is not an alink url - passing to proxy...`);
         },
-        onProxyReq: (proxyReq, req, res) => {
-          proxyReq.setHeader('X-Forwarded-For', `${devHost}:${serverPort}`);
+        onProxyReq: (proxyReq) => {
+          proxyReq.setHeader("X-Forwarded-For", `${devHost}:${serverPort}`);
         },
       },
     },
-    onListening: devServer => {
+    onListening: (devServer) => {
       serverPort = devServer.server.address().port;
     },
   };
@@ -108,7 +105,6 @@ module.exports = defineConfig({
       : "/alink/",
 
   outputDir: "../../../farmos_asset_link/asset-link-dist/",
-
   transpileDependencies: ["quasar"],
 
   configureWebpack: {
@@ -125,7 +121,6 @@ module.exports = defineConfig({
         },
       }),
     ],
-
   },
 
   pluginOptions: {
@@ -134,5 +129,6 @@ module.exports = defineConfig({
       rtlSupport: false,
     },
   },
+
   devServer: createDevServerConfig(),
 });

@@ -166,11 +166,11 @@ export default class AssetLink {
 
   /* eslint-disable no-console,no-unused-vars */
   async boot() {
-    // const bootingEventGroup = this._devToolsApi.startTimelineEventGroup({
-    //   data: {},
-    //   title: `booting`,
-    //   groupId: `booting-${uuidv4()}`,
-    // });
+    const bootingEventGroup = this._devToolsApi.startTimelineEventGroup({
+      data: {},
+      title: `booting`,
+      groupId: `booting-${uuidv4()}`,
+    });
 
     this._connectionStatus.start();
 
@@ -353,7 +353,7 @@ export default class AssetLink {
       this._precache();
     }
 
-    // bootingEventGroup.end();
+    bootingEventGroup.end();
 
     return true;
   }

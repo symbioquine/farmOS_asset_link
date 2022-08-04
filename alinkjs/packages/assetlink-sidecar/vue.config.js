@@ -10,9 +10,11 @@ const createDevServerConfig = () => {
 
   const devHost = targetUrl.hostname;
 
+  let serverPort;
+
   let serverConfig = {
     hot: true,
-    watchFiles: ['node_modules/assetlink/**/*'],
+    watchFiles: ["node_modules/assetlink/**/*"],
     // client: {
     //   webSocketTransport: `${__dirname}/src/alink-plugin-reloading-dev-server-ws-transport`,
     // },
@@ -61,12 +63,12 @@ const createDevServerConfig = () => {
             `'${req.path}' is not an alink sidecar url - passing to proxy...`
           );
         },
-        onProxyReq: (proxyReq, req, res) => {
-          proxyReq.setHeader('X-Forwarded-For', `${devHost}:${serverPort}`);
+        onProxyReq: (proxyReq) => {
+          proxyReq.setHeader("X-Forwarded-For", `${devHost}:${serverPort}`);
         },
       },
     },
-    onListening: devServer => {
+    onListening: (devServer) => {
       serverPort = devServer.server.address().port;
     },
   };
