@@ -1,7 +1,8 @@
 const { defineConfig } = require("@vue/cli-service");
 const { ModuleFederationPlugin } = require("webpack").container;
 
-const DEV_PROXY_TARGET = process.env.ASSET_LINK_DEV_PROXY_TARGET || "http://localhost";
+const DEV_PROXY_TARGET =
+  process.env.ASSET_LINK_DEV_PROXY_TARGET || "http://localhost";
 
 const createDevServerConfig = () => {
   const targetUrl = new URL(DEV_PROXY_TARGET);
@@ -55,17 +56,23 @@ const createDevServerConfig = () => {
         changeOrigin: true,
         bypass(req) {
           if (req.path.indexOf("/alink/sidecar") === 0) {
-            console.log(`'${req.path}' is an alink sidecar url - passing to proxy...`);
+            console.log(
+              `'${req.path}' is an alink sidecar url - passing to proxy...`
+            );
             return null;
           }
           if (req.path.indexOf("/alink/backend") === 0) {
-            console.log(`'${req.path}' is an alink backend url - passing to proxy...`);
+            console.log(
+              `'${req.path}' is an alink backend url - passing to proxy...`
+            );
             return null;
           }
           if (req.path.indexOf("/alink") === 0) {
             return req.path;
           }
-          console.log(`'${req.path}' is not an alink url - passing to proxy...`);
+          console.log(
+            `'${req.path}' is not an alink url - passing to proxy...`
+          );
         },
         onProxyReq: (proxyReq) => {
           proxyReq.setHeader("X-Forwarded-For", `${devHost}:${serverPort}`);

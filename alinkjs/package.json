@@ -8,6 +8,7 @@
     "nx": "^14.4.3"
   },
   "scripts": {
+    "build": "lerna run build",
     "dev": "multiview [npm run dev:assetlink] [npm run serve:sidecar] [npm run serve:pwa] -e",
     "dev:assetlink": "lerna run dev --stream --scope=assetlink --ignore='assetlink-*'",
     "serve:sidecar": "lerna run serve --stream --scope=assetlink-sidecar -- --port 1234",

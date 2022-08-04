@@ -14,7 +14,13 @@
           class="q-mr-sm"
         />
 
-        <q-btn v-if="metaActionDefs.length" flat padding="xs" icon="mdi-dots-vertical" @click.stop>
+        <q-btn
+          v-if="metaActionDefs.length"
+          flat
+          padding="xs"
+          icon="mdi-dots-vertical"
+          @click.stop
+        >
           <q-menu>
             <q-list style="min-width: 200px">
               <component
@@ -54,7 +60,10 @@
       </q-banner>
 
       <q-page>
-        <router-view v-if="assetLink.vm.booted" @expose-meta-actions="metaActionDefs = $event" />
+        <router-view
+          v-if="assetLink.vm.booted"
+          @expose-meta-actions="metaActionDefs = $event"
+        />
 
         <q-inner-loading :showing="!assetLink.vm.booted">
           <q-circular-progress
@@ -69,9 +78,11 @@
           >
             {{ assetLink.vm.bootProgress }}%
           </q-circular-progress>
-          <span v-if="assetLink.vm.bootFailed" class="text-italic text-red-12">{{
-            assetLink.vm.bootText
-          }}</span>
+          <span
+            v-if="assetLink.vm.bootFailed"
+            class="text-italic text-red-12"
+            >{{ assetLink.vm.bootText }}</span
+          >
           <span v-else class="text-italic">{{ assetLink.vm.bootText }}</span>
         </q-inner-loading>
       </q-page>
@@ -80,7 +91,14 @@
 </template>
 
 <script>
-import { defineComponent, inject, getCurrentInstance, provide, watch, ref } from "vue";
+import {
+  defineComponent,
+  inject,
+  getCurrentInstance,
+  provide,
+  watch,
+  ref,
+} from "vue";
 import { useRouter, useRoute } from "vue-router";
 
 import AssetLink from "assetlink/AssetLink";

@@ -14,7 +14,10 @@ defineExpose({
   <q-drawer v-model="drawer" overlay bordered class="bg-grey-3">
     <q-scroll-area class="fit">
       <q-list v-if="assetLink.vm.pendingUpdates.length > 0">
-        <template v-for="pendingUpdate in assetLink.vm.pendingUpdates" :key="pendingUpdate.data.id">
+        <template
+          v-for="pendingUpdate in assetLink.vm.pendingUpdates"
+          :key="pendingUpdate.data.id"
+        >
           <q-item clickable>
             <q-item-section>
               {{ pendingUpdate.data.options.label }}

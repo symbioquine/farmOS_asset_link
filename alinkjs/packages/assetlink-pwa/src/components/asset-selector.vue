@@ -23,7 +23,9 @@ const currentSearchMethod = ref(props.searchMethod);
 
 const emit = defineEmits(["searchMethodChanged"]);
 
-watch(currentSearchMethod, () => emit("searchMethodChanged", currentSearchMethod.value));
+watch(currentSearchMethod, () =>
+  emit("searchMethodChanged", currentSearchMethod.value)
+);
 </script>
 
 <template>
@@ -31,7 +33,13 @@ watch(currentSearchMethod, () => emit("searchMethodChanged", currentSearchMethod
     {{ title }}
   </div>
 
-  <search-method-tile-tabber v-model:current-search-method="currentSearchMethod">
-    <component :is="slotDef.component" v-for="slotDef in searchMethodTileDefs" :key="slotDef.id" />
+  <search-method-tile-tabber
+    v-model:current-search-method="currentSearchMethod"
+  >
+    <component
+      :is="slotDef.component"
+      v-for="slotDef in searchMethodTileDefs"
+      :key="slotDef.id"
+    />
   </search-method-tile-tabber>
 </template>

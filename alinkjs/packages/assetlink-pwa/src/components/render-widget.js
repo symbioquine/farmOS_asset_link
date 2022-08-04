@@ -14,7 +14,8 @@ const RenderWidget = defineComponent({
     });
 
     return widgetDecorators.reduce(
-      (decoratedWidget, decorator) => h(decorator.component, decorator.props, [decoratedWidget]),
+      (decoratedWidget, decorator) =>
+        h(decorator.component, decorator.props, [decoratedWidget]),
       this.$slots.default({})
     );
   },
