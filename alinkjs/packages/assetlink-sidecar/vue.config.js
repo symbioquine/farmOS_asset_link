@@ -3,7 +3,7 @@ const { ModuleFederationPlugin } = require("webpack").container;
 const WebpackAssetsManifest = require("webpack-assets-manifest");
 
 const DEV_PROXY_TARGET =
-  process.env.ASSET_LINK_DEV_PROXY_TARGET || "http://localhost";
+  process.env.ASSET_LINK_DEV_PROXY_TARGET || "http://127.0.0.1";
 
 const createDevServerConfig = () => {
   const targetUrl = new URL(DEV_PROXY_TARGET);
@@ -15,36 +15,6 @@ const createDevServerConfig = () => {
   let serverConfig = {
     hot: true,
     watchFiles: ["node_modules/assetlink/**/*"],
-    // client: {
-    //   webSocketTransport: `${__dirname}/src/alink-plugin-reloading-dev-server-ws-transport`,
-    // },
-    // webSocketServer: 'ws',
-    // setupMiddlewares: function (middlewares, devServer) {
-    //   if (!devServer) {
-    //     throw new Error('webpack-dev-server is not defined');
-    //   }
-    //
-    //   const files = [`${__dirname}/alink-plugins/**`];
-    //   chokidar
-    //     .watch(files, {
-    //       alwaysStat: true,
-    //       atomic: false,
-    //       followSymlinks: false,
-    //       ignoreInitial: true,
-    //       ignorePermissionErrors: true,
-    //       persistent: true,
-    //       usePolling: true,
-    //     })
-    //     .on("all", (event, pluginFilePath) => {
-    //       const fileName = path.basename(pluginFilePath);
-    //
-    //       const pluginUrl = `${targetUrl.protocol}//${devHost}:8080/alink/alink-plugins/${fileName}`;
-    //
-    //       devServer.sendMessage(devServer.webSocketServer.clients, 'asset-link-plugin-changed', pluginUrl);
-    //     });
-    //
-    //   return middlewares;
-    // },
     headers: {
       "Set-Cookie": "assetLinkDrupalBasePath=/; path=/",
     },
@@ -64,7 +34,17 @@ const createDevServerConfig = () => {
           );
         },
         onProxyReq: (proxyReq) => {
-          proxyReq.setHeader("X-Forwarded-For", `${devHost}:${serverPort}`);
+          // console.log("existing headers", proxyReq.getHeaders());
+
+          if (!proxyReq.getHeader("X-Forwarded-For")) {
+            proxyReq.setHeader("X-Forwarded-For", devHost);
+          }
+          if (!proxyReq.getHeader("X-Forwarded-Port")) {
+            proxyReq.setHeader("X-Forwarded-Port", serverPort);
+          }
+          if (!proxyReq.getHeader("X-Forwarded-Host")) {
+            proxyReq.setHeader("X-Forwarded-Host", `${devHost}:${serverPort}`);
+          }
         },
       },
     },
