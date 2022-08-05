@@ -94,8 +94,14 @@ module.exports = defineConfig({
   outputDir: "../../../farmos_asset_link/asset-link-dist/",
   transpileDependencies: ["quasar"],
 
-  configureWebpack: {
-    plugins: [
+  configureWebpack: (config) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      "path": require.resolve("path-browserify"),
+    };
+
+    config.plugins = [
+      ...config.plugins, // this is important !
       new ModuleFederationPlugin({
         name: "assetlink",
         filename: "pwa/remoteEntry.js",
@@ -103,11 +109,14 @@ module.exports = defineConfig({
           vue: {
             singleton: true,
           },
+          "vue-router": {
+            singleton: true,
+          },
           quasar: {},
           assetlink: {},
         },
       }),
-    ],
+    ];
   },
 
   pluginOptions: {

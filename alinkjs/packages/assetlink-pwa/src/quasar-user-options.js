@@ -1,5 +1,6 @@
 import "./styles/quasar.sass";
-import "@quasar/extras/material-icons/material-icons.css";
+import iconSet from "quasar/icon-set/mdi-v6";
+import "@quasar/extras/mdi-v6/mdi-v6.css";
 
 import {
   QAjaxBar,
@@ -142,6 +143,7 @@ import {
 
 // To be used on app.use(Quasar, { ... })
 export default {
+  iconSet,
   config: {},
   components: {
     QAjaxBar,
