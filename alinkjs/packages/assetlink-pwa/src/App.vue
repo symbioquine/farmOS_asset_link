@@ -124,6 +124,8 @@ export default defineComponent({
     watch(
       route,
       () => {
+        metaActionDefs.value = [];
+
         farmOSLoginUrl.value = createDrupalUrl(
           `/user/login?destination=${window.location.pathname}`
         );
