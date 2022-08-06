@@ -104,18 +104,6 @@ import { useRouter, useRoute } from "vue-router";
 import AssetLink from "assetlink/AssetLink";
 import createDrupalUrl from "assetlink/utils/createDrupalUrl";
 
-if (import.meta.hot) {
-  import.meta.hot.on("asset-link-plugin-changed", (data) => {
-    const pluginChangedEvent = new CustomEvent("asset-link-plugin-changed", {
-      detail: {
-        pluginUrl: data.pluginUrl,
-      },
-    });
-
-    window.dispatchEvent(pluginChangedEvent);
-  });
-}
-
 export default defineComponent({
   name: "App",
   setup(props, { expose }) {

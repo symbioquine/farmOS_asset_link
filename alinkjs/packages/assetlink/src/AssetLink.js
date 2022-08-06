@@ -186,6 +186,10 @@ export default class AssetLink {
       await this._cores.pluginLoader.unloadPlugin(pluginUrl);
     });
 
+    this._cores.pluginLists.eventBus.$on('update-plugin', async pluginUrl => {
+      await this._cores.pluginLoader.reloadPlugin(pluginUrl);
+    });
+
     this._cores.pluginLoader.eventBus.$on('add-route', routeDef => {
       if (typeof this.rootComponent.exposed?.addRoute === 'function') {
         this.rootComponent.exposed.addRoute(routeDef);
@@ -196,10 +200,6 @@ export default class AssetLink {
       if (typeof this.rootComponent.exposed?.removeRoute === 'function') {
         this.rootComponent.exposed.removeRoute(routeDef);
       }
-    });
-
-    window.addEventListener('asset-link-plugin-changed', async e => {
-      await this._cores.pluginLoader.reloadPlugin(new URL(e.detail.pluginUrl));
     });
 
     await this._cores.pluginLoader.boot();

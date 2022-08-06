@@ -222,6 +222,11 @@ class PluginReferenceTracker {
     }
   }
 
+  /**
+   * Remove a plugin list's reference to a given plugin url and - if
+   * no further references to that plugin exist - emit a 'remove-plugin'
+   * event.
+   */
   /* eslint-disable no-console */
   async freePluginReference(pluginUrl, listUrl) {
     const pluginReferences = this._pluginReferences[pluginUrl.toString()];
@@ -244,6 +249,20 @@ class PluginReferenceTracker {
     }
 
     await this._eventBus.$emit('remove-plugin', pluginUrl);
+  }
+
+  /**
+   * Emits an 'update-plugin' event for a plugin reference - acking it first
+   * if necessary.
+   */
+  async updatePluginReference(pluginUrl, listUrl) {
+    const pluginReferences = this._pluginReferences[pluginUrl.toString()];
+
+    if (!pluginReferences) {
+      await this.ackPluginReference(pluginUrl, listUrl);
+    }
+
+    await this._eventBus.$emit('update-plugin', pluginUrl);
   }
 }
 
@@ -268,7 +287,46 @@ class HttpPluginList {
   }
 
   async load(skipCache) {
-    this._latestPluginListView = postProcessPluginList(await this._getHttpPluginList(skipCache), this._isDefault, this._isLocal, this._url);
+    const rawPluginList = await this._getHttpPluginList(skipCache);
+
+    this._latestPluginListView = postProcessPluginList(rawPluginList, this._isDefault, this._isLocal, this._url);
+
+    if (rawPluginList.updateChannel) {
+      if (this._updateSocket) {
+        this._updateSocket.close();
+        this._updateSocket = undefined;
+      }
+
+      this._updateSocket = new WebSocket(rawPluginList.updateChannel);
+
+      this._updateSocket.addEventListener('message', (event) => {
+          const message = JSON.parse(event.data);
+
+          const isPluginChangedEvent = message.type === 'asset-link-plugin-changed';
+          const isPluginRemovedEvent = message.type === 'asset-link-plugin-removed';
+
+          if (isPluginChangedEvent || isPluginRemovedEvent) {
+            const pluginUrl = resolvePluginUrl(message.data, this._latestPluginListView);
+
+            const pluginRefIdx = this._latestPluginListView.plugins.findIndex(pRef => pRef.url.toString() === pluginUrl.toString());
+
+            if (pluginRefIdx < 0 && isPluginChangedEvent) {
+              this._latestPluginListView.plugins.push({ url: pluginUrl });
+            }
+
+            if (pluginRefIdx >= 0 && isPluginRemovedEvent) {
+              this._latestPluginListView.plugins.splice(pluginRefIdx, 1);
+            }
+
+            if (isPluginChangedEvent) {
+              this._pluginReferenceTracker.updatePluginReference(pluginUrl, this._url);
+            }
+            if (isPluginRemovedEvent) {
+              this._pluginReferenceTracker.freePluginReference(pluginUrl, this._url);
+            }
+          }
+      });
+    }
 
     await Promise.all(this._latestPluginListView.plugins.map(pRef => this._pluginReferenceTracker.ackPluginReference(pRef.url, this._url)));
 
@@ -425,9 +483,7 @@ const postProcessPluginList = (pluginList, isDefault, isLocal, sourceUrl) => {
   }
 
   pluginList.plugins = pluginList.plugins.map(pluginRef => {
-    // Resolve relative paths on this server, but still allow for
-    // arbitrary absolute/third-party urls
-    const pluginUrl = new URL(pluginRef.url, isLocal ? window.location.origin : pluginList.sourceUrl);
+    const pluginUrl = resolvePluginUrl(pluginRef.url, pluginList);
 
     return {
       url: pluginUrl,
@@ -435,4 +491,10 @@ const postProcessPluginList = (pluginList, isDefault, isLocal, sourceUrl) => {
   });
 
   return pluginList;
+};
+
+const resolvePluginUrl = (rawUrl, pluginList) => {
+  // Resolve relative paths on this server, but still allow for
+  // arbitrary absolute/third-party urls
+  return new URL(rawUrl, pluginList.isLocal ? window.location.origin : pluginList.sourceUrl);
 };

@@ -36,8 +36,10 @@ const createDevServerConfig = () => {
           const fileName = path.basename(pluginFilePath);
     
           const pluginUrl = `${targetUrl.protocol}//${devHost}:${serverPort}/alink/plugins/${fileName}`;
-    
-          devServer.sendMessage(devServer.webSocketServer.clients, 'asset-link-plugin-changed', pluginUrl);
+
+          const eventToSend = (event === 'unlink') ? 'asset-link-plugin-removed' : 'asset-link-plugin-changed';
+
+          devServer.sendMessage(devServer.webSocketServer.clients, eventToSend, pluginUrl);
         });
     
       return middlewares;
@@ -57,9 +59,10 @@ const createDevServerConfig = () => {
             return req.path;
           }
           if (req.path.indexOf("/alink/backend/default-plugins.repo.json") === 0) {
+            const wsProtocol = (targetUrl.protocol === "https") ? 'wss' : 'ws';
             res.send({
               plugins: fs.readdirSync(`${__dirname}/plugins`).map(pluginFilename => ({url: `/alink/plugins/${pluginFilename}`})),
-              updateChannel: '/ws',
+              updateChannel: `${wsProtocol}://${devHost}:${serverPort}/ws`,
             });
             return;
           }
