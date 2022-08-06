@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h5 class="q-my-sm">Actions:</h5>
+    <h5 class="q-my-xs">Actions:</h5>
     <div class="row q-mx-md" v-for="actionDef in assetLink.getSlots({ type: 'asset-action', route: $route, asset })">
       <component
             :key="actionDef.id"

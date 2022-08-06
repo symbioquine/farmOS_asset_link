@@ -4,13 +4,12 @@
       md="6"
       offset-md="3"
     >
-      <q-carousel class="q-ml-md q-mt-lg"
+      <q-carousel class="q-ml-md q-mt-xs"
         v-model="carouselPosition"
         swipeable
         animated
         control-type="flat"
         navigation
-        padding
         :arrows="false"
         height="200px"
       >

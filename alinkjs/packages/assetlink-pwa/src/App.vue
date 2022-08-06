@@ -2,7 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar class="bg-green text-white">
-        <q-toolbar-title> Asset Link </q-toolbar-title>
+        <q-toolbar-title> Asset Link</q-toolbar-title>
 
         <farmos-sync-icon @click.stop="$refs.syncTray.toggle()" />
 

@@ -31,15 +31,18 @@ resolveImageEntity();
 <template>
   <q-carousel-slide
       v-if="imageEntity">
-    <q-img
-      v-if="imageEntity"
-      :src="assetLink.util.createDrupalUrl(imageEntity.attributes.uri.url).toString()"
-      fit="contain"
-    ></q-img>
+    <div class="row fit justify-start items-center no-wrap">
+      <q-img
+        v-if="imageEntity"
+        :src="assetLink.util.createDrupalUrl(imageEntity.attributes.uri.url).toString()"
+        class="rounded-borders full-height"
+        fit="contain"
+      ></q-img>
 
-    <q-inner-loading :showing="!imageEntity">
-      <q-spinner-gears size="50px" color="primary" />
-    </q-inner-loading>
+      <q-inner-loading :showing="!imageEntity">
+        <q-spinner-gears size="50px" color="primary" />
+      </q-inner-loading>
+    </div>
   </q-carousel-slide>
 </template>
 
