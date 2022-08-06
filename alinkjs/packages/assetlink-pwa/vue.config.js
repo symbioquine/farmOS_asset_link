@@ -112,8 +112,15 @@ module.exports = defineConfig({
           "vue-router": {
             singleton: true,
           },
-          quasar: {},
-          assetlink: {},
+          quasar: {
+            singleton: true,
+          },
+          "quasar/src/plugins/Dialog.js": {
+            singleton: true,
+          },
+          assetlink: {
+            singleton: true,
+          },
         },
       }),
     ];
