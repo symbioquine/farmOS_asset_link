@@ -1,4 +1,5 @@
 const chokidar = require('chokidar');
+const yaml = require('js-yaml');
 const path = require('path');
 const fs = require('fs');
 const CopyPlugin = require("copy-webpack-plugin");
@@ -113,6 +114,38 @@ const createDevServerConfig = () => {
   return serverConfig;
 };
 
+/*
+ * Custom plugin to generate configuration entity yml files for each of our included
+ * default Asset Link plugins.
+ */
+function GenerateDefaultPluginConfigYmlFilesPlugin() {
+  GenerateDefaultPluginConfigYmlFilesPlugin.prototype.apply = (compiler) => {
+    compiler.hooks.beforeCompile.tap('GenerateDefaultPluginConfigYmlFilesPlugin', (compilation) => {
+
+      const configOutputDir = `${__dirname}/../../../farmos_asset_link/config/install`;
+
+      if (!fs.existsSync(configOutputDir)) {
+        fs.mkdirSync(configOutputDir, { recursive: true });
+      }
+
+      fs.readdirSync(`${__dirname}/plugins`).forEach(filename => {
+        const nameWithoutExt = filename.replace(/(\.[^.]+)*$/, '');
+
+        const configOutputFilename = `${configOutputDir}/farmos_asset_link.asset_link_default_plugin.${nameWithoutExt}.yml`;
+
+        fs.writeFileSync(configOutputFilename, yaml.dump({
+          langcode: 'en',
+          status: true,
+          id: nameWithoutExt,
+          dependencies: { enforced: { module: [ 'farmos_asset_link' ] } },
+          url: `{base_path}alink/plugins/${filename}`,
+        }));
+      });
+
+    });
+  };
+}
+
 module.exports = {
   output: {
     publicPath: process.env.NODE_ENV === 'production'
@@ -134,6 +167,7 @@ module.exports = {
         },
       ],
     }),
+    new GenerateDefaultPluginConfigYmlFilesPlugin(),
   ],
   devServer: createDevServerConfig(),
 };
