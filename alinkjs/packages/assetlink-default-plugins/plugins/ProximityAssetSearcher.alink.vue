@@ -43,6 +43,8 @@ const icon = computed(() => {
 </template>
 
 <script>
+import { geohash, haversine } from "assetlink-plugin-api";
+
 /**
  * Searches for assets by their proximity to a given location.
  */
@@ -54,7 +56,7 @@ export default {
 
     const crd = searchRequest.coordinates;
 
-    const ghash = assetLink.util.geohash.encode(crd.latitude, crd.longitude);
+    const ghash = geohash.encode(crd.latitude, crd.longitude);
 
     // 4 Geohash digits is ~78 km which we'll consider the limit for practical "proximity"
     const minHashLength = 3;
@@ -117,7 +119,7 @@ export default {
         continue;
       }
 
-      const weight = assetLink.util.haversine({lat: crd.latitude, lng: crd.longitude}, {lat: geometry.lat, lng: geometry.lon});
+      const weight = haversine({lat: crd.latitude, lng: crd.longitude}, {lat: geometry.lat, lng: geometry.lon});
 
       filteredAssetResults.push({
         weight,

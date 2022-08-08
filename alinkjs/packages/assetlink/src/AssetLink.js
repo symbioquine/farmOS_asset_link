@@ -15,17 +15,15 @@ import localforage from 'localforage';
 import fetch from 'cross-fetch';
 import { v4 as uuidv4 } from 'uuid';
 
+import EventBus from '@/EventBus';
 import AssetLinkUI from '@/AssetLinkUI';
-import AssetLinkUtil from '@/AssetLinkUtil';
 import FarmOSConnectionStatusDetector from '@/FarmOSConnectionStatusDetector';
 import PeekableAsyncIterator from '@/PeekableAsyncIterator';
 import AssetLinkPluginListsCore from '@/AssetLinkPluginListsCore';
 import AssetLinkPluginLoaderCore from '@/AssetLinkPluginLoaderCore';
 import HttpAccessDeniedException from '@/HttpAccessDeniedException';
 
-import createDrupalUrl from '@/utils/createDrupalUrl';
-import currentEpochSecond from '@/utils/currentEpochSecond';
-import EventBus from '@/utils/EventBus';
+import { createDrupalUrl, currentEpochSecond } from "assetlink-plugin-api";
 
 const fetchJson = (url, args) => fetch(url, args).then(response => response.json());
 
@@ -77,7 +75,6 @@ export default class AssetLink {
     this._remote = undefined;
 
     this._ui = new AssetLinkUI();
-    this._util = new AssetLinkUtil();
   }
 
   /**
@@ -114,13 +111,6 @@ export default class AssetLink {
    */
   get ui() {
     return this._ui;
-  }
-
-  /**
-   * Utility methods exposed for Asset Link plugins.
-   */
-  get util() {
-    return this._util;
   }
 
   /**

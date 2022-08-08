@@ -13,6 +13,7 @@ window.assetLinkDrupalBasePath = Cookies.get("assetLinkDrupalBasePath");
 const path = require("path");
 
 const app = createApp(App).use(router).use(Quasar, quasarUserOptions);
+app.provide("app", app);
 
 function importAll(requireContext, extension) {
   return requireContext.keys().map((componentFile) => {

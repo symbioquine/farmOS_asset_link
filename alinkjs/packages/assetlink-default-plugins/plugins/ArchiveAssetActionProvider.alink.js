@@ -1,10 +1,10 @@
 import { h } from 'vue';
 import { QBtn } from 'quasar';
 
+import { formatRFC3339 } from "assetlink-plugin-api";
+
 export default class ArchiveAssetActionProvider {
   static onLoad(handle, assetLink) {
-
-    const formatRFC3339 = assetLink.util.formatRFC3339;
 
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.archive', archiveAction => {
       archiveAction.type('asset-action');

@@ -91,18 +91,12 @@
 </template>
 
 <script>
-import {
-  defineComponent,
-  inject,
-  getCurrentInstance,
-  provide,
-  watch,
-  ref,
-} from "vue";
+import { defineComponent, inject, getCurrentInstance, watch, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
 import AssetLink from "assetlink/AssetLink";
-import createDrupalUrl from "assetlink/utils/createDrupalUrl";
+
+import { createDrupalUrl } from "assetlink-plugin-api";
 
 export default defineComponent({
   name: "App",
@@ -114,9 +108,12 @@ export default defineComponent({
 
     const devToolsApi = inject("devToolsApi");
 
+    const app = inject("app");
+
     const assetLink = new AssetLink(rootComponent, devToolsApi);
 
-    provide("assetLink", assetLink);
+    // provide("assetLink", assetLink);
+    app.provide("assetLink", assetLink);
 
     const metaActionDefs = ref([]);
 

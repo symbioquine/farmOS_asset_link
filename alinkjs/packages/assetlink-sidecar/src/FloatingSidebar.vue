@@ -1,9 +1,10 @@
 <script setup>
 import { inject, onMounted, getCurrentInstance } from "vue";
 
+import { createDrupalUrl } from "assetlink-plugin-api";
+
 import AssetLinkIcon from "@/icons/asset-link.svg";
 import AssetLink from "assetlink/AssetLink";
-import createDrupalUrl from "assetlink/utils/createDrupalUrl";
 
 const devToolsApi = inject("devToolsApi");
 

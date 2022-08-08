@@ -1,6 +1,8 @@
 <script setup>
 import { inject, ref } from 'vue';
 
+import { createDrupalUrl } from "assetlink-plugin-api";
+
 const props = defineProps({
   imgRef: {
     type: Object,
@@ -34,7 +36,7 @@ resolveImageEntity();
     <div class="row fit justify-start items-center no-wrap">
       <q-img
         v-if="imageEntity"
-        :src="assetLink.util.createDrupalUrl(imageEntity.attributes.uri.url).toString()"
+        :src="createDrupalUrl(imageEntity.attributes.uri.url).toString()"
         class="rounded-borders full-height"
         fit="contain"
       ></q-img>

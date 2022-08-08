@@ -1,17 +1,15 @@
-import * as Vue from 'vue';
-import * as VueRouter from 'vue-router';
-import * as Quasar from 'quasar';
-import { reactive } from 'vue';
+import { markRaw, reactive } from 'vue';
 
 import { v4 as uuidv4 } from 'uuid';
-import EventBus from 'assetlink/utils/EventBus';
 
 import { loadModule } from 'vue3-sfc-loader/dist/vue3-sfc-loader.esm.js';
 import { parseComponent } from 'vue-template-compiler';
 
+import EventBus from '@/EventBus';
 import VuePluginShorthandDecorator from '@/VuePluginShorthandDecorator';
+import pluginModuleLibrary from '@/pluginModuleLibrary';
 
-import currentEpochSecond from '@/utils/currentEpochSecond';
+import { createDrupalUrl, currentEpochSecond } from "assetlink-plugin-api";
 
 export default class AssetLinkPluginLoaderCore {
 
@@ -95,18 +93,7 @@ export default class AssetLinkPluginLoaderCore {
         }
 
         if (!this.moduleCache) {
-          this.moduleCache = Object.assign(Object.create(null), {
-            vue: Vue,
-            'vue-router': VueRouter,
-            'quasar': Quasar,
-
-            // TODO: Figure out how to make loading these cleaner/on-demand
-            // 'vue-codemirror': import('vue-codemirror'),
-            // 'codemirror/mode/javascript/javascript.js': import('codemirror/mode/javascript/javascript.js'),
-            // 'codemirror/mode/vue/vue.js': import('codemirror/mode/vue/vue.js'),
-            // 'codemirror/lib/codemirror.css': import('codemirror/lib/codemirror.css'),
-            // 'codemirror/theme/base16-dark.css': import('codemirror/theme/base16-dark.css'),
-          });
+          this.moduleCache = pluginModuleLibrary;
         }
 
         const options = {
@@ -282,7 +269,7 @@ class AssetLinkPluginHandle {
           routeDef.path = path;
         },
         component(component) {
-          routeDef.component = Vue.markRaw(component);
+          routeDef.component = markRaw(component);
         },
     };
 
@@ -321,7 +308,7 @@ class AssetLinkPluginHandle {
           slotDef.weightFn = weightFn;
         },
         component(component) {
-          slotDef.component = Vue.markRaw(component);
+          slotDef.component = markRaw(component);
         },
     };
 
@@ -386,7 +373,7 @@ class AssetLinkPluginHandle {
           widgetDecoratorDef.weightFn = weightFn;
         },
         component(component) {
-          widgetDecoratorDef.component = Vue.markRaw(component);
+          widgetDecoratorDef.component = markRaw(component);
         },
     };
 

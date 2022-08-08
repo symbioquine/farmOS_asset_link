@@ -95,6 +95,8 @@
 import { h } from 'vue';
 import { QItem, QItemSection } from 'quasar';
 
+import { createDrupalUrl } from "assetlink-plugin-api";
+
 export default {
   inject: ['assetLink'],
 
@@ -221,7 +223,6 @@ export default {
   },
 
   onLoad(handle, assetLink) {
-    const createDrupalUrl = assetLink.util.createDrupalUrl;
 
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.manage_plugins', slot => {
       slot.type('config-action');

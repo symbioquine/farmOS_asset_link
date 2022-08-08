@@ -1,14 +1,20 @@
 <template>
-  <asset-selector
-    title="Find Destination"
-    confirm-label="Move to selected location(s)"
-    @submit="onDestinationSelected($event)"
-  ></asset-selector>
+  <q-dialog ref="dialogRef" @hide="onDialogHide">
+    <q-card class="q-dialog-plugin q-gutter-md">
+      <asset-selector
+        title="Find Destination"
+        confirm-label="Move to selected location(s)"
+        @submit="onDestinationSelected($event)"
+      ></asset-selector>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script>
 import { h } from 'vue';
 import { QBtn } from 'quasar';
+
+import { formatRFC3339, summarizeAssetNames } from "assetlink-plugin-api";
 
 export default {
   inject: ['dialogContext'],
@@ -22,9 +28,6 @@ export default {
 
   onLoad(handle, assetLink) {
 
-    const summarizeAssetNames = assetLink.util.summarizeAssetNames;
-    const formatRFC3339 = assetLink.util.formatRFC3339;
-
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.move', moveAction => {
       moveAction.type('asset-action');
 
@@ -35,6 +38,9 @@ export default {
 
         console.log(destinations);
 
+        if (!destinations || !destinations.length) {
+          return;
+        }
 
         const movementLog = {
           type: 'log--activity',
