@@ -9,10 +9,12 @@
   },
   "scripts": {
     "build": "lerna run build",
-    "dev": "multiview [npm run dev:assetlink] [npm run serve:sidecar] [npm run serve:pwa] [npm run serve:plugins] -e",
+    "dev": "multiview [npm run dev:plugin-api] [npm run dev:assetlink] [npm run serve:sidecar] [npm run serve:pwa] [npm run serve:plugins] -e",
+    "dev:plugin-api": "lerna run dev --stream --scope=assetlink-plugin-api",
     "dev:assetlink": "lerna run dev --stream --scope=assetlink --ignore='assetlink-*'",
     "serve:sidecar": "lerna run serve --stream --scope=assetlink-sidecar -- --port 1234",
     "serve:pwa": "ASSET_LINK_DEV_PROXY_TARGET='http://127.0.0.1:1234' lerna run serve --stream --scope=assetlink-pwa -- --port 1235",
-    "serve:plugins": "ASSET_LINK_DEV_PROXY_TARGET='http://127.0.0.1:1235' lerna run serve --stream --scope=assetlink-default-plugins -- --port 1236"
+    "serve:plugins": "ASSET_LINK_DEV_PROXY_TARGET='http://127.0.0.1:1235' lerna run serve --stream --scope=assetlink-default-plugins -- --port 1236",
+    "lint": "lerna run lint"
   }
 }

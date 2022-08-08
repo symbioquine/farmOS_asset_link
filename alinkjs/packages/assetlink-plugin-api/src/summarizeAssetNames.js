@@ -4,7 +4,7 @@
  */
 export default function summarizeAssetNames(assets) {
   if (assets.length <= 3) {
-    return assets.map(a => a.attributes.name).join(", ");
+    return assets.map((a) => a.attributes.name).join(", ");
   }
   return `${assets[0].attributes.name} (+${assets.length - 1} more)`;
 }

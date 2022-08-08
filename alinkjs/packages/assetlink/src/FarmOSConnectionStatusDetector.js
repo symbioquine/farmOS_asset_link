@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue';
 import fetch from 'cross-fetch';
 import throttle from '@jcoreio/async-throttle'
-import createDrupalUrl from '@/utils/createDrupalUrl';
+import { createDrupalUrl } from "assetlink-plugin-api";
 
 const DEFAULT_FETCHER_DELEGATE = { fetch };
 

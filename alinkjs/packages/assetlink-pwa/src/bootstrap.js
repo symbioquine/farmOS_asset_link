@@ -6,6 +6,8 @@ import router from "./router";
 import App from "./App.vue";
 import quasarUserOptions from "./quasar-user-options";
 
+import { components as pluginApiComponents } from "assetlink-plugin-api";
+
 import Cookies from "js-cookie";
 
 window.assetLinkDrupalBasePath = Cookies.get("assetLinkDrupalBasePath");
@@ -26,6 +28,11 @@ function importAll(requireContext, extension) {
 
 importAll(require.context("./components/", true, /\.vue$/), ".vue");
 importAll(require.context("./components/", true, /\.js$/), ".js");
+
+// Add the components from the "assetlink-plugin-api" library
+Object.entries(pluginApiComponents).forEach(([componentName, component]) =>
+  app.component(componentName, component)
+);
 
 devToolsPlugin({ app });
 

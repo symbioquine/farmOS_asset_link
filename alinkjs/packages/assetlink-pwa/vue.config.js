@@ -97,7 +97,7 @@ module.exports = defineConfig({
   configureWebpack: (config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,
-      "path": require.resolve("path-browserify"),
+      path: require.resolve("path-browserify"),
     };
 
     config.plugins = [

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "rm ../../../farmos_asset_link/asset-link-dist/plugins/* && cp ./plugins/* ../../../farmos_asset_link/asset-link-dist/plugins/",
+    "build": "export PLUGIN_DIR=../../../farmos_asset_link/asset-link-dist/plugins && [ -d \"$PLUGIN_DIR\" ] && rm $PLUGIN_DIR/* || mkdir $PLUGIN_DIR && cp ./plugins/* $PLUGIN_DIR/",
     "serve": "webpack serve"
   },
   "devDependencies": {
