@@ -105,7 +105,7 @@ class FarmAssetLinkController extends ControllerBase {
       '/sidecar/',
     ];
     foreach($resource_dirs as $resource_dir) {
-      if (strpos($path_suffix, $resource_dir) !== 0) {
+      if (strpos($path_suffix, $resource_dir) === 0) {
         $require_file_exists = true;
         break;
       }
