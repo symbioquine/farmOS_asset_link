@@ -3,7 +3,7 @@
  */
 export default class UrlBasedAssetSearcher {
 
-  searchAssets(assetLink, searchRequest) {
+  static searchAssets(assetLink, searchRequest) {
     if (searchRequest.type !== 'text-search') {
       return undefined;
     }

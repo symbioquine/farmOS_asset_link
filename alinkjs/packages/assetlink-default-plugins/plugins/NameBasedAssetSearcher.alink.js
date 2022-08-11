@@ -3,7 +3,7 @@
  */
 export default class NamedBasedAssetSearcher {
 
-  searchAssets(assetLink, searchRequest, searchPhase) {
+  static searchAssets(assetLink, searchRequest, searchPhase) {
     if (searchRequest.type !== 'text-search') {
       return undefined;
     }
