@@ -7,7 +7,7 @@ import { parseComponent } from 'vue-template-compiler';
 
 import EventBus from '@/EventBus';
 import VuePluginShorthandDecorator from '@/VuePluginShorthandDecorator';
-import pluginModuleLibrary from '@/pluginModuleLibrary';
+import { default as pluginModuleLibrary, pluginModuleLibraryNames } from '@/pluginModuleLibrary';
 
 import { createDrupalUrl, currentEpochSecond } from "assetlink-plugin-api";
 
@@ -101,6 +101,23 @@ export default class AssetLinkPluginLoaderCore {
           compiledCache: {
             set: (key, str) => this._store.setItem(`asset-link-cached-compiled-plugin:${key}`, str),
             get: (key) => this._store.getItem(`asset-link-cached-compiled-plugin:${key}`),
+          },
+          pathResolve: ({ refPath, relPath }) => {
+            // Seems to occur prior to loading of the plugin module file itself
+            if (refPath === undefined) {
+              return relPath;
+            }
+
+            // self
+            if ( relPath === '.' ) {
+              return refPath;
+            }
+
+            if (this.moduleCache[relPath] === undefined) {
+              throw new Error(`Unsupported import '${relPath}'. Supported libraries:` + JSON.stringify(pluginModuleLibraryNames));
+            }
+
+            return relPath;
           },
           async getFile(url) {
             const fileUrl = new URL(url);
