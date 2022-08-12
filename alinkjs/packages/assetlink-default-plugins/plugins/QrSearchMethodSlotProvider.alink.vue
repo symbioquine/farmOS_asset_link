@@ -1,10 +1,23 @@
 <script setup>
+import { ref } from 'vue';
+import { uuidv4 } from 'assetlink-plugin-api';
+
+const emit = defineEmits(["update:searchRequest"]);
+
+const searchText = ref('');
+
 const qrCodeErr = (err) => {
   console.log('Error: ' + err.message + " - " + JSON.stringify(err));
 };
 
-const qrCodeScanned = async (qrCodeText) => {
-  console.log(`qrCodeScanned: ${qrCodeText}`);
+const qrCodeScanned = async (qrCodeResult) => {
+  console.log('qrCodeScanned', qrCodeResult);
+  searchText.value = qrCodeResult.data;
+  emit('update:searchRequest', {
+    id: uuidv4(),
+    type: 'text-search',
+    term: qrCodeResult.data,
+  });
 };
 
 </script>
@@ -17,6 +30,7 @@ const qrCodeScanned = async (qrCodeText) => {
     <template #search-interface>
       <div class="q-pa-md">
         <qr-code-scanner @qr-code-scanned="qrCodeScanned($event)" @qr-code-err="qrCodeErr"></qr-code-scanner>
+        <q-input v-model="searchText" dense disabled />
       </div>
     </template>
 

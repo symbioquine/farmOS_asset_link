@@ -2,8 +2,8 @@ import * as Vue from 'vue';
 import * as VueRouter from 'vue-router';
 import * as Quasar from 'quasar';
 import * as AssetlinkPluginApi from 'assetlink-plugin-api';
-import geohash from 'ngeohash';
-import haversine from 'haversine-distance';
+import ngeohash from 'ngeohash';
+import haversineDistance from 'haversine-distance';
 
 const libraries = {
   'assetlink-plugin-api': AssetlinkPluginApi,
@@ -11,8 +11,8 @@ const libraries = {
   'vue-router': VueRouter,
   'quasar': Quasar,
 
-  geohash,
-  haversine,
+  ngeohash,
+  'haversine-distance': haversineDistance,
 
   // TODO: Figure out how to make loading these cleaner/on-demand
   // 'vue-codemirror': import('vue-codemirror'),

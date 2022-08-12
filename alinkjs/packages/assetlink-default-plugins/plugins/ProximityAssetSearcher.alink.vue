@@ -1,11 +1,73 @@
 <script setup>
-import { computed, inject } from 'vue';
+import { computed, inject, ref, onMounted } from 'vue';
+import { uuidv4 } from 'assetlink-plugin-api';
 
+const assetLink = inject('assetLink');
 const currentSearchMethod = inject('currentSearchMethod');
 
+const searchText = ref('');
+
+const emit = defineEmits(["update:searchRequest"]);
+
 const icon = computed(() => {
-  return currentSearchMethod === 'proximity-search' ? 'mdi-map-marker-plus' : 'mdi-map-marker-radius';
+  return currentSearchMethod.value === 'proximity-search' ? 'mdi-map-marker-plus' : 'mdi-map-marker-radius';
 });
+
+function getGeoPosition(options) {
+  return new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, options));
+}
+
+const tryGetLocation = async () => {
+  const self = this;
+
+  const geolocationOpts = {
+    enableHighAccuracy: true,
+    maximumAge: 0,
+  };
+
+  let pos;
+  try {
+    pos = await getGeoPosition(geolocationOpts);
+  } catch (e) {
+    assetLink.vm.messages.push({text: `Failed to get geolocation: ${e.message}`, type: "error"});
+    console.log(e);
+  }
+
+  // Copy the contents since it can't be stringified in some browser/os combinations
+  // https://stackoverflow.com/questions/69695705
+  const posCopy = {
+      "coords": {
+        "latitude": pos.coords.latitude,
+        "longitude": pos.coords.longitude,
+        "accuracy": pos.coords.accuracy,
+        "altitude": pos.coords.altitude,
+        "altitudeAccuracy": pos.coords.altitudeAccuracy,
+        "heading": pos.coords.heading,
+        "speed": pos.coords.speed
+    },
+    "timestamp": pos.timestamp
+  };
+  console.log(`Location acquired: ${JSON.stringify(posCopy)}`);
+
+  const crd = posCopy.coords;
+
+  const newSearchText = `pos: ${crd.latitude.toFixed(6)},${crd.longitude.toFixed(6)} (+/-${Math.round(crd.accuracy, 3)}m)`;
+  if (searchText.value !== newSearchText) {
+    searchText.value = newSearchText;
+    emit('update:searchRequest', {
+      id: uuidv4(),
+      type: 'proximity-search',
+      coordinates: crd,
+    });
+  }
+
+}
+
+onMounted(() => {
+  tryGetLocation();
+});
+
+// TODO: Also try to get the location when the button is clicked again
 </script>
 
 <template alink-slot[net.symbioquine.farmos_asset_link.asset_search.v0.proximity]="asset-search-method(weight: 150)">
@@ -15,26 +77,7 @@ const icon = computed(() => {
 
     <template #search-interface>
       <div class="q-pa-md">
-        <q-card>
-          <q-item>
-
-            <q-item-section>
-              <q-item-label>
-                <q-skeleton type="text" />
-              </q-item-label>
-              <q-item-label caption>
-                <q-skeleton type="text" />
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-    
-          <q-skeleton height="200px" square />
-    
-          <q-card-actions align="right" class="q-gutter-md">
-            <q-skeleton type="QBtn" />
-            <q-skeleton type="QBtn" />
-          </q-card-actions>
-        </q-card>
+        <q-input v-model="searchText" disabled />
       </div>
     </template>
 
@@ -43,7 +86,8 @@ const icon = computed(() => {
 </template>
 
 <script>
-import { geohash, haversine } from "assetlink-plugin-api";
+import geohash from 'ngeohash';
+import haversine from 'haversine-distance';
 
 /**
  * Searches for assets by their proximity to a given location.

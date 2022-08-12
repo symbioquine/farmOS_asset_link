@@ -116,7 +116,7 @@ const searchAssets = async function searchAssets() {
 };
 
 watch(searchRequest, (val) => {
-  console.log(`search request changed: ${val}`);
+  console.log("search request changed:", val);
   searchAssets();
   emit("update:searchRequest", val);
 });
