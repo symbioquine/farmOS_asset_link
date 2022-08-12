@@ -27,11 +27,13 @@ function getNormalizedVNodes(vnodes) {
 
 const SearchMethodTileTabber = defineComponent({
   props: {
-    currentSearchMethod: { type: String, required: true },
+    searchMethod: { type: String, required: true },
   },
-  emits: ["update:currentSearchMethod"],
+  emits: ["update:searchMethod"],
   setup(props, { slots, emit }) {
-    provide("currentSearchMethod", props.currentSearchMethod);
+    const currentSearchMethod = ref(props.searchMethod);
+
+    provide("currentSearchMethod", currentSearchMethod);
 
     const slotsContents = slots.default();
 
@@ -79,12 +81,13 @@ const SearchMethodTileTabber = defineComponent({
           h(QBtn, {
             push: true,
             color: "secondary",
-            outline: props.currentSearchMethod === m.name,
+            outline: currentSearchMethod.value === m.name,
             icon: m.icon,
             class: "q-py-lg",
             size: "35px",
             onClick: () => {
-              emit("update:currentSearchMethod", m.name);
+              currentSearchMethod.value = m.name;
+              emit("update:searchMethod", m.name);
             },
           })
         );

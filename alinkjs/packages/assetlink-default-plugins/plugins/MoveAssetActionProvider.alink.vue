@@ -1,10 +1,31 @@
+<script setup>
+import { useDialogPluginComponent } from 'quasar'
+
+defineEmits([
+  ...useDialogPluginComponent.emits
+]);
+
+const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+
+const onSubmit = (selectedAssets) => {
+  console.log("onAssetSelected", selectedAssets);
+
+  if (!selectedAssets || selectedAssets.length === 0) {
+    onDialogCancel();
+    return;
+  }
+
+  onDialogOK(selectedAssets);
+};
+</script>
+
 <template>
   <q-dialog ref="dialogRef" @hide="onDialogHide">
-    <q-card class="q-dialog-plugin q-gutter-md">
+    <q-card class="q-dialog-plugin q-gutter-md" style="width: 700px; max-width: 80vw;">
       <asset-selector
         title="Find Destination"
         confirm-label="Move to selected location(s)"
-        @submit="onDestinationSelected($event)"
+        @submit="onSubmit"
       ></asset-selector>
     </q-card>
   </q-dialog>
@@ -17,15 +38,6 @@ import { QBtn } from 'quasar';
 import { formatRFC3339, summarizeAssetNames } from "assetlink-plugin-api";
 
 export default {
-  inject: ['dialogContext'],
-
-  methods: {
-    onDestinationSelected(selectedAssets) {
-      console.log("onAssetSelected", selectedAssets);
-      this.dialogContext.$emit('submit', selectedAssets);
-    },
-  },
-
   onLoad(handle, assetLink) {
 
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.move', moveAction => {

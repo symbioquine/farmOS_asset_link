@@ -131,36 +131,41 @@ const onCancel = () => {
 </script>
 
 <template>
-  <div class="text-h5 grey lighten-2">
-    {{ title }}
-  </div>
+  <div class="column">
+    <div class="text-h5 grey lighten-2">
+      {{ title }}
+    </div>
 
-  <search-method-tile-tabber
-    v-model:current-search-method="currentSearchMethod"
-  >
-    <component
-      :is="slotDef.component"
-      v-for="slotDef in searchMethodTileDefs"
-      :key="slotDef.id"
-      @update:searchRequest="(req) => (searchRequest = req)"
+    <search-method-tile-tabber v-model:search-method="currentSearchMethod">
+      <component
+        :is="slotDef.component"
+        v-for="slotDef in searchMethodTileDefs"
+        :key="slotDef.id"
+        @update:searchRequest="(req) => (searchRequest = req)"
+      />
+    </search-method-tile-tabber>
+
+    <q-tree
+      node-key="id"
+      :nodes="nodes"
+      dense
+      :tick-strategy="props.selectMultiple ? 'leaf' : 'none'"
+      v-model:ticked="tickedKeys"
+      v-model:selected="selectedKey"
+      no-nodes-label="No assets found"
+      class="q-mx-lg q-mb-md col-grow"
     />
-  </search-method-tile-tabber>
-  <q-tree
-    node-key="id"
-    :nodes="nodes"
-    dense
-    :tick-strategy="props.selectMultiple ? 'leaf' : 'none'"
-    v-model:ticked="tickedKeys"
-    v-model:selected="selectedKey"
-    class="q-mx-lg"
-  />
-  <div class="q-pa-md q-gutter-sm">
-    <q-btn color="secondary" label="Cancel" @click="onCancel()" />
-    <q-btn
-      color="primary"
-      :label="props.confirmLabel"
-      @click="onAccept()"
-      :disabled="!hasAssetSelection"
-    />
+
+    <q-separator />
+
+    <div class="q-pa-md q-gutter-sm row justify-end">
+      <q-btn color="secondary" label="Cancel" @click="onCancel()" />
+      <q-btn
+        color="primary"
+        :label="props.confirmLabel"
+        @click="onAccept()"
+        :disabled="!hasAssetSelection"
+      />
+    </div>
   </div>
 </template>

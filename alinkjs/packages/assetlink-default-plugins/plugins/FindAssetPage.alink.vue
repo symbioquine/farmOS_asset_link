@@ -22,12 +22,13 @@ const onAssetSelected = (selectedAssets) => {
 </script>
 
 <template alink-route[net.symbioquine.farmos_asset_link.routes.v0.find_asset_page]="/find/asset/:searchType">
-  <q-page padding>
+  <q-page padding class="column">
     <asset-selector
         title="Find Asset"
         :search-method="searchMethod"
         :key="searchMethod"
         @search-method-changed="searchMethod => router.replace(`/find/asset/${searchMethod}`)"
-        @submit="(assets) => onAssetSelected(assets)"></asset-selector>
+        @submit="(assets) => onAssetSelected(assets)"
+        class="col"></asset-selector>
   </q-page>
 </template>
