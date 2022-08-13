@@ -50,6 +50,7 @@ const SearchMethodTileTabber = defineComponent({
             foundTabs.push({
               name: n.props.name,
               icon: n.props.icon,
+              clickSignaler: n.component.exposed.tileClicked,
             });
           }
 
@@ -88,6 +89,7 @@ const SearchMethodTileTabber = defineComponent({
             onClick: () => {
               currentSearchMethod.value = m.name;
               emit("update:searchMethod", m.name);
+              m.clickSignaler();
             },
           })
         );

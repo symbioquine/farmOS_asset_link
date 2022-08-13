@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue';
 import { useDialogPluginComponent } from 'quasar'
 
 defineEmits([
@@ -17,6 +18,8 @@ const onSubmit = (selectedAssets) => {
 
   onDialogOK(selectedAssets);
 };
+
+const searchMethod = ref('text-search');
 </script>
 
 <template>
@@ -25,6 +28,9 @@ const onSubmit = (selectedAssets) => {
       <asset-selector
         title="Find Destination"
         confirm-label="Move to selected location(s)"
+        :search-method="searchMethod"
+        :key="searchMethod"
+        @search-method-changed="newSearchMethod => searchMethod = newSearchMethod"
         @submit="onSubmit"
         :additional-filters="[{ attribute: 'is_location', op: 'equal', value: true }]"
       ></asset-selector>

@@ -3,6 +3,8 @@ import { inject } from "vue";
 
 const currentSearchMethod = inject("currentSearchMethod");
 
+const emit = defineEmits(["tile-clicked"]);
+
 const props = defineProps({
   name: {
     type: String,
@@ -16,6 +18,7 @@ const props = defineProps({
 
 defineExpose({
   isSearchMethod: true,
+  tileClicked: () => emit('tile-clicked'),
 });
 </script>
 

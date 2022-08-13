@@ -102,7 +102,6 @@ const searchAssets = async function searchAssets() {
     !searchIterItem.done
   ) {
     searchIterItem = await assetSearchResultCursor.next();
-    console.log("searchIterItem:", searchIterItem);
 
     if (currSearchReq.id !== searchRequest.value.id) {
       return;
@@ -121,7 +120,6 @@ const searchAssets = async function searchAssets() {
 };
 
 watch(searchRequest, (val) => {
-  console.log("search request changed:", val);
   searchAssets();
   emit("update:searchRequest", val);
 });

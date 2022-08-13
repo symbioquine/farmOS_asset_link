@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, ref, onMounted } from 'vue';
+import { computed, inject, ref } from 'vue';
 import { uuidv4 } from 'assetlink-plugin-api';
 
 const assetLink = inject('assetLink');
@@ -63,17 +63,16 @@ const tryGetLocation = async () => {
 
 }
 
-onMounted(() => {
+if (currentSearchMethod.value === 'proximity-search') {
   tryGetLocation();
-});
-
-// TODO: Also try to get the location when the button is clicked again
+}
 </script>
 
 <template alink-slot[net.symbioquine.farmos_asset_link.asset_search.v0.proximity]="asset-search-method(weight: 150)">
   <search-method
     name="proximity-search"
-    :icon="icon">
+    :icon="icon"
+    @tile-clicked="tryGetLocation">
 
     <template #search-interface>
       <div class="q-pa-md">

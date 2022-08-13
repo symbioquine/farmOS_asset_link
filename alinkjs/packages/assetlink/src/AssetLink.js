@@ -461,8 +461,6 @@ export default class AssetLink {
    * Central asset searching entry-point. Responsible for delegating to asset searching plugins.
    */
   searchAssets(searchRequest, searchPhase) {
-    console.log("searchAssets:", JSON.stringify(searchRequest), searchPhase);
-
     const assetSearchPlugins = this.plugins.filter(p => typeof p.searchAssets === 'function');
 
     const searchResultCursors = [];
@@ -479,13 +477,9 @@ export default class AssetLink {
     }
 
     async function* coiterateSearchCursors() {
-      console.log("coiterateSearchCursors: searchResultCursors =", searchResultCursors);
-
       const peekableSearchResultCursors = searchResultCursors.map(c => new PeekableAsyncIterator(c));
 
       while(peekableSearchResultCursors.length > 0) {
-
-        console.log("coiterateSearchCursors: peekableSearchResultCursors.length =", peekableSearchResultCursors.length, peekableSearchResultCursors);
 
         let bestNextCursor = undefined;
         let doneBestNextCursorIndex = undefined;
