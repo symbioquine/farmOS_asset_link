@@ -22,10 +22,12 @@ export default class UrlBasedAssetSearcher {
       return undefined;
     }
 
+    const additionalFilters = searchRequest.additionalFilters || [];
+
     const assetDrupalInternalId = matches[1];
 
     async function* assetResultsIterator() {
-      const asset = await assetLink.resolveAsset(assetDrupalInternalId);
+      const asset = await assetLink.resolveAsset(assetDrupalInternalId, additionalFilters);
 
       if (!asset) {
         return;

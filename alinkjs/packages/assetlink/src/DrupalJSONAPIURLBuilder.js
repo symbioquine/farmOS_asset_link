@@ -28,13 +28,21 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
           undefined,
           attributeFilter.attribute
         );
-        filters.push({ [resourceAttribute]: attributeFilter.value });
+
+        // When comparing to booleans, Drupal requires a numeric '0' or '1'
+        let filterValue = attributeFilter.value;
+        if (attributeFilter.op === 'equal' && typeof filterValue === 'boolean') {
+          filterValue = filterValue ? 1 : 0;
+        }
+
+        filters.push({ [resourceAttribute]: filterValue });
       } else if (filterSpecifier.kind === 'attribute') {
         const attributeFilter = filterSpecifier;
         const resourceAttribute = this.serializeAttributeAsParam(
           undefined,
           attributeFilter.attribute
         );
+
         filters.push({
           ['client-' + resourceAttribute + '-' + index]: {
             path: resourceAttribute,

@@ -26,6 +26,7 @@ const onSubmit = (selectedAssets) => {
         title="Find Destination"
         confirm-label="Move to selected location(s)"
         @submit="onSubmit"
+        :additional-filters="[{ attribute: 'is_location', op: 'equal', value: true }]"
       ></asset-selector>
     </q-card>
   </q-dialog>

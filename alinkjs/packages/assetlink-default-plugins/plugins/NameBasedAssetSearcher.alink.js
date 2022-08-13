@@ -9,6 +9,7 @@ export default class NamedBasedAssetSearcher {
     }
 
     const term = searchRequest.term;
+    const additionalFilters = searchRequest.additionalFilters || [];
 
     if (!term) {
       return undefined;
@@ -19,10 +20,15 @@ export default class NamedBasedAssetSearcher {
 
       const entitySource = searchPhase === 'local' ? assetLink.entitySource.cache : assetLink.entitySource;
 
-      const results = await entitySource.query(q => assetTypes.map(assetType => q
+      const results = await entitySource.query(q => assetTypes.map(assetType => {
+        let baseQuery = q
           .findRecords(`asset--${assetType}`)
-          .filter({ attribute: 'name', op: 'CONTAINS', value: term })
-          .sort('drupal_internal__id')));
+          .filter({ attribute: 'name', op: 'CONTAINS', value: term });
+
+        return additionalFilters
+          .reduce((query, f) => query.filter(f), baseQuery)
+          .sort('drupal_internal__id');
+      }));
 
       const assets = results.flatMap(l => l);
 

@@ -141,10 +141,17 @@ export default {
 
     const entitySource = searchPhase === 'local' ? assetLink.entitySource.cache : assetLink.entitySource;
 
-    const results = await entitySource.query(q => assetTypes.map(assetType => q
+    const additionalFilters = searchRequest.additionalFilters || [];
+
+    const results = await entitySource.query(q => assetTypes.map(assetType => {
+      let baseQuery = q
         .findRecords(`asset--${assetType}`)
-        .filter({ attribute: 'intrinsic_geometry.geohash', op: 'CONTAINS', value: ghashPrefix })
-        .sort('drupal_internal__id')));
+        .filter({ attribute: 'intrinsic_geometry.geohash', op: 'CONTAINS', value: ghashPrefix });
+
+      return additionalFilters
+        .reduce((query, f) => query.filter(f), baseQuery)
+        .sort('drupal_internal__id');
+    }));
 
     const assets = results.flatMap(l => l);
 

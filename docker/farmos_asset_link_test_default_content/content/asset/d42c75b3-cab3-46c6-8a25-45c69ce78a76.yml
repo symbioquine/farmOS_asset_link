@@ -1,0 +1,58 @@
+_meta:
+  version: '1.0'
+  entity_type: asset
+  uuid: d42c75b3-cab3-46c6-8a25-45c69ce78a76
+  bundle: land
+  default_langcode: en
+default:
+  revision_user:
+    -
+      target_id: 1
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: 'Field A'
+  status:
+    -
+      value: active
+  created:
+    -
+      value: 1660403906
+  revision_translation_affected:
+    -
+      value: true
+  geometry:
+    -
+      value: 'POLYGON((-74.8734447736448 41.70530928419885,-74.86829826146077 41.70442507482153,-74.86866433136507 41.7017723737315,-74.87374624297777 41.702640542498926,-74.8734447736448 41.70530928419885))'
+      geo_type: Polygon
+      lat: 41.703539779646
+      lon: -74.871038827495
+      left: -74.873746242978
+      top: 41.705309284199
+      right: -74.868298261461
+      bottom: 41.701772373732
+      geohash: dr6v
+      latlon: '41.703539779646,-74.871038827495'
+  intrinsic_geometry:
+    -
+      value: 'POLYGON((-74.8734447736448 41.70530928419885,-74.86829826146077 41.70442507482153,-74.86866433136507 41.7017723737315,-74.87374624297777 41.702640542498926,-74.8734447736448 41.70530928419885))'
+      geo_type: Polygon
+      lat: 41.703539779646
+      lon: -74.871038827495
+      left: -74.873746242978
+      top: 41.705309284199
+      right: -74.868298261461
+      bottom: 41.701772373732
+      geohash: dr6v
+      latlon: '41.703539779646,-74.871038827495'
+  is_location:
+    -
+      value: true
+  is_fixed:
+    -
+      value: true
+  land_type:
+    -
+      value: field

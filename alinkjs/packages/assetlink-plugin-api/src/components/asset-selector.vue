@@ -10,6 +10,7 @@ const props = defineProps({
   searchMethod: { type: String, default: "text-search" },
   selectMultiple: { type: Boolean, default: false },
   confirmLabel: { type: String, default: "Choose" },
+  additionalFilters: { type: Array, default: () => [] },
 });
 
 const route = useRoute();
@@ -63,27 +64,31 @@ const nodes = computed(() => {
   });
 });
 
+// TODO: Add a "show more" button at the bottom of the search to increase this
 const maxDesiredSearchEntries = 10;
 
-/* eslint-disable class-methods-use-this,no-unused-vars */
 const searchAssets = async function searchAssets() {
-  const currSearchId = searchRequest.value.id;
+  const currSearchReq = {
+    ...searchRequest.value,
+  };
+
+  currSearchReq.additionalFilters = [
+    ...(currSearchReq.additionalFilters || []),
+    ...props.additionalFilters,
+  ];
 
   isSearchingAssets.value = true;
 
-  let assetSearchResultCursor = assetLink.searchAssets(
-    searchRequest.value,
-    "local"
-  );
+  let assetSearchResultCursor = assetLink.searchAssets(currSearchReq, "local");
 
   if (assetLink.connectionStatus.isOnline) {
     assetSearchResultCursor = new RacingLocalRemoteAsyncIterator(
       assetSearchResultCursor,
-      assetLink.searchAssets(searchRequest.value, "remote")
+      assetLink.searchAssets(currSearchReq, "remote")
     );
   }
 
-  if (currSearchId !== searchRequest.value.id) {
+  if (currSearchReq.id !== searchRequest.value.id) {
     return;
   }
 
@@ -99,7 +104,7 @@ const searchAssets = async function searchAssets() {
     searchIterItem = await assetSearchResultCursor.next();
     console.log("searchIterItem:", searchIterItem);
 
-    if (currSearchId !== searchRequest.value.id) {
+    if (currSearchReq.id !== searchRequest.value.id) {
       return;
     }
 
