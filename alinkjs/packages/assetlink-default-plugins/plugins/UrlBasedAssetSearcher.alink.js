@@ -16,8 +16,6 @@ export default class UrlBasedAssetSearcher {
 
     const matches = term.match(/https?:\/\/.*\/asset\/(\d+)/);
 
-    console.log(matches);
-
     if (!matches || matches.length < 2) {
       return undefined;
     }

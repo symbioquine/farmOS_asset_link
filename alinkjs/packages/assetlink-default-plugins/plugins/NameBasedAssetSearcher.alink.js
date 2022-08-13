@@ -32,8 +32,6 @@ export default class NamedBasedAssetSearcher {
 
       const assets = results.flatMap(l => l);
 
-      console.log("NamedBasedAssetSearcher::searchAssets", assets);
-
       for (let asset of assets) {
         yield {
           weight: 1,
