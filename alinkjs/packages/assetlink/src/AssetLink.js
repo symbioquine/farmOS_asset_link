@@ -421,26 +421,30 @@ export default class AssetLink {
   /**
    * Get an asset by UUID or Drupal internal id.
    */
-  async resolveAsset(assetRef) {
+  async resolveAsset(assetRef, additionalFilters) {
     await this._booted;
 
     const assetTypes = (await this.getAssetTypes()).map(t => t.attributes.drupal_internal__id);
 
     const isRefNumeric = /^-?\d+$/.test(assetRef);
 
-    let filter = { attribute: 'id', value: assetRef };
+    let idFilter = { attribute: 'id', value: assetRef };
     if (isRefNumeric) {
-      filter = { attribute: 'drupal_internal__id', value: parseInt(assetRef) };
+      idFilter = { attribute: 'drupal_internal__id', value: parseInt(assetRef) };
     }
 
-    const findAsset = async (source) => {
-      const results = await source.query(q => assetTypes.map(assetType => q
+    const findAsset = async entitySource => {
+      const results = await entitySource.query(q => assetTypes.map(assetType => {
+        let baseQuery = q
           .findRecords(`asset--${assetType}`)
-          .filter(filter)
-          .sort('drupal_internal__id')));
+          .filter(idFilter);
+
+        return (additionalFilters || [])
+          .reduce((query, f) => query.filter(f), baseQuery)
+          .sort('drupal_internal__id');
+      }));
 
       const assets = results.flatMap(l => l);
-
       return assets.find(a => a);
     };
 
