@@ -1,6 +1,0 @@
-{
-    "name": "Unarchive",
-    "transformAttributes": {
-        "archived": {"from": "$not($null)", "to": "$null"}
-    }
-}
