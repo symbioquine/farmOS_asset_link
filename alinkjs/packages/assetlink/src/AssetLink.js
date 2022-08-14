@@ -316,6 +316,7 @@ export default class AssetLink {
         this.eventBus.$emit('changed:asset', { assetType: update.operations.record.type, assetId: update.operations.record.id});
       }
 
+      // TODO: Listen for log creation/updates and emit 'changed:assetLogs' for each related asset (assets, inventory references, etc)
     });
 
     watch(() => this.connectionStatus.isOnline, async (isOnline) => {
@@ -416,6 +417,25 @@ export default class AssetLink {
     }
 
     return await listAssetTypes(this._memory);
+  }
+
+  /**
+   * Get a list of the log_type entities.
+   */
+  async getLogTypes() {
+    const listLogTypes = async (source) => {
+      return await source.query((q) => q
+          .findRecords(`log_type--log_type`)
+          .sort('drupal_internal__id'));
+    };
+
+    const logTypes = await listLogTypes(this._memory.cache);
+
+    if (logTypes.length) {
+      return logTypes;
+    }
+
+    return await listLogTypes(this._memory);
   }
 
   /**

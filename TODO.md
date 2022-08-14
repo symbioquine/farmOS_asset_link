@@ -7,3 +7,4 @@
 * Add a way to reload a given asset/log/etc from the server
 * Implement view/edit source on the manage plugins page
 * When a plugin fails to load, highlight the culprit line in the source view
+* Provide a plugin slot/widget short-hand predicate syntax

@@ -2,6 +2,8 @@ import { SyncQueryOperators } from '@orbit/record-cache';
 import { QueryExpressionParseError } from '@orbit/data';
 import { RecordNotFoundException } from '@orbit/records';
 import { deepGet, isNone } from '@orbit/utils';
+import { DateTimeSerializer } from '@orbit/serializers';
+
 
 // Based on https://github.com/orbitjs/orbit/blob/2c4bf7038d2f74ba31e45e949c70ec4161ced28f/packages/@orbit/record-cache/src/operators/sync-query-operators.ts
 export default {
@@ -17,7 +19,7 @@ export default {
       let exp = expression;
       let results = cache.getRecordsSync(exp.records || exp.type);
       if (exp.filter) {
-        results = filterRecords(results, exp.filter);
+        results = filterRecords(cache.schema, results, exp.filter);
       }
       if (exp.sort) {
         results = sortRecords(results, exp.sort);
@@ -62,10 +64,12 @@ export default {
   },
 }
 
-function filterRecords(records, filters) {
+function filterRecords(schemas, records, filters) {
   return records.filter((record) => {
+    const recordModel = schemas.models[record.type] || {};
+
     for (let i = 0, l = filters.length; i < l; i++) {
-      if (!applyFilter(record, filters[i])) {
+      if (!applyFilter(recordModel, record, filters[i])) {
         return false;
       }
     }
@@ -73,14 +77,20 @@ function filterRecords(records, filters) {
   });
 }
 
-function applyFilter(record, filter) {
-
+function applyFilter(recordModel, record, filter) {
   if (filter.kind === 'attribute') {
     let attributeKey = filter.attribute.split('.');
+
+    const attributeModel = deepGet(recordModel || {}, ['attributes', ...attributeKey]) || {};
 
     let actual = deepGet(record, ['attributes', ...attributeKey]);
 
     let expected = filter.value;
+
+    // We can probably stop doing this - and sending epoch filters - once https://www.drupal.org/project/drupal/issues/3260025 is done
+    if (attributeModel.type === 'string' && attributeModel.format === 'date-time' && actual && typeof expected === 'number') {
+      actual = new DateTimeSerializer().deserialize(actual).getTime() / 1000;
+    }
 
     // https://api.drupal.org/api/drupal/core%21modules%21jsonapi%21src%21Query%21EntityCondition.php/property/EntityCondition%3A%3AallowedOperators/9.4.x
     switch (filter.op) {
@@ -122,7 +132,75 @@ function applyFilter(record, filter) {
         throw new QueryExpressionParseError(`Filter operation ${filter.op} not recognized for Store.`);
     }
   }
-  return SyncQueryOperators.applyFilter(record, filter);
+
+  // Drupal only allows relationship queries which use the format '?filter[asset.id]=1a7bb66a-56a6-4f1f-a5d0-f3f61d35abce'
+  // but internally Orbit.js needs to find the relationship by the first part - i.e. 'asset' - then compare the type and id
+  // fields.
+  let relationKey = filter.relation.split('.');
+
+  if (filter.kind === 'relatedRecords') {
+    let actual = deepGet(record, [
+      'relationships',
+      relationKey[0],
+      'data'
+    ]);
+    if (actual === undefined) {
+      return false;
+    }
+    let expected = filter.records;
+    switch (filter.op) {
+      case 'equal':
+        return (
+          actual.length === expected.length &&
+          expected.every((e) =>
+            actual.some((a) => a.id === e.id && a.type === e.type)
+          )
+        );
+      case 'all':
+        return expected.every((e) =>
+          actual.some((a) => a.id === e.id && a.type === e.type)
+        );
+      case 'some':
+        return expected.some((e) =>
+          actual.some((a) => a.id === e.id && a.type === e.type)
+        );
+      case 'none':
+        return !expected.some((e) =>
+          actual.some((a) => a.id === e.id && a.type === e.type)
+        );
+      default:
+        throw new QueryExpressionParseError(
+          'Filter operation ${filter.op} not recognized for Store.'
+        );
+    }
+  } else if (filter.kind === 'relatedRecord') {
+    let actual = deepGet(record, ['relationships', relationKey[0], 'data']);
+    if (actual === undefined) {
+      return false;
+    }
+    let expected = filter.record;
+    switch (filter.op) {
+      case 'equal':
+        if (actual === null) {
+          return expected === null;
+        } else {
+          if (Array.isArray(expected)) {
+            return expected.some(
+              (e) => actual.type === e.type && actual.id === e.id
+            );
+          } else if (expected) {
+            return actual.type === expected.type && actual.id === expected.id;
+          } else {
+            return false;
+          }
+        }
+      default:
+        throw new QueryExpressionParseError(
+          'Filter operation ${filter.op} not recognized for Store.'
+        );
+    }
+  }
+  return false;
 }
 
 function sortRecords(

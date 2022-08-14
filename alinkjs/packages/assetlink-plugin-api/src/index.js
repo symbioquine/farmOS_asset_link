@@ -20,5 +20,5 @@ const components = {
 };
 export { components };
 
-export { formatRFC3339 } from "date-fns";
+export { formatRFC3339, parseJSON as parseJSONDate } from "date-fns";
 export { v4 as uuidv4 } from "uuid";

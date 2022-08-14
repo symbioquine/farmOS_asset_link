@@ -18,7 +18,7 @@ const props = defineProps({
 
 defineExpose({
   isSearchMethod: true,
-  tileClicked: () => emit('tile-clicked'),
+  tileClicked: () => emit("tile-clicked"),
 });
 </script>
 
