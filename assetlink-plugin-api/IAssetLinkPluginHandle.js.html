@@ -1,0 +1,328 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asset Link Plugin API docs IAssetLinkPluginHandle.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="./custom-styles.css">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+             
+                <a class="image" href="index.html">
+                    <img src="https://user-images.githubusercontent.com/30754460/184543756-4bbd5d3b-7a87-487b-b2ab-5d7244e728ac.png" alt="logo">
+                </a>
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">Asset Link Plugin API</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                <div class="dropdown is-hoverable is-right">
+                    <a class="dropdown-trigger link">
+                        Tutorials
+                        <i class="fas fa-chevron-down fa-xs"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-content">
+                        
+                            <a class="dropdown-item" href="tutorial-extension-model.html">
+                                Extension Model
+                            </a>
+                        
+                        </div>
+                    </div>
+                </div>
+                
+                 
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/symbioquine/farmOS_asset_link"
+                        >
+                            Github
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://www.npmjs.com/package/assetlink-plugin-api"
+                        >
+                            npm
+                        </a>
+                    
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+                <div class="search-wrapper">
+                    <input id="search" type="text" placeholder="Search docs..." class="input">
+                </div>
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-URL.html">URL</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li></ul><h3>Global</h3><ul><li><a href="global.html#components">components</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-AssetResolver.html">AssetResolver</a></li><li><a href="module-AssetSelector.html">AssetSelector</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>IAssetLinkPluginHandle.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-disable no-unused-vars */
+
+/**
+ * An object which is passed into the method a plugin's {@link IAssetLinkPlugin.onLoad} method.
+ *
+ * @interface
+ * @property {IAssetLinkPlugin} thisPlugin The current plugin. For JS plugins this is just the class itself, but for
+ *   .vue plugins this is the only way to access the Vue component that results from loading the .vue file.
+ */
+export default class IAssetLinkPluginHandle {}
+
+/**
+ * @callback routeDefiner
+ * @param  {IAssetLinkPluginRouteHandle} routeHandle - The handle used to define a route
+ */
+
+/**
+ * Define a route provided by this plugin.
+ *
+ * ### Usage
+ *
+ * ```js
+ * handle.defineRoute('com.example.farmos_asset_link.routes.v0.my_page', pageRoute => {
+ *   // See https://router.vuejs.org/guide/essentials/dynamic-matching.html for route path format
+ *   pageRoute.path("/my-page/:arg");
+ *
+ *   pageRoute.component(SomeVueComponent);
+ * });
+ * ```
+ *
+ * @method IAssetLinkPluginHandle#defineRoute
+ * @param {String} routeName The name of this route. e.g. `com.example.farmos_asset_link.routes.v0.my_page`
+ * @param {routeDefiner} routeDefiner A method which accepts a {@link IAssetLinkPluginRouteHandle}
+ *   and defines the route
+ */
+IAssetLinkPluginHandle.prototype.defineRoute = function (
+  routeName,
+  routeDefiner
+) {};
+
+/**
+ * @callback slotDefiner
+ * @param  {IAssetLinkPluginSlotHandle} slotHandle - The handle used to define a route
+ */
+
+/**
+ * Define a slot provided by this plugin.
+ *
+ * ### Usage
+ *
+ * ```js
+ * handle.defineSlot('com.example.farmos_asset_link.slots.v0.my_slot', pageSlot => {
+ *   pageSlot.type('page-slot');
+ *
+ *   pageSlot.showIf(context => context.pageName === 'asset-page');
+ *
+ *   pageSlot.component(SomeVueComponent);
+ * });
+ * ```
+ *
+ * @method IAssetLinkPluginHandle#defineSlot
+ * @param {String} slotName The name of this slot. e.g. `com.example.farmos_asset_link.slots.v0.my_slot`
+ * @param {slotDefiner} slotDefiner A method which accepts a {@link IAssetLinkPluginSlotHandle}
+ *   and defines the slot
+ */
+IAssetLinkPluginHandle.prototype.defineSlot = function (
+  slotName,
+  slotDefiner
+) {};
+
+/**
+ * @callback widgetDecoratorDefiner
+ * @param  {IAssetLinkPluginWidgetDecoratorHandle} widgetDecoratorHandle - The handle used to define a route
+ */
+
+/**
+ * Define a widget decorator provided by this plugin.
+ *
+ * ### Usage
+ *
+ * ```js
+ * handle.defineWidgetDecorator('com.example.farmos_asset_link.widget_decorator.v0.asset_name_with_peace_sign', widgetDecorator => {
+ *   widgetDecorator.targetWidgetName('asset-name');
+ *
+ *   widgetDecorator.appliesIf(context => context.asset.attributes.status !== 'archived');
+ *
+ *   widgetDecorator.component(handle.thisPlugin);
+ * });
+ * ```
+ *
+ * @method IAssetLinkPluginHandle#defineWidgetDecorator
+ * @param {String} widgetDecoratorName The name of this widget decorator. e.g. `com.example.farmos_asset_link.widget_decorator.v0.asset_name_with_peace_sign`
+ * @param {widgetDecoratorDefiner} widgetDecoratorDefiner A method which accepts a {@link IAssetLinkPluginWidgetDecoratorHandle}
+ *   and defines the widget decorator
+ */
+IAssetLinkPluginHandle.prototype.defineWidgetDecorator = function (
+  widgetDecoratorName,
+  widgetDecoratorDefiner
+) {};
+
+/**
+ * @callback pluginIngestorDefiner
+ * @param  {IAssetLinkPluginIngestorHandle} pluginIngestorHandle - The handle used to define a route
+ */
+
+/**
+ * Define a plugin ingestor for this plugin.
+ *
+ * ### Usage
+ *
+ * ```js
+ * handle.definePluginIngestor(pluginIngestor => {
+ *   pluginIngestor.onEveryPlugin(plugin => {
+ *     // Do something with every other plugin regardless of loading order...
+ *   });
+ * });
+ * ```
+ *
+ * @method IAssetLinkPluginHandle#definePluginIngestor
+ * @param {pluginIngestorDefiner} pluginIngestorDefiner A method which accepts a {@link IAssetLinkPluginIngestorHandle}
+ *   and defines the plugin ingestor.
+ */
+IAssetLinkPluginHandle.prototype.definePluginIngestor = function (
+  pluginIngestorDefiner
+) {};
+
+/**
+ * @callback attributedHandlerFn
+ * @param  {IAssetLinkPluginHandle} attributedHandle - The handle used to define a route
+ */
+
+/**
+ * Define functionality on behalf of another plugin.
+ *
+ * ### Usage
+ *
+ * ```js
+ * handle.onBehalfOf(plugin, attributedHandle => {
+ *   // Asset Link will manage the lifecycle of routes/slots/etc defined via `attributedHandle`
+ * });
+ * ```
+ *
+ * @method IAssetLinkPluginHandle#onBehalfOf
+ * @param {IAssetLinkPlugin} otherPlugin the plugin on behalf of which this plugin will define functionality.
+ * @param {attributedHandlerFn} attributedHandlerFn A method which accepts the attributed {@link IAssetLinkPluginHandle}
+ *   and defines functionality on behalf of that other plugin.
+ */
+IAssetLinkPluginHandle.prototype.onBehalfOf = function (
+  otherPlugin,
+  attributedHandlerFn
+) {};
+
+/**
+ * Record an error from the current plugin.
+ *
+ * ### Usage
+ *
+ * ```js
+ * handle.recordError("The stars are out of alignment.");
+ * ```
+ *
+ * @method IAssetLinkPluginHandle#recordError
+ * @param {String} errorString the error message
+ */
+IAssetLinkPluginHandle.prototype.recordError = function (errorString) {};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.11</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+<script src="scripts/search.js"> </script>
+
+
+</body>
+</html>
