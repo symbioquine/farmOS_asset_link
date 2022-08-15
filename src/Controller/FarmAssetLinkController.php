@@ -93,7 +93,33 @@ class FarmAssetLinkController extends ControllerBase {
     // Remove the '/alink' prefix
     $path_suffix = substr($path, 6);
 
+    // Some paths under /alink should return an HTTP 404 instead of just
+    // returning the index.html content.
+    $require_file_exists = false;
+    $resource_dirs = [
+      '/css/',
+      '/fonts/',
+      '/img/',
+      '/js/',
+      '/plugins/',
+      '/sidecar/',
+    ];
+    foreach($resource_dirs as $resource_dir) {
+      if (strpos($path_suffix, $resource_dir) === 0) {
+        $require_file_exists = true;
+        break;
+      }
+    }
+
     $file_path = $asset_link_dist_path . $path_suffix;
+
+    if ($require_file_exists && !file_exists($file_path)) {
+      $response = new Response();
+      $response->setStatusCode(404);
+      $response->headers->set('Content-Type', 'text/plain');
+      $response->setContent("No such file");
+      return $response;
+    }
 
     if (empty($path_suffix) || $path_suffix === '/' || !file_exists($file_path)) {
       $file_path = $asset_link_dist_path . "index.html";

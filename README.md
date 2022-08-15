@@ -69,7 +69,8 @@ cd docker/
 ```sh
 cd alinkjs/
 npm install
-npm run serve
+npm exec lerna bootstrap
+npm run dev
 ```
 
 Access the home page at http://localhost:8080/alink
@@ -84,7 +85,8 @@ cp /path/to/my/dev/server/fullchain.pem ./devcerts/mydomain.farmos.test/fullchai
 export ASSET_LINK_DEV_PROXY_TARGET='https://mydomain.farmos.test'
 cd alinkjs/
 npm install
-npm run serve
+npm exec lerna bootstrap
+npm run dev
 ```
 
 ### Procedure for pushing new versions

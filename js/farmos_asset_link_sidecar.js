@@ -5,11 +5,13 @@
   console.log(matches);
 
   if (!matches || matches.length < 2) {
+    console.log("No match returning without sidecar...");
     return;
   }
 
   const container = document.createElement('div');
-  container.setAttribute('data-vuetify', '');
+  container.className = "quasar-style-wrap";
+  container.setAttribute('data-quasar', '');
   container.style = "width: 1vw; height: 1vh; position: fixed; top: 0px; left: 0px;";
   document.body.appendChild(container);
 
@@ -17,20 +19,16 @@
   sidebar.id = "asset-link-floating-sidebar";
   container.appendChild(sidebar);
 
-  function addStylesheet(url) {
-    const link  = document.createElement('link');
-    link.rel  = 'stylesheet';
-    link.type = 'text/css';
-    link.href = url;
-    link.media = 'all';
-    document.getElementsByTagName('head')[0].appendChild(link);
+  // TODO: Honor base path here
+  const data = await fetch('/alink/sidecar/assets-manifest.json');
+
+  const json = await data.json();
+
+  const requiredJsFiles = json.entrypoints?.app?.assets?.js || [];
+
+  for (const requiredJsFile of requiredJsFiles) {
+    console.log("Importing sidecar...", requiredJsFile);
+    // TODO: Honor base path here
+    await import(`/alink/sidecar/${requiredJsFile}`);
   }
-
-  addStylesheet('/alink/css/chunk-vendors.css');
-  addStylesheet('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900');
-  addStylesheet('https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css');
-
-  await import('/alink/js/chunk-vendors.js');
-  await import('/alink/js/chunk-common.js');
-  await import('/alink/js/sidecar.js');
 })();

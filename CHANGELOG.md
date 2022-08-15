@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2022-08-15
+
+### Added
+
+- Add basic asset location slot to asset pages
+- Add some additional test data - "Field A" and "Field B"
+- Add rudimentary documention for the plugin API
+
+### Changed
+
+- Upgraded to Vue 3
+- Migrated from Vuetify to Quasar
+- Broke packages up and integrated Lerna for managing the build accross the resulting packages
+- Extracted the plugin API into its own package in preparation for publishing that to NPM
+- Allow plugins to provide custom search methods for assets
+- Use plugins to define the buttons in the sidecar/SideBar within the farmOS UI
+
+### Fixed
+
+- Make move asset action plugin only search for locations, not all assets
+- Fix a bug with main controller code to 404 on non-existent resources
+
 ## [0.4.1] - 2022-06-12
 
 ### Added

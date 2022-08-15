@@ -5,4 +5,4 @@ dependencies:
   enforced:
     module:
       - farmos_asset_link
-url: '{base_path}alink/alink-plugins/AssetNameWithArchivedWidgetDecorator.alink.vue'
+url: '{base_path}alink/plugins/AssetNameWithArchivedWidgetDecorator.alink.vue'

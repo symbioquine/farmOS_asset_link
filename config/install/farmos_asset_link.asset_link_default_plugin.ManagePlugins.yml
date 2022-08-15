@@ -5,4 +5,4 @@ dependencies:
   enforced:
     module:
       - farmos_asset_link
-url: '{base_path}alink/alink-plugins/ManagePlugins.alink.vue'
+url: '{base_path}alink/plugins/ManagePlugins.alink.vue'
