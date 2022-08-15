@@ -18,8 +18,7 @@ const onSearchTextUpdated = (text) => {
 <template alink-slot[net.symbioquine.farmos_asset_link.asset_search.v0.text]="asset-search-method(weight: 50)">
   <search-method
     name="text-search"
-    icon="mdi-keyboard"
-    ref="searchMethod">
+    icon="mdi-keyboard">
 
     <template #search-interface>
       <div class="q-pa-md">

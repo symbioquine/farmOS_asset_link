@@ -8,6 +8,7 @@ lerna-debug.log
 /docker/www
 **/node_modules
 .project
+website/assetlink-plugin-api
 
 # gitignore template for Drupal 8 projects
 #

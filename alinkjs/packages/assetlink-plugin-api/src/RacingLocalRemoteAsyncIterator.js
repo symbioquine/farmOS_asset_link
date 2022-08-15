@@ -1,6 +1,7 @@
 /**
  * Returns results from a 'local' async iterator until a 'remote' one starts
  * returning results then only returns results from the 'remote' one after that.
+ * @private
  */
 export default class RacingLocalRemoteAsyncIterator {
   constructor(localDelegate, remoteDelegate) {

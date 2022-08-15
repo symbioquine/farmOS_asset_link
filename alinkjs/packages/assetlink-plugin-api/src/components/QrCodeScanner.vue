@@ -1,3 +1,23 @@
+<script>
+/**
+ * Renders a camera preview and emits events when QR codes are scanned.
+ *
+ * ### Usage
+ *
+ * ```js
+ * <qr-code-scanner
+ *   &commat;qr-code-scanned="onQrCodeScanned"
+ *   &commat;qr-code-err="onQrCodeErr"
+ * ></qr-code-scanner>
+ * ```
+ *
+ * @category components
+ * @vue-event {String} qr-code-scanned - Emit scanned codes
+ * @vue-event {String} qr-code-err - Emit error when scanner fails or can't initialize
+ */
+export default {};
+</script>
+
 <script setup>
 import { onMounted, onUnmounted, ref } from "vue";
 import QrScanner from "qr-scanner";
@@ -13,7 +33,7 @@ onMounted(() => {
     preview.value,
     (content) => {
       try {
-        emit("qr-code-scanned", content);
+        emit("qr-code-scanned", content.data);
       } catch (err) {
         emit("qr-code-err", err);
       }

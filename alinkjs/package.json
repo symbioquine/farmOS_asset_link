@@ -4,7 +4,16 @@
   },
   "name": "farmOS_asset_link",
   "devDependencies": {
+    "@babel/preset-env": "^7.18.10",
+    "@vue/compiler-sfc": "^3.2.37",
+    "better-docs": "^2.7.2",
+    "jsdoc": "^3.6.7",
+    "jsdoc-babel": "^0.5.0",
+    "jsdoc-vuejs": "^4.0.0",
+    "live-server": "^1.1.0",
+    "livereload": "^0.9.3",
     "multiview": "^3.0.1",
+    "nodemon": "^2.0.7",
     "nx": "^14.4.3"
   },
   "scripts": {
@@ -15,6 +24,10 @@
     "serve:sidecar": "lerna run serve --stream --scope=assetlink-sidecar -- -- --port=1234",
     "serve:pwa": "ASSET_LINK_DEV_PROXY_TARGET='http://127.0.0.1:1234' lerna run serve --stream --scope=assetlink-pwa -- -- --port=1235",
     "serve:plugins": "ASSET_LINK_DEV_PROXY_TARGET='http://127.0.0.1:1235' lerna run serve --stream --scope=assetlink-default-plugins -- -- --port=1236",
-    "lint": "lerna run lint"
+    "lint": "lerna run lint",
+    "docs": "jsdoc -c ./jsdoc-cfg/jsdoc.conf.js",
+    "watch-doc-src": "nodemon --exec 'npm run docs' -e js,vue,md,ejs,json --watch ./jsdoc-cfg --watch ./packages/assetlink-plugin-api/src --watch ./packages/assetlink-plugin-api/tutorials --watch ./packages/assetlink-plugin-api/README.md",
+    "serve-docs": "cd ../website && live-server --no-browser --wait=1000",
+    "docs-dev": "npm run docs && npm run serve-docs & npm run watch-doc-src"
   }
 }

@@ -1,5 +1,3 @@
-# Extension Model
-
 ## Plugins
 
 Almost everything user-facing in Asset Link is implemented via plugins. A plugin is just a file with some code or data in it that Asset Link
@@ -8,7 +6,8 @@ knows how to load - usually via HTTP. Asset Link plugins must be named using the
 Support for Javascript and Vue.js plugins is built into Asset Link. Plugins ending with `alink.js` or `alink.vue` must be valid Javascript and Vue.js
 respectively. Other file types can be supported by way of plugins that interpret them.
 
-When they are loaded, JS/Vue plugins are passed an instance of the `AssetLink` class which serves as the API entry-point for Asset Link.
+When they are loaded, JS/Vue plugins are passed an [`AssetLink` instance](IAssetLink.html) which serves as the API entry-point for Asset Link and a
+[handle object](IAssetLinkPluginHandle.html) which is used to define the plugin's functionality.
 
 ## Plugin Lists (repositories)
 
@@ -242,7 +241,7 @@ In its `onLoad` method a plugin may choose to be notified about every other plug
 ```javascript
     handle.definePluginIngestor(pluginIngestor => {
       pluginIngestor.onEveryPlugin(plugin => {
-        // Do something with every other plugin...
+        // Do something with every other plugin regardless of loading order...
       });
     });
 ```

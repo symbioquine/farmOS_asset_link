@@ -1,23 +1,36 @@
+/**
+ * @alias module:something-nifty/lib/plugins/Plugin
+ */
 export { default as createDrupalUrl } from "./createDrupalUrl";
 export { default as currentEpochSecond } from "./currentEpochSecond";
 export { default as summarizeAssetNames } from "./summarizeAssetNames";
 export { default as RacingLocalRemoteAsyncIterator } from "./RacingLocalRemoteAsyncIterator";
 
-import AssetResolver from "./components/asset-resolver.vue";
-import AssetSelector from "./components/asset-selector.vue";
-import QrCodeScanner from "./components/qr-code-scanner.vue";
-import RenderWidget from "./components/render-widget";
-import SearchMethodTileTabber from "./components/search-method-tile-tabber";
-import SearchMethod from "./components/search-method.vue";
+import AssetResolver from "./components/AssetResolver.vue";
+import AssetSelector from "./components/AssetSelector.vue";
+import QrCodeScanner from "./components/QrCodeScanner.vue";
+import RenderWidget from "./components/RenderWidget";
+import SearchMethodTileTabber from "./components/SearchMethodTileTabber";
+import SearchMethod from "./components/SearchMethod.vue";
 
 const components = {
   AssetResolver,
   AssetSelector,
   QrCodeScanner,
   RenderWidget,
-  SearchMethodTileTabber,
   SearchMethod,
+  SearchMethodTileTabber,
 };
+/**
+ * @export components
+ * @desc
+ * * [AssetResolver](./module-AssetResolver.html)
+ * * [AssetSelector](./module-AssetSelector.html)
+ * * [QrCodeScanner](./module-QrCodeScanner.html)
+ * * [RenderWidget](./module-RenderWidget.html)
+ * * [SearchMethod](./module-SearchMethod.html)
+ * * [SearchMethodTileTabber](./module-SearchMethodTileTabber.html)
+ */
 export { components };
 
 export { formatRFC3339, parseJSON as parseJSONDate } from "date-fns";

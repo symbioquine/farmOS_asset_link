@@ -1,3 +1,29 @@
+<script>
+/**
+ * Provides a UI for searching for and choosing assets using
+ * plugin-supplied search methods.
+ *
+ * ### Usage
+ *
+ * ```js
+ * <asset-selector
+ *   title="Find Asset"
+ *   &commat;submit="(assets) => onAssetSelected(assets)"
+ * ></asset-selector>
+ * ```
+ *
+ * @category components
+ * @vue-prop {String} title - the title to show at the top of the selector
+ * @vue-prop {String} [searchMethod=text-search] - the initially selected search method
+ * @vue-prop {Boolean} [selectMultiple=false] - allow selecting multiple assets
+ * @vue-prop {String} [confirmLabel=Choose] - the text of the button which confirms the current asset selection
+ * @vue-prop {Object} [additionalFilters=[]] - Additional [Orbit.js filters]{@link https://orbitjs.com/docs/querying-data#attribute-filtering} to apply to the searches
+ * @vue-event {String} searchMethodChanged - Emit currently selected search method
+ * @vue-event {Asset[]} submit - Emit selected asset(s)
+ */
+export default {};
+</script>
+
 <script setup>
 import { inject, ref, computed, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -5,8 +31,6 @@ import RacingLocalRemoteAsyncIterator from "@/RacingLocalRemoteAsyncIterator";
 
 const props = defineProps({
   title: { type: String, required: true },
-  inputLabel: { type: String, default: "Search" },
-  inputPlaceholder: { type: String, default: "Search Assets" },
   searchMethod: { type: String, default: "text-search" },
   selectMultiple: { type: Boolean, default: false },
   confirmLabel: { type: String, default: "Choose" },
@@ -23,10 +47,10 @@ const searchMethodTileDefs = computed(() =>
 
 const currentSearchMethod = ref(props.searchMethod);
 
-const emit = defineEmits(["searchMethodChanged", "submit"]);
+const emit = defineEmits(["changed:searchMethod", "submit"]);
 
 watch(currentSearchMethod, () =>
-  emit("searchMethodChanged", currentSearchMethod.value)
+  emit("changed:searchMethod", currentSearchMethod.value)
 );
 
 const searchResultEntries = ref([]);

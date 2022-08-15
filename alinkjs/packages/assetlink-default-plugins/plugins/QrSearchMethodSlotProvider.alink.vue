@@ -12,11 +12,11 @@ const qrCodeErr = (err) => {
 
 const qrCodeScanned = async (qrCodeResult) => {
   console.log('qrCodeScanned', qrCodeResult);
-  searchText.value = qrCodeResult.data;
+  searchText.value = qrCodeResult;
   emit('update:searchRequest', {
     id: uuidv4(),
     type: 'text-search',
-    term: qrCodeResult.data,
+    term: qrCodeResult,
   });
 };
 

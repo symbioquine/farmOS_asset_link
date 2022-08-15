@@ -30,7 +30,7 @@ const searchMethod = ref('text-search');
         confirm-label="Move to selected location(s)"
         :search-method="searchMethod"
         :key="searchMethod"
-        @search-method-changed="newSearchMethod => searchMethod = newSearchMethod"
+        @changed:search-method="newSearchMethod => searchMethod = newSearchMethod"
         @submit="onSubmit"
         :additional-filters="[{ attribute: 'is_location', op: 'equal', value: true }]"
       ></asset-selector>

@@ -25,6 +25,38 @@ function getNormalizedVNodes(vnodes) {
   return Array.from(children);
 }
 
+/**
+ * Renders a set of toggleable buttons for each search method that occurs
+ * in the default Vue slot of this component.
+ *
+ * ### Usage
+ *
+ * ```js
+ * <search-method-tile-tabber v-model:search-method="currentSearchMethod">
+ *   <search-method
+ *     name="text-search"
+ *     icon="mdi-keyboard">
+ *     <template #search-interface>
+ *       Text Search UI
+ *     </template>
+ *   </search-method>
+ *   <search-method
+ *     name="random-search"
+ *     icon="mdi-dice-5">
+ *     <template #search-interface>
+ *       Random Search UI
+ *     </template>
+ *   </search-method>
+ * </search-method-tile-tabber>
+ * ```
+ *
+ * See [TODO]() for more details about implementing new search forms.
+ *
+ * @category components
+ * @module SearchMethodTileTabber
+ * @vue-prop {String} name - the name of the widget
+ * @vue-prop {Object} context - the context to be passed to any widget decorate plugins
+ */
 const SearchMethodTileTabber = defineComponent({
   props: {
     searchMethod: { type: String, required: true },

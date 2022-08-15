@@ -27,7 +27,7 @@ const onAssetSelected = (selectedAssets) => {
         title="Find Asset"
         :search-method="searchMethod"
         :key="searchMethod"
-        @search-method-changed="searchMethod => router.replace(`/find/asset/${searchMethod}`)"
+        @changed:search-method="searchMethod => router.replace(`/find/asset/${searchMethod}`)"
         @submit="(assets) => onAssetSelected(assets)"
         class="col"></asset-selector>
   </q-page>

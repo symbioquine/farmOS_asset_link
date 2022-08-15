@@ -1,3 +1,22 @@
+<script>
+/**
+ * Resolves a farmOS asset given an ID of that asset. e.g. '1' or a UUID
+ *
+ * ### Usage
+ *
+ * ```js
+ * <asset-resolver :asset-ref="42" #default="{ asset }">
+ *   <h1>Asset: {{ asset.attributes.name }}</h1>
+ * </asset-resolver>
+ * ```
+ *
+ * @category components
+ * @vue-prop {Number|String} assetRef - the asset ID
+ * @vue-event {Asset} asset-resolved - Emit resolved asset
+ */
+export default {};
+</script>
+
 <template>
   <span>
     <i v-if="!resolvedAsset">Unknown asset '{{ assetRef }}'...</i>
