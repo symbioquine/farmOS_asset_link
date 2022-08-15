@@ -1,7 +1,13 @@
 {
   "name": "assetlink-plugin-api",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.5.1",
+  "description": "Plugin API for Asset Link - a contrib module for farmOS 2.x that supercharges links to your farmOS assets with an extensible hybrid PWA experience",
+  "license": "GPLV3",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/symbioquine/farmOS_asset_link.git"
+  },
+  "homepage": "https://symbioquine.github.io/farmOS_asset_link/assetlink-plugin-api",
   "main": "dist/assetlink-plugin-api.common.js",
   "scripts": {
     "build": "vue-cli-service build --target lib --formats=commonjs src/index.js",

@@ -31,8 +31,6 @@ const sidecarMenuItemDefs = computed(() => {
 const assetRef = computed(() => {
   const matches = window.location.href.match(/https?:\/\/.*\/asset\/(\d+)/);
 
-  console.log(matches);
-
   if (!matches || matches.length < 2) {
     return undefined;
   }

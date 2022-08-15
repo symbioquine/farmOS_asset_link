@@ -1,6 +1,6 @@
 {
   "name": "assetlink",
-  "version": "1.0.0",
+  "version": "0.5.1",
   "description": "",
   "main": "index.js",
   "publishConfig": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare-dist": "rm -rf ./dist/* && cp ./package.json ./dist/",
+    "prepare-dist": "mkdir -p ./dist && rm -rf ./dist/* && cp ./package.json ./dist/",
     "build": "npm run prepare-dist && babel src --out-dir dist",
     "dev": "npm run prepare-dist && babel src --watch --out-dir dist"
   },
@@ -32,7 +32,9 @@
     "assetlink-plugin-api": "*",
     "cross-fetch": "^3.1.5",
     "js-cookie": "^3.0.1",
+    "haversine-distance": "^1.2.1",
     "localforage": "^1.10.0",
+    "ngeohash": "^0.6.3",
     "qr-scanner": "^1.4.1",
     "quasar": "^2.6.0",
     "uuid": "^8.3.2",
