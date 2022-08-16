@@ -32,7 +32,7 @@ export default class ArchiveAssetActionProvider {
       };
 
       archiveAction.component(({ asset }) =>
-        h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'class': 'text-none' },  "Archive" ));
+        h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'no-caps': true },  "Archive" ));
 
     });
 
@@ -62,7 +62,7 @@ export default class ArchiveAssetActionProvider {
       };
 
       unarchiveAction.component(({ asset }) =>
-        h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'class': 'text-none' },  "Unarchive" ));
+        h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'no-caps': true },  "Unarchive" ));
     });
   }
 }

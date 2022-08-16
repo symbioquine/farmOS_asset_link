@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2022-08-16
+
+### Added
+
+- Better docs for IAssetLink/IAssetLinkUI/IFarmOSConnectionStatus interfaces
+- Data access and simple asset action plugin tutorials
+
+### Changed
+
+- Moved EventBus implementation to assetlink-plugin-api package to make documentation easier
+- Include Vue runtime compiler in PWA/Sidecar builds
+
 ## [0.5.1] - 2022-08-15
 
 ### Added
