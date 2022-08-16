@@ -5,7 +5,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asset Link Plugin API docs QrCodeScanner</title>
+  <title>Asset Link Plugin API docs IAssetLinkUI</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -125,8 +125,8 @@
         <div class="core" id="main-content-wrapper">
             <div class="content">
                 <header class="page-title">
-                    <p>Module</p>
-                    <h1>QrCodeScanner</h1>
+                    <p>Interface</p>
+                    <h1>IAssetLinkUI</h1>
                 </header>
                 
 
@@ -137,8 +137,7 @@
 
 <header>
     
-        
-            
+        <h2>IAssetLinkUI</h2>
         
     
 </header>
@@ -147,37 +146,150 @@
     <div class="container-overview">
     
         
-            <div class="description"><p>Renders a camera preview and emits events when QR codes are scanned.</p>
-<h3>Usage</h3>
-<pre class="prettyprint source lang-js"><code>&lt;qr-code-scanner
-  &commat;qr-code-scanned=&quot;onQrCodeScanned&quot;
-  &commat;qr-code-err=&quot;onQrCodeErr&quot;
->&lt;/qr-code-scanner>
-</code></pre>
-<h3 class="subsection-title" style="margin-top: 1em" data-jsdoc-vuejs="section-event">Events</h3>
-<table data-jsdoc-vuejs="table-event">
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th>Payload Type</th>
-        <th>Description</th>
-    </tr>
-    </thead>
-    <tbody><tr>
-        <td><code>qr-code-scanned</code></td>
-        <td>String</td>
-        <td>Emit scanned codes</td>
-    </tr><tr>
-        <td><code>qr-code-err</code></td>
-        <td>String</td>
-        <td>Emit error when scanner fails or can't initialize</td>
-    </tr></tbody>
-</table></div>
+            <div class="description"><p>UI components/methods exposed for Asset Link plugins.</p></div>
         
 
         
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+<div class="table-container">
+    <table class="props table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
             
 
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>dialog</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type"><a href="IAssetLinkUIDialogs.html">IAssetLinkUIDialogs</a></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>Convenience methods for creating various kinds of Dialogs</p></td>
+</tr>
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="IAssetLinkUI.js.html" class="button">View Source</a>
+            <span>
+                <a href="IAssetLinkUI.js.html">IAssetLinkUI.js</a>, <a href="IAssetLinkUI.js.html#line3">line 3</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+        
+    
+    </div>
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <div class='vertical-section'>
+            <h1>Methods</h1>
+            <div class="members">
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="createDialog">
+        <a class="href-link" href="#createDialog">#</a>
+        
+        <span class="code-name">
+            
+                createDialog<span class="signature">(opts)</span><span class="type-signature"> &rarr; {<a href="external-Promise.html">external:Promise</a>}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <p>Provides a thin promise wrapper around Quasar dialogs.</p>
+    </div>
+    
 
 
 
@@ -186,6 +298,58 @@
 
 
 
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>opts</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">Object</code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>Options passed to the Quasar Dialog plugin <code>Dialog#create</code> method.
+See <a href="https://quasar.dev/quasar-plugins/dialog">https://quasar.dev/quasar-plugins/dialog</a>.</p></td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
 
 
 
@@ -223,6 +387,13 @@
     
 
     
+        <p class="tag-source">
+            <a href="IAssetLinkUI.js.html" class="button">View Source</a>
+            <span>
+                <a href="IAssetLinkUI.js.html">IAssetLinkUI.js</a>, <a href="IAssetLinkUI.js.html#line11">line 11</a>
+            </span>
+        </p>
+    
 </dl>
 
 
@@ -242,28 +413,39 @@
 
 
 
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
 
-
-
-
-        
+<div class="columns">
     
+    <div class='param-desc column is-7'><p>a promise that is fullfilled when the dialog is confirmed or cancelled
+with the result of the dialog - if any.</p></div>
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<code class="param-type"><a href="external-Promise.html">external:Promise</a></code>
+
+
     </div>
     
-    
+</div>
 
-    
+                
+        </div>
+    </div>
 
-    
 
-    
 
-    
 
-    
-
-    
-
+</div>
+            
+            </div>
+        </div>
     
 
     

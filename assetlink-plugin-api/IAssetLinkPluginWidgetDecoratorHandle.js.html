@@ -74,6 +74,14 @@
                                 Extension Model
                             </a>
                         
+                            <a class="dropdown-item" href="tutorial-farm-data-access.html">
+                                Farm Data Access
+                            </a>
+                        
+                            <a class="dropdown-item" href="tutorial-writing-plugins.html">
+                                Writing Plugins
+                            </a>
+                        
                         </div>
                     </div>
                 </div>
@@ -112,7 +120,7 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-URL.html">URL</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li></ul><h3>Global</h3><ul><li><a href="global.html#components">components</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-AssetResolver.html">AssetResolver</a></li><li><a href="module-AssetSelector.html">AssetSelector</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-@orbit_jsonapi.html">@orbit/jsonapi</a></li><li><a href="external-@orbit_memory.html">@orbit/memory</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-URL.html">URL</a></li></ul><h3>Classes</h3><ul><li><a href="external-@orbit_jsonapi.JSONAPISource.html">JSONAPISource</a></li><li><a href="external-@orbit_memory.MemorySource.html">MemorySource</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li><li><a href="IAssetLinkUI.html">IAssetLinkUI</a></li><li><a href="IAssetLinkUIDialogs.html">IAssetLinkUIDialogs</a></li><li><a href="IFarmOSConnectionStatus.html">IFarmOSConnectionStatus</a></li></ul><h3>Global</h3><ul><li><a href="global.html#components">components</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#EventBus">EventBus</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-AssetResolver.html">AssetResolver</a></li><li><a href="module-AssetSelector.html">AssetSelector</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
                 
             </nav>
         </div>
@@ -137,61 +145,61 @@
  *
  * @interface
  */
-export default class IAssetLinkPluginWidgetDecoratorHandle {
-}
+export default class IAssetLinkPluginWidgetDecoratorHandle {}
 
 /**
  * Specify the name of the widget this decorator applies to.
- * 
+ *
  * ### Usage
- * 
+ *
  * ```js
  * widgetDecorator.targetWidgetName('asset-name');
  * ```
- * 
+ *
  * @method IAssetLinkPluginWidgetDecoratorHandle#targetWidgetName
  * @param {String} targetWidgetName The name of the widget this decorator should apply to.
  */
-IAssetLinkPluginWidgetDecoratorHandle.prototype.targetWidgetName = function(targetWidgetName) {
-};
+IAssetLinkPluginWidgetDecoratorHandle.prototype.targetWidgetName = function (
+  targetWidgetName
+) {};
 
 /**
  * Specify a function which determines whether this widget decorator should apply for a given context.
- * 
+ *
  * ### Usage
- * 
+ *
  * ```js
  * pageSlot.appliesIf(context => context.asset.attributes.status !== 'archived');
  * ```
- * 
+ *
  * @method IAssetLinkPluginWidgetDecoratorHandle#appliesIf
  * @param {Function} predicateFn Determines whether this widget decorator should apply for a given
  *   context.
  */
-IAssetLinkPluginWidgetDecoratorHandle.prototype.appliesIf = function(predicateFn) {
-};
+IAssetLinkPluginWidgetDecoratorHandle.prototype.appliesIf = function (
+  predicateFn
+) {};
 
 /**
  * Specify the weight for this widget decorator.
- * 
+ *
  * ### Usage
- * 
+ *
  * ```js
  * pageSlot.weight(50);
  * ```
- * 
+ *
  * @method IAssetLinkPluginWidgetDecoratorHandle#weight
  * @param {Number|Function} weight The weight of this widget decorator - either a fixed number
  *   or a function that takes the context and returns a number.
  */
-IAssetLinkPluginWidgetDecoratorHandle.prototype.weight = function(weight) {
-};
+IAssetLinkPluginWidgetDecoratorHandle.prototype.weight = function (weight) {};
 
 /**
  * Specify the component for this plugin-provided slot.
- * 
+ *
  * ### Usage
- * 
+ *
  * ```js
  * pageSlot.component(SomeVueComponent);
  * ```
@@ -201,8 +209,10 @@ IAssetLinkPluginWidgetDecoratorHandle.prototype.weight = function(weight) {
  *   this can be anything that is valid as the first argument to Vue's [`h()` function](https://vuejs.org/api/render-function.html#h).
  *   See Vue's documentation on [render functions](https://vuejs.org/guide/extras/render-function.html).
  */
-IAssetLinkPluginWidgetDecoratorHandle.prototype.component = function(component) {
-};</code></pre>
+IAssetLinkPluginWidgetDecoratorHandle.prototype.component = function (
+  component
+) {};
+</code></pre>
         </article>
     </section>
 

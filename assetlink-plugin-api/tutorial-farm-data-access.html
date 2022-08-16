@@ -5,7 +5,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asset Link Plugin API docs QrCodeScanner</title>
+  <title>Asset Link Plugin API docs Farm Data Access</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -108,7 +108,7 @@
 </div>
     <div id="main">
         <div
-            class="sidebar "
+            class="sidebar tutorials"
             id="sidebarNav"
         >
             
@@ -118,163 +118,69 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-@orbit_jsonapi.html">@orbit/jsonapi</a></li><li><a href="external-@orbit_memory.html">@orbit/memory</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-URL.html">URL</a></li></ul><h3>Classes</h3><ul><li><a href="external-@orbit_jsonapi.JSONAPISource.html">JSONAPISource</a></li><li><a href="external-@orbit_memory.MemorySource.html">MemorySource</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li><li><a href="IAssetLinkUI.html">IAssetLinkUI</a></li><li><a href="IAssetLinkUIDialogs.html">IAssetLinkUIDialogs</a></li><li><a href="IFarmOSConnectionStatus.html">IFarmOSConnectionStatus</a></li></ul><h3>Global</h3><ul><li><a href="global.html#components">components</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#EventBus">EventBus</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-AssetResolver.html">AssetResolver</a></li><li><a href="module-AssetSelector.html">AssetSelector</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
+                    <div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-extension-model.html">Extension Model</a></li><li><a href="tutorial-farm-data-access.html">Farm Data Access</a></li><li><a href="tutorial-writing-plugins.html">Writing Plugins</a><ul><li><a href="tutorial-simple-asset-action-plugin.html">Simple Asset Action</a></li></ul></li></ul></div>
                 
             </nav>
         </div>
         <div class="core" id="main-content-wrapper">
             <div class="content">
                 <header class="page-title">
-                    <p>Module</p>
-                    <h1>QrCodeScanner</h1>
+                    <p>Tutorial</p>
+                    <h1>Farm Data Access</h1>
                 </header>
-                
-
-
-
-
-<section>
-
-<header>
-    
-        
-            
-        
-    
-</header>
+                <section>
 
 <article>
-    <div class="container-overview">
-    
-        
-            <div class="description"><p>Renders a camera preview and emits events when QR codes are scanned.</p>
-<h3>Usage</h3>
-<pre class="prettyprint source lang-js"><code>&lt;qr-code-scanner
-  &commat;qr-code-scanned=&quot;onQrCodeScanned&quot;
-  &commat;qr-code-err=&quot;onQrCodeErr&quot;
->&lt;/qr-code-scanner>
+    <p>Plugins in Asset Link have access to the full farmOS data model via the <a href="https://farmos.org/development/api/">farmOS/Drupal JSON:API</a>.</p>
+<p>This access is mediated by a library called <a href="https://orbitjs.com/">Orbit.js</a>. Asset Link exposes <a href="https://orbitjs.com/docs/data-sources">Orbit.js sources</a>
+via the <a href="IAssetLink.html">Asset Link API</a>. The most common use-cases will use <code>assetLink.entitySource</code> which first queries the in-memory data - followed
+by the farmOS server if the app is online at the time.</p>
+<pre class="prettyprint source lang-js"><code>await assetLink.entitySource.query(q => q
+  .findRecords(`asset--equipment`)
+  .filter({ attribute: 'name', op: 'CONTAINS', value: 'slow' }));
 </code></pre>
-<h3 class="subsection-title" style="margin-top: 1em" data-jsdoc-vuejs="section-event">Events</h3>
-<table data-jsdoc-vuejs="table-event">
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th>Payload Type</th>
-        <th>Description</th>
-    </tr>
-    </thead>
-    <tbody><tr>
-        <td><code>qr-code-scanned</code></td>
-        <td>String</td>
-        <td>Emit scanned codes</td>
-    </tr><tr>
-        <td><code>qr-code-err</code></td>
-        <td>String</td>
-        <td>Emit error when scanner fails or can't initialize</td>
-    </tr></tbody>
-</table></div>
-        
+<p>That fallback logic - first querying the in memory data followed by the farmOS server - sounds ideal, but often we are happy with just using the in-memory data
+and prefer that offline-first behavior from a performance standpoint. In that case we can explicitly query <code>assetLink.entitySource.cache</code> followed by
+<code>assetLink.entitySource</code>.</p>
+<pre class="prettyprint source lang-js"><code>const offlineResults = await assetLink.entitySource.cache.query(q => q
+  .findRecords(`asset--equipment`)
+  .filter({ attribute: 'name', op: 'CONTAINS', value: 'slow' }));
 
-        
-            
+// Do something with the offline results right away
 
+if (assetLink.connectionStatus.isOnline) {
+  const onlineResults = await assetLink.entitySource.query(q => q
+    .findRecords(`asset--equipment`)
+    .filter({ attribute: 'name', op: 'CONTAINS', value: 'slow' }));
 
+  // Update the UI with more up-to-date data if/when it becomes available
+}
+</code></pre>
+<p>Asset Link also provides some convenience methods that handle common cases like loading an asset by ID. For example, see <a href="IAssetLink.html#resolveAsset">IAssetLink#resolveAsset</a>.</p>
+<pre class="prettyprint source lang-js"><code>const asset = await assetLink.resolveAsset(42);
 
+console.log(asset.attributes.name);
+</code></pre>
+<p>Modifying farmOS data occurs via Orbit.js as well, but is a little simpler. Asset Link takes care of synchronizing changes with the server the next time
+the app is online. Queries of farmOS data that occur before the changes are synchronized will use the local versions of the farmOS assets/logs/etc which
+include the unsynchronized changes.</p>
+<pre class="prettyprint source lang-js"><code>await assetLink.entitySource.update((t) => {
+  return t.updateRecord({
+    type: asset.type,
+    id: asset.id,
+    attributes: {
+      name: &quot;Fred&quot;,
+    },
+  });
+}, {label: `Rename asset: &quot;${asset.attributes.name}&quot; to &quot;Fred&quot;`});
 
+const updatedAsset = await assetLink.resolveAsset(asset.id);
 
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-    
-    </div>
-    
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+// updatedAsset.attributes.name === 'Fred'
+</code></pre>
 </article>
 
 </section>
-
-
-
 
             </div>
             

@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +7,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asset Link Plugin API docs QrCodeScanner</title>
+  <title>Asset Link Plugin API docs EventBus.js</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -125,153 +127,110 @@
         <div class="core" id="main-content-wrapper">
             <div class="content">
                 <header class="page-title">
-                    <p>Module</p>
-                    <h1>QrCodeScanner</h1>
+                    <p>Source</p>
+                    <h1>EventBus.js</h1>
                 </header>
                 
 
 
 
-
-<section>
-
-<header>
     
-        
-            
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * A simple async event bus.
+ *
+ * The Vue 3 framework recommended event buses - https://github.com/developit/mitt https://github.com/scottcorgan/tiny-emitter
+ * do not support async handlers well.
+ */
+export default class EventBus {
+  constructor() {
+    this._handlersByEventNameAndSubscriptionKey = {};
+    this._nextSubscriptionSerial = 0;
+  }
 
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description"><p>Renders a camera preview and emits events when QR codes are scanned.</p>
-<h3>Usage</h3>
-<pre class="prettyprint source lang-js"><code>&lt;qr-code-scanner
-  &commat;qr-code-scanned=&quot;onQrCodeScanned&quot;
-  &commat;qr-code-err=&quot;onQrCodeErr&quot;
->&lt;/qr-code-scanner>
+  /**
+   * Subscribe to the named event with a given handler.
+   * @return {EventBusUnsubscriber} an object which a single no-arg method `$off()` that is used to remove the subscription.
+   */
+  $on(eventName, handler) {
+    if (
+      !Object.hasOwn(this._handlersByEventNameAndSubscriptionKey, eventName)
+    ) {
+      this._handlersByEventNameAndSubscriptionKey[eventName] = {};
+    }
+
+    const subscriptionKey = `evtsub-${this._nextSubscriptionSerial++}`;
+
+    this._handlersByEventNameAndSubscriptionKey[eventName][subscriptionKey] =
+      handler;
+
+    return new EventBusUnsubscriber(
+      this._handlersByEventNameAndSubscriptionKey,
+      eventName,
+      subscriptionKey
+    );
+  }
+
+  /**
+   * Subscribe to the next firing of the named event with a given handler.
+   * @return an object which a single no-arg method `$off()` that is used to remove the subscription.
+   */
+  $once(eventName, handler) {
+    const unsubscriber = this.$on(eventName, (arg) => {
+      unsubscriber.$off();
+      return handler(arg);
+    });
+    return unsubscriber;
+  }
+
+  /**
+   * Emit a named event.
+   * @return a promise which resolves once all the handlers have been called
+   */
+  async $emit(eventName, arg) {
+    const handlers = Object.values(
+      this._handlersByEventNameAndSubscriptionKey[eventName] || {}
+    );
+
+    const promises = handlers.map((h) => h(arg));
+
+    return Promise.all(promises).then(() => true);
+  }
+}
+
+class EventBusUnsubscriber {
+  constructor(
+    handlersByEventNameAndSubscriptionKey,
+    eventName,
+    subscriptionKey
+  ) {
+    this._handlersByEventNameAndSubscriptionKey =
+      handlersByEventNameAndSubscriptionKey;
+    this._eventName = eventName;
+    this._subscriptionKey = subscriptionKey;
+  }
+
+  /**
+   * Remove a previously created event handler subscription.
+   */
+  $off() {
+    if (this._handlersByEventNameAndSubscriptionKey[this._eventName]) {
+      delete this._handlersByEventNameAndSubscriptionKey[this._eventName][
+        this._subscriptionKey
+      ];
+    }
+    if (
+      Object.keys(this._handlersByEventNameAndSubscriptionKey[this._eventName])
+        .length === 0
+    ) {
+      delete this._handlersByEventNameAndSubscriptionKey[this._eventName];
+    }
+  }
+}
 </code></pre>
-<h3 class="subsection-title" style="margin-top: 1em" data-jsdoc-vuejs="section-event">Events</h3>
-<table data-jsdoc-vuejs="table-event">
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th>Payload Type</th>
-        <th>Description</th>
-    </tr>
-    </thead>
-    <tbody><tr>
-        <td><code>qr-code-scanned</code></td>
-        <td>String</td>
-        <td>Emit scanned codes</td>
-    </tr><tr>
-        <td><code>qr-code-err</code></td>
-        <td>String</td>
-        <td>Emit error when scanner fails or can't initialize</td>
-    </tr></tbody>
-</table></div>
-        
-
-        
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-    
-    </div>
-    
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+        </article>
+    </section>
 
 
 

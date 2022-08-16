@@ -72,6 +72,14 @@
                                 Extension Model
                             </a>
                         
+                            <a class="dropdown-item" href="tutorial-farm-data-access.html">
+                                Farm Data Access
+                            </a>
+                        
+                            <a class="dropdown-item" href="tutorial-writing-plugins.html">
+                                Writing Plugins
+                            </a>
+                        
                         </div>
                     </div>
                 </div>
@@ -110,7 +118,7 @@
             
             <nav>
                 
-                    <div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-extension-model.html">Extension Model</a></li></ul></div>
+                    <div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-extension-model.html">Extension Model</a></li><li><a href="tutorial-farm-data-access.html">Farm Data Access</a></li><li><a href="tutorial-writing-plugins.html">Writing Plugins</a><ul><li><a href="tutorial-simple-asset-action-plugin.html">Simple Asset Action</a></li></ul></li></ul></div>
                 
             </nav>
         </div>
@@ -193,7 +201,7 @@ export default {
 &lt;/script>
 </code></pre>
 <h3>Handle Object</h3>
-<p>The handle object which is passed into plugins' <code>onLoad</code> method is an instance of <a href="TODO">AssetLinkPluginHandle</a>. It provides some helpers
+<p>The handle object which is passed into plugins' <code>onLoad</code> method is an instance of <a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a>. It provides some helpers
 with validation for hooking into Asset Link's pluggable rendering system.</p>
 <p>Importantly, the component class itself must be accessed via the <code>AssetLinkPluginHandle::thisPlugin</code> property.</p>
 <h2>Pluggable Asset/Log Search</h2>
