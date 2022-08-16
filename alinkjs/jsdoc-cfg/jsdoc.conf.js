@@ -52,7 +52,8 @@ module.exports = {
     "default": {
       "staticFiles": {
         "include": [
-            "./jsdoc-cfg/static"
+            "./jsdoc-cfg/static",
+            "./packages/assetlink-plugin-api/tutorials/static"
         ]
       }
     }

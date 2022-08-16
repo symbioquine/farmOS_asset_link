@@ -92,6 +92,8 @@ module.exports = defineConfig({
       : "/alink/",
 
   outputDir: "../../../farmos_asset_link/asset-link-dist/",
+
+  runtimeCompiler: true,
   transpileDependencies: ["quasar"],
 
   configureWebpack: (config) => {

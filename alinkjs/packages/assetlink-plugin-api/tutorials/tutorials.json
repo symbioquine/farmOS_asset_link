@@ -1,5 +1,16 @@
 {
-    "extension-model": {
-        "title": "Extension Model"
+  "extension-model": {
+    "title": "Extension Model"
+  },
+  "farm-data-access": {
+    "title": "Farm Data Access"
+  },
+  "writing-plugins": {
+    "title": "Writing Plugins",
+    "children": {
+      "simple-asset-action-plugin": {
+        "title": "Simple Asset Action"
+      }
     }
+  }
 }

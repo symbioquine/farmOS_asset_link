@@ -1,8 +1,7 @@
 import { reactive } from 'vue';
 
-import { createDrupalUrl, currentEpochSecond } from "assetlink-plugin-api";
+import { createDrupalUrl, currentEpochSecond, EventBus } from "assetlink-plugin-api";
 
-import EventBus from '@/EventBus';
 import DefaultPluginListLoadingFailure from '@/DefaultPluginListLoadingFailure';
 import HttpAccessDeniedException from '@/HttpAccessDeniedException';
 

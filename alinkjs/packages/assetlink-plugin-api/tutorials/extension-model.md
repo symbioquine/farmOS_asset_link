@@ -91,7 +91,7 @@ export default {
 
 ### Handle Object
 
-The handle object which is passed into plugins' `onLoad` method is an instance of [AssetLinkPluginHandle](TODO). It provides some helpers
+The handle object which is passed into plugins' `onLoad` method is an instance of {@link IAssetLinkPluginHandle}. It provides some helpers
 with validation for hooking into Asset Link's pluggable rendering system.
 
 Importantly, the component class itself must be accessed via the `AssetLinkPluginHandle::thisPlugin` property.

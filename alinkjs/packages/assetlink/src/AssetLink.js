@@ -15,7 +15,6 @@ import localforage from 'localforage';
 import fetch from 'cross-fetch';
 import { v4 as uuidv4 } from 'uuid';
 
-import EventBus from '@/EventBus';
 import AssetLinkUI from '@/AssetLinkUI';
 import FarmOSConnectionStatusDetector from '@/FarmOSConnectionStatusDetector';
 import PeekableAsyncIterator from '@/PeekableAsyncIterator';
@@ -23,7 +22,7 @@ import AssetLinkPluginListsCore from '@/AssetLinkPluginListsCore';
 import AssetLinkPluginLoaderCore from '@/AssetLinkPluginLoaderCore';
 import HttpAccessDeniedException from '@/HttpAccessDeniedException';
 
-import { createDrupalUrl, currentEpochSecond } from "assetlink-plugin-api";
+import { createDrupalUrl, currentEpochSecond, EventBus } from "assetlink-plugin-api";
 
 const fetchJson = (url, args) => fetch(url, args).then(response => response.json());
 

@@ -1,33 +1,27 @@
 /* eslint-disable no-unused-vars */
 
 /**
- * 
+ *
  * @interface
  */
-export default class IAssetLinkPlugin {
-
-}
+export default class IAssetLinkPlugin {}
 
 /**
  * Called when a plugin is first loaded.
- * 
+ *
  * @static
- * @abstract
  * @method IAssetLinkPlugin.onLoad
  * @param {IAssetLinkPluginHandle} handle An object which is
  *   used to tell Asset Link what functionality this plugin
  *   provides.
  * @param {IAssetLink} assetLink The asset link instance.
  */
-IAssetLinkPlugin.onLoad = function(handle, assetLink) {
-  
-};
+IAssetLinkPlugin.onLoad = function (handle, assetLink) {};
 
 /**
  * Called (possibly twice) as part of each search request.
- * 
+ *
  * @static
- * @abstract
  * @method IAssetLinkPlugin.searchAssets
  * @param {IAssetLink} assetLink The asset link instance.
  * @param {Object} searchRequest An object with varying structure produced by
@@ -37,6 +31,8 @@ IAssetLinkPlugin.onLoad = function(handle, assetLink) {
  *   or `assetLink.entitySource` for a offline or and online asset search
  *   respectively.
  */
-IAssetLinkPlugin.searchAssets = function(assetLink, searchRequest, searchPhase) {
-  
-};
+IAssetLinkPlugin.searchAssets = function (
+  assetLink,
+  searchRequest,
+  searchPhase
+) {};

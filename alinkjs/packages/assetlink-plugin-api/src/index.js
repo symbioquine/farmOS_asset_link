@@ -5,6 +5,7 @@ export { default as createDrupalUrl } from "./createDrupalUrl";
 export { default as currentEpochSecond } from "./currentEpochSecond";
 export { default as summarizeAssetNames } from "./summarizeAssetNames";
 export { default as RacingLocalRemoteAsyncIterator } from "./RacingLocalRemoteAsyncIterator";
+export { default as EventBus } from "./EventBus";
 
 import AssetResolver from "./components/AssetResolver.vue";
 import AssetSelector from "./components/AssetSelector.vue";

@@ -84,6 +84,7 @@ module.exports = defineConfig({
 
   outputDir: "../../../farmos_asset_link/asset-link-dist/sidecar",
 
+  runtimeCompiler: true,
   transpileDependencies: ["quasar"],
 
   configureWebpack(config) {

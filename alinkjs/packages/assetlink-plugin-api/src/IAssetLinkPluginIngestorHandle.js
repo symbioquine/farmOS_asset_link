@@ -6,8 +6,7 @@
  *
  * @interface
  */
-export default class IAssetLinkPluginIngestorHandle {
-}
+export default class IAssetLinkPluginIngestorHandle {}
 
 /**
  * @callback pluginIngestorFn
@@ -16,9 +15,9 @@ export default class IAssetLinkPluginIngestorHandle {
 
 /**
  * Specify the component for this plugin-provided route.
- * 
+ *
  * ### Usage
- * 
+ *
  * ```js
  * pluginIngestor.onEveryPlugin(plugin => {
  *
@@ -32,5 +31,6 @@ export default class IAssetLinkPluginIngestorHandle {
  * @method IAssetLinkPluginIngestorHandle#onEveryPlugin
  * @param {pluginIngestorFn} ingestorFn The function which accepts each loaded plugin
  */
-IAssetLinkPluginIngestorHandle.prototype.onEveryPlugin = function(ingestorFn) {
-};
+IAssetLinkPluginIngestorHandle.prototype.onEveryPlugin = function (
+  ingestorFn
+) {};

@@ -5,11 +5,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { loadModule } from 'vue3-sfc-loader/dist/vue3-sfc-loader.esm.js';
 import { parseComponent } from 'vue-template-compiler';
 
-import EventBus from '@/EventBus';
 import VuePluginShorthandDecorator from '@/VuePluginShorthandDecorator';
 import { default as pluginModuleLibrary, pluginModuleLibraryNames } from '@/pluginModuleLibrary';
 
-import { createDrupalUrl, currentEpochSecond } from "assetlink-plugin-api";
+import { createDrupalUrl, currentEpochSecond, EventBus } from "assetlink-plugin-api";
 
 export default class AssetLinkPluginLoaderCore {
 
