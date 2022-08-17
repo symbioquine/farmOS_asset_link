@@ -94,13 +94,16 @@ npm run dev
 From the [development branch][development branch] of this repository:
 
 ```sh
-# Add/commit your changes
-git add [...]
+# Update CHANGELOG.md
+edit CHANGELOG.md
+
+# Add your changes
+git add CHANGELOG.md [...]
+
 # Update NPM package version and commit
-npm --no-git-tag-version version --force patch
-git commit
-# Tag the release with the unbuilt prefix
-git tag unbuilt-v9000.0.1
+cd ./alinkjs
+npx lerna version --no-push --no-changelog --message "Release version %v" --tag-version-prefix="unbuilt-v" v9000.0.1
+
 # Push the development branch and new tag
 git push --atomic origin HEAD:development unbuilt-v9000.0.1
 ```
