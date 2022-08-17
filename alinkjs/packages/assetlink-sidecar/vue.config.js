@@ -1,3 +1,5 @@
+const fs = require("fs");
+const https = require("https");
 const { defineConfig } = require("@vue/cli-service");
 const { ModuleFederationPlugin } = require("webpack").container;
 const WebpackAssetsManifest = require("webpack-assets-manifest");
@@ -23,7 +25,7 @@ const createDevServerConfig = () => {
         ws: false,
         target: DEV_PROXY_TARGET,
         context: () => true,
-        secure: targetUrl.protocol === "https",
+        secure: targetUrl.protocol === "https:",
         changeOrigin: true,
         bypass: function (req) {
           if (req.path.indexOf("/alink/sidecar") === 0) {
@@ -53,7 +55,14 @@ const createDevServerConfig = () => {
     },
   };
 
-  if (targetUrl.protocol === "https") {
+  if (targetUrl.protocol === "https:") {
+    const devRootCA = `${__dirname}/../../../devcerts/rootCA.pem`;
+
+    https.globalAgent.options.ca = https.globalAgent.options.ca || [];
+    https.globalAgent.options.ca.push(fs.readFileSync(devRootCA));
+
+    serverConfig.proxy["^/"].agent = https.globalAgent;
+
     Object.assign(serverConfig, {
       // Deprecated `https` config still needed to cause links printed to console to have correct protocol
       // https://github.com/symfony/webpack-encore/issues/1064
@@ -61,9 +70,9 @@ const createDevServerConfig = () => {
       server: {
         type: "https",
         options: {
-          ca: `${__dirname}/../devcerts/rootCA.pem`,
-          key: `${__dirname}/../devcerts/${devHost}/privkey.pem`,
-          cert: `${__dirname}/../devcerts/${devHost}/fullchain.pem`,
+          ca: devRootCA,
+          key: `${__dirname}/../../../devcerts/${devHost}/privkey.pem`,
+          cert: `${__dirname}/../../../devcerts/${devHost}/fullchain.pem`,
         },
       },
       host: devHost,

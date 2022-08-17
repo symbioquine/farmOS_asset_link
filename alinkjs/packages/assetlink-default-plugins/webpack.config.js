@@ -1,7 +1,8 @@
+const fs = require('fs');
+const https = require('https');
 const chokidar = require('chokidar');
 const yaml = require('js-yaml');
 const path = require('path');
-const fs = require('fs');
 const CopyPlugin = require("copy-webpack-plugin");
 
 
@@ -53,14 +54,14 @@ const createDevServerConfig = () => {
         ws: false,
         target: DEV_PROXY_TARGET,
         context: () => true,
-        secure: targetUrl.protocol === "https",
+        secure: targetUrl.protocol === "https:",
         changeOrigin: true,
         bypass: function (req, res) {
           if (req.path.indexOf("/alink/plugins") === 0) {
             return req.path;
           }
           if (req.path.indexOf("/alink/backend/default-plugins.repo.json") === 0) {
-            const wsProtocol = (targetUrl.protocol === "https") ? 'wss' : 'ws';
+            const wsProtocol = (targetUrl.protocol === "https:") ? 'wss' : 'ws';
             res.send({
               plugins: fs.readdirSync(`${__dirname}/plugins`).map(pluginFilename => ({url: `/alink/plugins/${pluginFilename}`})),
               updateChannel: `${wsProtocol}://${devHost}:${serverPort}/ws`,
@@ -91,23 +92,28 @@ const createDevServerConfig = () => {
     },
   };
 
-  if (targetUrl.protocol === 'https') {
+  if (targetUrl.protocol === "https:") {
+    const devRootCA = `${__dirname}/../../../devcerts/rootCA.pem`;
+
+    https.globalAgent.options.ca = https.globalAgent.options.ca || [];
+    https.globalAgent.options.ca.push(fs.readFileSync(devRootCA));
+
+    serverConfig.proxy["/"].agent = https.globalAgent;
+
     Object.assign(serverConfig, {
       // Deprecated `https` config still needed to cause links printed to console to have correct protocol
       // https://github.com/symfony/webpack-encore/issues/1064
       https: true,
       server: {
-        type: 'https',
+        type: "https",
         options: {
-          ca: `${__dirname}/../devcerts/rootCA.pem`,
-          key: `${__dirname}/../devcerts/${devHost}/privkey.pem`,
-          cert: `${__dirname}/../devcerts/${devHost}/fullchain.pem`,
+          ca: devRootCA,
+          key: `${__dirname}/../../../devcerts/${devHost}/privkey.pem`,
+          cert: `${__dirname}/../../../devcerts/${devHost}/fullchain.pem`,
         },
       },
       host: devHost,
-      allowedHosts: [
-        devHost,
-      ],
+      allowedHosts: [devHost],
     });
   }
 
