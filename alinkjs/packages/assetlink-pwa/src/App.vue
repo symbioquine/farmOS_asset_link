@@ -77,6 +77,28 @@
         </template>
       </q-banner>
 
+      <q-banner
+        v-for="message in assetLink.vm.messages"
+        :key="message.id"
+        inline-actions
+        class="text-white bg-deep-orange-12"
+      >
+        {{ message.text }}
+        <template #action>
+          <q-btn
+            flat
+            dense
+            color="white"
+            label="Dismiss"
+            @click="
+              assetLink.vm.messages = assetLink.vm.messages.filter(
+                (m) => m.id !== message.id
+              )
+            "
+          />
+        </template>
+      </q-banner>
+
       <q-page>
         <router-view
           v-if="assetLink.vm.booted"
