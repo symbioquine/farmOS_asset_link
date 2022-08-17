@@ -10,11 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Implement service worker refresh UI to cleanly update the PWA
+- Add reload plugin button to the manage plugins page
+- Add a more specific warning message for asset proximity search when location permissions are denied
 
 ### Fixed
 
 - Re-add service-worker.js which got lost in the migration work
 - Fixed logic to connect/disconnect Orbit.js JSON:API source queries based on online/offline status
+- Fix reloading plugins so the `skipCache` parameter also skips the service worker cache
 
 ## [0.5.2] - 2022-08-16
 

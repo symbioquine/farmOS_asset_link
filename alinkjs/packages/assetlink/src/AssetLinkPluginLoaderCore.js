@@ -247,7 +247,13 @@ export default class AssetLinkPluginLoaderCore {
       return cacheItem.value;
     }
 
-    const pluginSrcRes = await fetch(url);
+    const headers = {};
+
+    if (skipCache) {
+      headers['X-Skip-Cache'] = "1";
+    }
+
+    const pluginSrcRes = await fetch(url, { headers });
 
     if (!pluginSrcRes.ok) {
       throw new Error(`HTTP Error ${pluginSrcRes.status}: ${pluginSrcRes.statusText}`);

@@ -5,7 +5,12 @@ import {
   setDefaultHandler,
   setCatchHandler,
 } from "workbox-routing";
-import { CacheFirst, NetworkOnly } from "workbox-strategies";
+import {
+  Strategy,
+  CacheFirst,
+  NetworkOnly,
+  NetworkFirst,
+} from "workbox-strategies";
 
 // define a prefix for your cache names. It is recommended to use your project name
 setCacheNameDetails({ prefix: "asset-link" });
@@ -14,14 +19,49 @@ setCacheNameDetails({ prefix: "asset-link" });
 precacheAndRoute(self.__WB_MANIFEST);
 // End of Precaching############################
 
+class SkipCacheAwareCacheFirstStrategy extends Strategy {
+  constructor(options) {
+    super(options);
+    this.cacheFirst = new CacheFirst();
+    this.networkFirst = new NetworkFirst();
+  }
+
+  handleAll(options) {
+    // Allow for flexible options to be passed.
+    /* eslint-disable no-undef */
+    if (options instanceof FetchEvent) {
+      options = {
+        event: options,
+        request: options.request,
+      };
+    }
+
+    const request =
+      typeof options.request === "string"
+        ? new Request(options.request)
+        : options.request;
+
+    if (request.headers["X-Skip-Cache"]) {
+      return this.networkFirst.handleAll(options);
+    }
+    return this.cacheFirst.handleAll(options);
+  }
+}
+
 // Start of CacheFirst Strategy##################
 // all the api request which matches the following pattern will use CacheFirst strategy for caching
-registerRoute(/https:\/\/.*\.repo\.json/, new CacheFirst());
-registerRoute(/https:\/\/.*\.alink\..*/, new CacheFirst());
+registerRoute(
+  /https:\/\/.*\.repo\.json/,
+  new SkipCacheAwareCacheFirstStrategy()
+);
+registerRoute(
+  /https:\/\/.*\.alink\..*/,
+  new SkipCacheAwareCacheFirstStrategy()
+);
 registerRoute(/https:\/\/.*\/api\/?.*/, new NetworkOnly());
 // End of CacheFirst Strategy####################
 
-setDefaultHandler(new CacheFirst());
+setDefaultHandler(new SkipCacheAwareCacheFirstStrategy());
 
 setCatchHandler(async ({ event }) => {
   const url = new URL(event.request.url);
@@ -29,8 +69,7 @@ setCatchHandler(async ({ event }) => {
   console.log(
     "You should be able to see this message in the console if setCatchHandler is called",
     url,
-    JSON.stringify(event),
-    "/__THIS_GETS_REPLACED_AT_RUNTIME_BY_THE_DRUPAL_CONTROLLER__/"
+    JSON.stringify(event)
   );
 
   // Don't handle alink backend urls

@@ -29,8 +29,13 @@ const tryGetLocation = async () => {
   try {
     pos = await getGeoPosition(geolocationOpts);
   } catch (e) {
-    assetLink.vm.messages.push({text: `Failed to get geolocation: ${e.message}`, type: "error"});
-    console.log(e);
+    console.log("Failed to get geolocation:", e);
+    if (e instanceof GeolocationPositionError && e.code === 1) {
+      assetLink.vm.messages.push({text: "Failed to get geolocation: Permission denied by browser. Please grant location access to this page to fix proximity searching.", type: "warning"});
+    } else {
+      assetLink.vm.messages.push({text: `Failed to get geolocation: ${e.message}`, type: "error"});
+    }
+    return;
   }
 
   // Copy the contents since it can't be stringified in some browser/os combinations
@@ -53,12 +58,15 @@ const tryGetLocation = async () => {
 
   const newSearchText = `pos: ${crd.latitude.toFixed(6)},${crd.longitude.toFixed(6)} (+/-${Math.round(crd.accuracy, 3)}m)`;
   if (searchText.value !== newSearchText) {
+    console.log(`Location changed - issuing updated search request...`);
     searchText.value = newSearchText;
     emit('update:searchRequest', {
       id: uuidv4(),
       type: 'proximity-search',
       coordinates: crd,
     });
+  } else {
+    console.log(`Skipping issuing of unchanged location search request.`);
   }
 
 }

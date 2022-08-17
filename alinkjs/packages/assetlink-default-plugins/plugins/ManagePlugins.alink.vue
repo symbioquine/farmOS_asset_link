@@ -26,6 +26,9 @@
                     <q-item-section @click="removePluginListByUrl(prop.node.sourceUrl)">remove</q-item-section>
                   </q-item>
                   <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin'">
+                    <q-item-section @click="reloadPluginByUrl(prop.node.pluginUrl)">reload</q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin'">
                     <q-item-section @click="removePluginByUrl(prop.node.pluginUrl)">remove</q-item-section>
                   </q-item>
                 </q-list>
@@ -125,6 +128,9 @@ export default {
       }
 
       await this.assetLink.cores.pluginLists.addPluginToLocalList(url);
+    },
+    async reloadPluginByUrl(pluginUrl) {
+      await this.assetLink.cores.pluginLoader.reloadPlugin(pluginUrl);
     },
     async removePluginByUrl(pluginUrl) {
       const confirmed = await this.assetLink.ui.dialog.confirm(`Are you sure you want to remove the plugin "${pluginUrl}"?`);
