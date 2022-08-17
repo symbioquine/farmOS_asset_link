@@ -96,6 +96,20 @@ module.exports = defineConfig({
   runtimeCompiler: true,
   transpileDependencies: ["quasar"],
 
+  pwa: {
+    name: "Asset Link",
+    themeColor: "#4CAF50",
+    msTileColor: "#000000",
+    appleMobileWebAppCapable: "yes",
+    appleMobileWebAppStatusBarStyle: "black",
+
+    // configure the workbox plugin
+    workboxPluginMode: "InjectManifest",
+    workboxOptions: {
+      swSrc: "./src/service-worker.js",
+    },
+  },
+
   configureWebpack: (config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,

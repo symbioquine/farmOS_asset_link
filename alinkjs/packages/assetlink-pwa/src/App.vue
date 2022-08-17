@@ -59,6 +59,24 @@
         </template>
       </q-banner>
 
+      <q-banner
+        v-if="assetLink.connectionStatus.canReachFarmOS.value && updateExists"
+        inline-actions
+        class="text-white bg-deep-orange-12"
+      >
+        An update is available for Asset Link
+        <template #action>
+          <q-btn
+            flat
+            dense
+            color="white"
+            icon-right="mdi-refresh"
+            label="Update"
+            @click="refreshApp"
+          />
+        </template>
+      </q-banner>
+
       <q-page>
         <router-view
           v-if="assetLink.vm.booted"
@@ -94,6 +112,8 @@
 import { defineComponent, inject, getCurrentInstance, watch, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
+import { useServiceWorkerUX } from "@/useServiceWorkerUX";
+
 import AssetLink from "assetlink/AssetLink";
 
 import { createDrupalUrl } from "assetlink-plugin-api";
@@ -105,6 +125,8 @@ export default defineComponent({
 
     const router = useRouter();
     const route = useRoute();
+
+    const { updateExists, refreshApp } = useServiceWorkerUX();
 
     const devToolsApi = inject("devToolsApi");
 
@@ -159,6 +181,8 @@ export default defineComponent({
       assetLink,
       farmOSLoginUrl,
       metaActionDefs,
+      updateExists,
+      refreshApp,
     };
   },
   created() {

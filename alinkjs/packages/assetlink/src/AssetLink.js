@@ -318,7 +318,7 @@ export default class AssetLink {
       // TODO: Listen for log creation/updates and emit 'changed:assetLogs' for each related asset (assets, inventory references, etc)
     });
 
-    watch(() => this.connectionStatus.isOnline, async (isOnline) => {
+    watch(this.connectionStatus.isOnline, async (isOnline) => {
       this._remote.requestQueue.autoProcess = isOnline;
       if (isOnline && !this._remote.requestQueue.empty) {
         this._remote.requestQueue.process();
