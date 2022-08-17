@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.3] - 2022-08-17
+
 ### Added
 
 - Implement service worker refresh UI to cleanly update the PWA
