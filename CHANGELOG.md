@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Improved styling of asset selector to make the search results scroll and fit the page better
+
+### Fixed
+
+- Show the asset search weight text under each search result
+
 ## [0.5.3] - 2022-08-17
 
 ### Added

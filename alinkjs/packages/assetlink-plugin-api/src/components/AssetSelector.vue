@@ -83,6 +83,7 @@ const nodes = computed(() => {
     return {
       id: entry.asset.id,
       label: entry.asset.attributes.name,
+      weightText: entry.weightText,
       tickable: props.selectMultiple ? true : false,
     };
   });
@@ -159,7 +160,7 @@ const onCancel = () => {
 
 <template>
   <div class="column">
-    <div class="text-h5 grey lighten-2">
+    <div class="text-h5 grey lighten-2 q-mb-md">
       {{ title }}
     </div>
 
@@ -172,20 +173,37 @@ const onCancel = () => {
       />
     </search-method-tile-tabber>
 
-    <q-tree
-      node-key="id"
-      :nodes="nodes"
-      dense
-      :tick-strategy="props.selectMultiple ? 'leaf' : 'none'"
-      v-model:ticked="tickedKeys"
-      v-model:selected="selectedKey"
-      no-nodes-label="No assets found"
-      class="q-mx-lg q-mb-md col-grow"
-    />
+    <div
+      class="col"
+      style="
+        height: auto;
+        min-height: 0;
+        max-height: 100%;
+        position: relative;
+        contain: strict;
+        overflow: auto;
+      "
+    >
+      <q-tree
+        node-key="id"
+        :nodes="nodes"
+        :tick-strategy="props.selectMultiple ? 'leaf' : 'none'"
+        v-model:ticked="tickedKeys"
+        v-model:selected="selectedKey"
+        no-nodes-label="No assets found"
+        class="q-mx-lg q-mb-md"
+      >
+        <template v-slot:default-body="prop">
+          <div v-if="prop.node.weightText" class="q-ml-xl">
+            {{ prop.node.weightText }}
+          </div>
+        </template>
+      </q-tree>
+    </div>
 
     <q-separator />
 
-    <div class="q-pa-md q-gutter-sm row justify-end">
+    <div class="q-pa-sm q-gutter-sm row justify-end">
       <q-btn color="secondary" label="Cancel" @click="onCancel()" />
       <q-btn
         color="primary"
