@@ -651,7 +651,7 @@ export default class AssetLink {
     const models = {};
 
     await Promise.all(serverRelatedSchemas.map(async (serverRelatedSchema) => {
-      const relatedSchema = await fetchJson(serverRelatedSchema.targetSchema);
+      const relatedSchema = await fetchJson(typeof serverRelatedSchema.targetSchema === 'object' ? serverRelatedSchema.targetSchema.$ref : serverRelatedSchema.targetSchema);
 
       const relatedItemSchema = await fetchJson(relatedSchema.definitions.data.items.$ref);
 

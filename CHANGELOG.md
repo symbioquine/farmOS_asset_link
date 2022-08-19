@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Show the asset search weight text under each search result
+- Fix loading of schemas so it works with latest Drupal JSON:API schema data
 
 ## [0.5.3] - 2022-08-17
 
