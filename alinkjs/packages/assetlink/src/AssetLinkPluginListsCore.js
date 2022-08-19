@@ -361,7 +361,13 @@ class HttpPluginList {
       return cachedPluginList;
     }
 
-    const pluginListRes = await fetch(this._url);
+    const headers = {};
+
+    if (skipCache) {
+      headers['X-Skip-Cache'] = "1";
+    }
+
+    const pluginListRes = await fetch(this._url, { headers });
 
     console.log(pluginListRes);
 

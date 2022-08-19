@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Show the asset search weight text under each search result
 - Fix loading of schemas so it works with latest Drupal JSON:API schema data
+- Fix reloading plugin lists so the `skipCache` parameter also skips the service worker cache
 
 ## [0.5.3] - 2022-08-17
 
