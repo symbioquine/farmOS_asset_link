@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add a connection status description to the bottom of the sync tray
+- Add a menu to the bottom of the sync tray with an option to clear all local data
+
 ### Changed
 
 - Improved styling of asset selector to make the search results scroll and fit the page better

@@ -210,7 +210,7 @@ export default class AssetLink {
 
     this._schema = new RecordSchema({ models: this._models });
 
-    const bucket = new IndexedDBBucket({ namespace: 'asset-link-orbitjs-bucket' });
+    this._bucket = new IndexedDBBucket({ namespace: 'asset-link-orbitjs-bucket' });
 
     this._memory = new MemorySource({
       schema: this._schema,
@@ -226,7 +226,7 @@ export default class AssetLink {
       defaultFetchSettings: {
         timeout: 10000,
       },
-      bucket,
+      bucket: this._bucket,
       requestQueueSettings: {
         autoProcess: this.connectionStatus.isOnline.value || false,
       },
@@ -346,6 +346,17 @@ export default class AssetLink {
     bootingEventGroup.end();
 
     return true;
+  }
+
+  /**
+   * Clear all local data/caches/etc. Asset Link will become non-functional after this until the page is reloaded.
+   */
+  async permanentlyDeleteLocalData() {
+    await this._store.dropInstance();
+    this._connectionStatus.stop();
+    await this._coordinator.deactivate();
+    await this._backup.cache.deleteDB();
+    await this._bucket.deleteDB();
   }
 
   /**

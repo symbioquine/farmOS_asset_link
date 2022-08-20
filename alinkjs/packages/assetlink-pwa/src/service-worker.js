@@ -118,8 +118,14 @@ setCatchHandler(async ({ event }) => {
 });
 
 // From https://dev.to/drbragg/handling-service-worker-updates-in-your-vue-pwa-1pip
-self.addEventListener("message", (event) => {
+self.addEventListener("message", async (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
+  }
+  if (event.data && event.data.type === "CLEAR_ALL_CACHES") {
+    const cacheKeys = await caches.keys();
+    for (const key of cacheKeys) {
+      caches.delete(key);
+    }
   }
 });
