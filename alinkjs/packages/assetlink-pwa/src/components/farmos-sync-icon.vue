@@ -21,7 +21,7 @@ const assetLink = inject("assetLink");
 const statusIcon = computed(() => {
   const { connectionStatus } = assetLink;
 
-  if (!connectionStatus.hasNetworkConnection) {
+  if (!connectionStatus.hasNetworkConnection.value) {
     return "mdi-cloud-off-outline";
   }
 
