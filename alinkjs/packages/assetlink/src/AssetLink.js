@@ -228,7 +228,7 @@ export default class AssetLink {
       },
       bucket,
       requestQueueSettings: {
-        autoProcess: this.connectionStatus.isOnline || false,
+        autoProcess: this.connectionStatus.isOnline.value || false,
       },
     });
 
