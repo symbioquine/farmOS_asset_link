@@ -316,7 +316,13 @@ export default class AssetLink {
         this.eventBus.$emit('changed:asset', { assetType: update.operations.record.type, assetId: update.operations.record.id});
       }
 
-      // TODO: Listen for log creation/updates and emit 'changed:assetLogs' for each related asset (assets, inventory references, etc)
+      if (['addRecord', 'updateRecord'].includes(update.operations.op) && update.operations.record.type.startsWith('log--')) {
+        update.operations.record.relationships.asset.data.forEach(assetRel => {
+          this.eventBus.$emit('changed:assetLogs', { assetType: assetRel.type, assetId: assetRel.id});
+        });
+
+        // TODO: Emit 'changed:assetLogs' more types of related asset changes (inventory references, etc)
+      }
     });
 
     watch(this.connectionStatus.isOnline, async (isOnline) => {

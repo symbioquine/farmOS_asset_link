@@ -1,5 +1,5 @@
 <script setup>
-import { inject, ref, computed, onMounted, onUnmounted } from 'vue';
+import { inject, ref, onMounted, onUnmounted } from 'vue';
 
 import { currentEpochSecond, parseJSONDate } from "assetlink-plugin-api";
 
@@ -14,50 +14,54 @@ const props = defineProps({
 
 const assetLink = inject('assetLink');
 
+const loadingLocations = ref(false);
 const currentLocations = ref(null);
 
-const currentLocationsString = computed(() => {
-  if (!currentLocations.value) {
-    return '';
-  }
-  return currentLocations.value.map(cl => cl.attributes.name).join(', ');
-});
+const resolveCurrentLocation = async (opts) => {
+  const options = opts || {};
 
-const resolveCurrentLocation = async () => {
+  loadingLocations.value = true;
+
   const logTypes = (await assetLink.getLogTypes()).map(t => t.attributes.drupal_internal__id);
 
-  const entitySource = assetLink.entitySource;
+  const populateLocationsFromLatestMovementLogs = async (entitySource, entitySourceCache) => {
 
-  // TODO: Query local cache - and remote if online
-  // TODO: Include some visual indication of how up-to-date the results are - e.g. are we just showing cached results because the server is taking a long time or is offline
-
-  const results = await entitySource.query(q => logTypes.map(logType => {
-    return q.findRecords(`log--${logType}`)
-      .filter({ attribute: 'is_movement', op: 'equal', value: true })
-      .filter({ attribute: 'status', op: 'equal', value: 'done' })
-      .filter({ attribute: 'timestamp', op: '<=', value: currentEpochSecond() })
-      .filter({
-        relation: 'asset.id',
-        op: 'equal',
-        records: [{ type: props.asset.type, id: props.asset.id }]
-      })
-      .sort('-timestamp')
-      .page({ offset: 0, limit: 1 });
-  }), {
-    sources: {
-      remote: {
-        include: ['location']
+    const results = await entitySource.query(q => logTypes.map(logType => {
+      return q.findRecords(`log--${logType}`)
+        .filter({ attribute: 'is_movement', op: 'equal', value: true })
+        .filter({ attribute: 'status', op: 'equal', value: 'done' })
+        .filter({ attribute: 'timestamp', op: '<=', value: currentEpochSecond() })
+        .filter({
+          relation: 'asset.id',
+          op: 'some',
+          records: [{ type: props.asset.type, id: props.asset.id }]
+        })
+        .sort('-timestamp')
+        .page({ offset: 0, limit: 1 });
+    }), {
+      sources: {
+        remote: {
+          include: ['location']
+        }
       }
+    });
+
+    const logs = results.flatMap(l => l);
+
+    const latestLog = logs.length ? logs.reduce((logA, logB) => parseJSONDate(logA.attributes.timestamp) > parseJSONDate(logB.attributes.timestamp) ? logA : logB) : null;
+
+    if (latestLog) {
+      currentLocations.value = await entitySourceCache.query(q => q.findRelatedRecords(latestLog, 'location'))
     }
-  });
-
-  const logs = results.flatMap(l => l);
-
-  const latestLog = logs.length ? logs.reduce((logA, logB) => parseJSONDate(logA.attributes.timestamp) > parseJSONDate(logB.attributes.timestamp) ? logA : logB) : null;
-
-  if (latestLog) {
-    currentLocations.value = entitySource.cache.query(q => q.findRelatedRecords(latestLog, 'location'))
   }
+
+  await populateLocationsFromLatestMovementLogs(assetLink.entitySource.cache, assetLink.entitySource.cache);
+
+  if (!options.cacheOnly) {
+    await populateLocationsFromLatestMovementLogs(assetLink.entitySource, assetLink.entitySource.cache);
+  }
+
+  loadingLocations.value = false;
 };
 
 const onAssetLogsChanged = ({ assetType, assetId }) => {
@@ -78,8 +82,20 @@ onUnmounted(() => unsubber && unsubber.$off());
 </script>
 
 <template>
-  <div no-gutters class="row q-ml-sm">
-    <span v-if="currentLocations"> Location: {{ currentLocationsString }}</span>
+  <div no-gutters class="q-ml-sm relative-position fit">
+    <span class="relative-position" :class="{ 'text-grey-7': !assetLink.connectionStatus.isOnline.value }">
+    <span class="q-my-md">Location:</span>
+    <q-chip
+      color="primary"
+      text-color="white"
+      v-for="currentLocation in currentLocations"
+      :key="currentLocation.id">
+      {{ currentLocation.attributes.name }}
+    </q-chip>
+    <q-inner-loading :showing="loadingLocations">
+        <q-spinner-dots color="primary" />
+    </q-inner-loading>
+    </span>
   </div>
 </template>
 
