@@ -177,7 +177,7 @@ const onCancel = () => {
       class="col"
       style="
         height: auto;
-        min-height: 0;
+        min-height: 160px;
         max-height: 100%;
         position: relative;
         contain: strict;

@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix warnings from non-function default slot in JS plugin component declarations
 - Fix warnings from non-numeric boot progress values
 - Fix warning for name of emitted event on the asset page
+- Fix styling of asset selector to have a minimum size for the list of search results
 
 ## [0.5.3] - 2022-08-17
 
