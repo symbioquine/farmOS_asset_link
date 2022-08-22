@@ -288,7 +288,7 @@ export default class AssetLink {
       new SyncStrategy({
         source: 'remote',
         target: 'memory',
-        blocking: false
+        blocking: true
       })
     );
 
@@ -415,6 +415,8 @@ export default class AssetLink {
    * Get a list of the asset_type entities.
    */
   async getAssetTypes() {
+    await this._booted;
+
     const listAssetTypes = async (source) => {
       return await source.query((q) => q
           .findRecords(`asset_type--asset_type`)
@@ -434,6 +436,8 @@ export default class AssetLink {
    * Get a list of the log_type entities.
    */
   async getLogTypes() {
+    await this._booted;
+
     const listLogTypes = async (source) => {
       return await source.query((q) => q
           .findRecords(`log_type--log_type`)
