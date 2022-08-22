@@ -127,5 +127,6 @@ self.addEventListener("message", async (event) => {
     for (const key of cacheKeys) {
       caches.delete(key);
     }
+    await self.registration.unregister();
   }
 });

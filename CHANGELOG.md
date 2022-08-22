@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Improved styling of asset selector to make the search results scroll and fit the page better
+- Improve service-worker cache-clearing/unregistering behavior
 
 ### Fixed
 
