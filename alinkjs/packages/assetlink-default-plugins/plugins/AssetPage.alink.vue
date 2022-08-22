@@ -2,7 +2,7 @@
 import { computed, inject, ref, watch } from 'vue';
 import { useRoute } from 'vue-router'
 
-const emit = defineEmits(['asset-resolved']);
+const emit = defineEmits(['expose-meta-actions']);
 
 const route = useRoute();
 
