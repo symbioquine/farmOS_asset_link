@@ -688,7 +688,7 @@ export default class AssetLink {
         relationships: relatedItemSchema.definitions?.relationships?.properties || {},
       };
 
-      this.vm.bootProgress = ((Object.keys(models).length / serverRelatedSchemas.length) * 100).toFixed(1);
+      this.vm.bootProgress = (Object.keys(models).length / serverRelatedSchemas.length) * 100;
     }));
 
     return models;

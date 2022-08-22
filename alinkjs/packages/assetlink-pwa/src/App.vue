@@ -116,7 +116,7 @@
             color="#2E7D32"
             track-color="grey-3"
           >
-            {{ assetLink.vm.bootProgress }}%
+            {{ assetLink.vm.bootProgress.toFixed(1) }}%
           </q-circular-progress>
           <span
             v-if="assetLink.vm.bootFailed"

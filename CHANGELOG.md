@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix a bug with the sync icon showing the wrong value when no network connection is available
 - Fix warnings from Cookie SameSite attribute
 - Fix warnings from non-function default slot in JS plugin component declarations
+- Fix warnings from non-numeric boot progress values
 
 ## [0.5.3] - 2022-08-17
 
