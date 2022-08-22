@@ -264,8 +264,9 @@ export default class AssetLink {
 
       blocking: true
     });
+
     // Only use the remote query strategy when online
-    if (this.connectionStatus.isOnline) {
+    if (this.connectionStatus.isOnline.value) {
       this._coordinator.addStrategy(this._remoteQueryStrategy);
     }
 
@@ -339,7 +340,7 @@ export default class AssetLink {
 
     this.eventBus.$emit('booted');
 
-    if (this.connectionStatus.isOnline) {
+    if (this.connectionStatus.isOnline.value) {
       this._precache();
     }
 
