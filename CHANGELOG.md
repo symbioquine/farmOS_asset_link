@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add a connection status description to the bottom of the sync tray
 - Add a menu to the bottom of the sync tray with an option to clear all local data
+- Add support for the `some` operator when querying entity relationships
 
 ### Changed
 

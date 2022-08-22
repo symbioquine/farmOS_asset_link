@@ -64,17 +64,33 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
           });
         }
       } else if (filterSpecifier.kind === 'relatedRecords') {
-        if (filterSpecifier.op !== 'equal') {
+        if (filterSpecifier.op === 'equal') {
+          const relatedRecordsFilter = filterSpecifier;
+          filters.push({
+            [relatedRecordsFilter.relation]: relatedRecordsFilter.records
+              .map((e) => e.id)
+              .join(',')
+          });
+        } else if (filterSpecifier.op === 'some') {
+          const resourceRelationAttribute = this.serializeAttributeAsParam(
+              undefined,
+              filterSpecifier.relation
+            );
+
+          filters.push({
+            ['client-' + resourceRelationAttribute + '-' + index]: {
+              path: resourceRelationAttribute,
+              operator: 'CONTAINS',
+              value: filterSpecifier.records
+                .map((e) => e.id)
+                .join(',')
+            }
+          });
+        } else {
           throw new Error(
-            `Operation "${filterSpecifier.op}" is not supported in JSONAPI for relatedRecords filtering`
-          );
+              `Operation "${filterSpecifier.op}" is not supported in JSONAPI for relatedRecords filtering`
+            );
         }
-        const relatedRecordsFilter = filterSpecifier;
-        filters.push({
-          [relatedRecordsFilter.relation]: relatedRecordsFilter.records
-            .map((e) => e.id)
-            .join(',')
-        });
       } else {
         throw new QueryExpressionParseError(
           `Filter operation ${filterSpecifier.op} not recognized for JSONAPISource.`
