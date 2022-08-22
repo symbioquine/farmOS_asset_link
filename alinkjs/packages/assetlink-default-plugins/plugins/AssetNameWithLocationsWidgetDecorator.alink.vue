@@ -82,34 +82,30 @@ onUnmounted(() => unsubber && unsubber.$off());
 </script>
 
 <template>
-  <div no-gutters class="q-ml-sm relative-position fit">
-    <span class="relative-position" :class="{ 'text-grey-7': !assetLink.connectionStatus.isOnline.value }">
-    <span class="q-my-md">Location:</span>
+  <span>
+    <slot></slot>
     <q-chip
+      icon="mdi-crosshairs"
       color="primary"
       text-color="white"
       v-for="currentLocation in currentLocations"
       :key="currentLocation.id">
       {{ currentLocation.attributes.name }}
     </q-chip>
-    <q-inner-loading :showing="loadingLocations">
-        <q-spinner-dots color="primary" />
-    </q-inner-loading>
-    </span>
-  </div>
+  </span>
 </template>
 
 <script>
 export default {
   onLoad(handle) {
-    handle.defineSlot('net.symbioquine.farmos_asset_link.slots.v0.asset_location', slot => {
-      slot.type('page-slot');
+    handle.defineWidgetDecorator('net.symbioquine.farmos_asset_link.widget_decorator.v0.asset_name_with_locations', widgetDecorator => {
+      widgetDecorator.targetWidgetName('asset-name');
 
-      slot.showIf(context => context.pageName === 'asset-page');
+      widgetDecorator.appliesIf(context => true);
 
-      slot.weight(25);
+      widgetDecorator.weight(95);
 
-      slot.component(handle.thisPlugin);
+      widgetDecorator.component(handle.thisPlugin);
     });
   }
 }

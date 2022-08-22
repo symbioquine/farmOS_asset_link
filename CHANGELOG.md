@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a connection status description to the bottom of the sync tray
 - Add a menu to the bottom of the sync tray with an option to clear all local data
 - Add support for the `some` operator when querying entity relationships
+- Add a widget decorator for the asset name that shows the asset groups
 
 ### Changed
 
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve service-worker cache-clearing/unregistering behavior
 - Load all asset relationships when loading assets
 - Improved how asset location is loaded/displayed/refreshed
+- Change the asset location to be a widget decorator on the asset name
 
 ### Fixed
 
