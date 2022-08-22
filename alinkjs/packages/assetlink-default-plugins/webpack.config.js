@@ -47,7 +47,7 @@ const createDevServerConfig = () => {
       return middlewares;
     },
     headers: {
-      "Set-Cookie": "assetLinkDrupalBasePath=/; path=/",
+      "Set-Cookie": "assetLinkDrupalBasePath=/; path=/; SameSite=Lax",
     },
     proxy: {
       "/": {

@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix reloading plugin lists so the `skipCache` parameter also skips the service worker cache
 - Fix a bug with the initial value of the Orbit.js request queue autoProcess setting
 - Fix a bug with the sync icon showing the wrong value when no network connection is available
+- Fix warnings from Cookie SameSite attribute
 
 ## [0.5.3] - 2022-08-17
 

@@ -17,7 +17,7 @@ const createDevServerConfig = () => {
     hot: true,
     watchFiles: ["node_modules/assetlink/**/*"],
     headers: {
-      "Set-Cookie": "assetLinkDrupalBasePath=/; path=/",
+      "Set-Cookie": "assetLinkDrupalBasePath=/; path=/; SameSite=Lax",
     },
     proxy: {
       "^/": {

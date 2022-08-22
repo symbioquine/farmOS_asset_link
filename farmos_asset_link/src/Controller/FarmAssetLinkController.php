@@ -158,7 +158,7 @@ class FarmAssetLinkController extends ControllerBase {
 
     $cookie_expiry_epoch_sec = time() + (14 * 24 * 60 * 60);
 
-    $cookie = new Cookie('assetLinkDrupalBasePath', $base_path, $expire = $cookie_expiry_epoch_sec, $path = '/', $domain = null, $secure = false, $httpOnly = false, $raw = true, $sameSite = null);
+    $cookie = new Cookie('assetLinkDrupalBasePath', $base_path, $expire = $cookie_expiry_epoch_sec, $path = '/', $domain = null, $secure = false, $httpOnly = false, $raw = true, $sameSite = 'Lax');
     $response->headers->setCookie($cookie);
 
     $response->headers->set('Content-Type', $content_type);
