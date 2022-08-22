@@ -398,9 +398,18 @@ export default class AssetLink {
       // Precache recently changed assets
       const assetTypes = (await this.getAssetTypes()).map(t => t.attributes.drupal_internal__id);
 
-      await this._memory.query((q) => assetTypes.map(assetType => q.findRecords(`asset--${assetType}`)
+      await this._memory.query((q) => assetTypes.map(assetType => {
+        const entityType = `asset--${assetType}`;
+
+        const model = this._models[entityType];
+
+        const include = Object.keys(model.relationships);
+
+        return q.findRecords(entityType)
           .sort('-changed')
-          .page({ offset: 0, limit: 100 })));
+          .page({ offset: 0, limit: 100 })
+          .options({ include });
+      }));
 
       // TODO: Consider also precaching recently changed and recent/upcoming logs
 
@@ -470,13 +479,20 @@ export default class AssetLink {
 
     const findAsset = async entitySource => {
       const results = await entitySource.query(q => assetTypes.map(assetType => {
+        const entityType = `asset--${assetType}`;
+
         let baseQuery = q
-          .findRecords(`asset--${assetType}`)
+          .findRecords(entityType)
           .filter(idFilter);
+
+        const model = this._models[entityType];
+
+        const include = Object.keys(model.relationships);
 
         return (additionalFilters || [])
           .reduce((query, f) => query.filter(f), baseQuery)
-          .sort('drupal_internal__id');
+          .sort('drupal_internal__id')
+          .options({ include });
       }));
 
       const assets = results.flatMap(l => l);
