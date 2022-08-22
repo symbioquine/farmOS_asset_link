@@ -27,7 +27,7 @@ const searchMethod = ref('text-search');
     <q-card class="q-dialog-plugin q-gutter-md" style="width: 700px; max-width: 80vw;">
       <asset-selector
         title="Find Destination"
-        confirm-label="Move to selected location(s)"
+        confirm-label="Move to"
         :search-method="searchMethod"
         :key="searchMethod"
         @changed:search-method="newSearchMethod => searchMethod = newSearchMethod"

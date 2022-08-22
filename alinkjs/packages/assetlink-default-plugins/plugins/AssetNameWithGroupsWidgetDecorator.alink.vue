@@ -17,9 +17,7 @@ const assetLink = inject('assetLink');
 const loadingGroups = ref(false);
 const currentGroups = ref(null);
 
-const resolveCurrentGroups = async (opts) => {
-  const options = opts || {};
-
+const resolveCurrentGroups = async () => {
   loadingGroups.value = true;
 
   const logTypes = (await assetLink.getLogTypes()).map(t => t.attributes.drupal_internal__id);
@@ -57,9 +55,7 @@ const resolveCurrentGroups = async (opts) => {
 
   await populateGroupsFromLatestGroupMembershipLogs(assetLink.entitySource.cache, assetLink.entitySource.cache);
 
-  if (!options.cacheOnly) {
-    await populateGroupsFromLatestGroupMembershipLogs(assetLink.entitySource, assetLink.entitySource.cache);
-  }
+  await populateGroupsFromLatestGroupMembershipLogs(assetLink.entitySource, assetLink.entitySource.cache);
 
   loadingGroups.value = false;
 };
@@ -69,7 +65,7 @@ const onAssetLogsChanged = ({ assetType, assetId }) => {
     props.asset.type === assetType &&
     props.asset.id === assetId
   ) {
-    resolveCurrentGroups({ cacheOnly: true });
+    resolveCurrentGroups();
   }
 };
 

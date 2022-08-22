@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix styling of asset selector to have a minimum size for the list of search results
 - Fix more bad references to `assetLink.connectionStatus.isOnline`
 - Fix data-flow for the in-memory Orbit.js source so the initial call to `assetLink.assetTypes()` can return data
+- Remove `cacheOnly` behavior from asset name locations/groups wiget decorators since it was producing stale results
 
 ## [0.5.3] - 2022-08-17
 

@@ -17,9 +17,7 @@ const assetLink = inject('assetLink');
 const loadingLocations = ref(false);
 const currentLocations = ref(null);
 
-const resolveCurrentLocation = async (opts) => {
-  const options = opts || {};
-
+const resolveCurrentLocation = async () => {
   loadingLocations.value = true;
 
   const logTypes = (await assetLink.getLogTypes()).map(t => t.attributes.drupal_internal__id);
@@ -57,9 +55,7 @@ const resolveCurrentLocation = async (opts) => {
 
   await populateLocationsFromLatestMovementLogs(assetLink.entitySource.cache, assetLink.entitySource.cache);
 
-  if (!options.cacheOnly) {
-    await populateLocationsFromLatestMovementLogs(assetLink.entitySource, assetLink.entitySource.cache);
-  }
+  await populateLocationsFromLatestMovementLogs(assetLink.entitySource, assetLink.entitySource.cache);
 
   loadingLocations.value = false;
 };
@@ -69,7 +65,7 @@ const onAssetLogsChanged = ({ assetType, assetId }) => {
     props.asset.type === assetType &&
     props.asset.id === assetId
   ) {
-    resolveCurrentLocation({ cacheOnly: true });
+    resolveCurrentLocation();
   }
 };
 
