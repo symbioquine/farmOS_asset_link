@@ -93,7 +93,7 @@ export default {
       };
 
       moveAction.component(({ asset }) =>
-        h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'no-caps': true },  "Move" ));
+        h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'no-caps': true },  () => "Move" ));
     });
 
   }
