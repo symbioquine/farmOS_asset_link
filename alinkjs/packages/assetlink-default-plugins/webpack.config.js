@@ -1,5 +1,6 @@
 const fs = require('fs');
 const https = require('https');
+const glob = require('glob');
 const chokidar = require('chokidar');
 const yaml = require('js-yaml');
 const path = require('path');
@@ -134,6 +135,9 @@ function GenerateDefaultPluginConfigYmlFilesPlugin() {
         fs.mkdirSync(configOutputDir, { recursive: true });
       }
 
+      const existingConfigFiles = glob.sync(`${configOutputDir}/farmos_asset_link.asset_link_default_plugin.*.yml`);
+      existingConfigFiles.forEach(f => fs.unlinkSync(f));
+
       fs.readdirSync(`${__dirname}/plugins`).forEach(filename => {
         const nameWithoutExt = filename.replace(/(\.[^.]+)*$/, '');
 
@@ -158,6 +162,7 @@ module.exports = {
       ? '/__THIS_GETS_REPLACED_AT_RUNTIME_BY_THE_DRUPAL_CONTROLLER__/'
       : '/alink/plugins/',
     path: path.resolve(__dirname, '../../../farmos_asset_link/asset-link-dist/plugins/'),
+    clean: true,
   },
   // We have no entry since this package just contains uncompiled plugins
   entry: {},
