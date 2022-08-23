@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix more bad references to `assetLink.connectionStatus.isOnline`
 - Fix data-flow for the in-memory Orbit.js source so the initial call to `assetLink.assetTypes()` can return data
 - Remove `cacheOnly` behavior from asset name locations/groups wiget decorators since it was producing stale results
+- Add `key` param to asset page asset resolver to ensure the page updates when navigating from one asset to another
 
 ## [0.5.3] - 2022-08-17
 
