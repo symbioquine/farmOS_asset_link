@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.4] - 2022-08-23
+
 ### Added
 
 - Add a connection status description to the bottom of the sync tray
