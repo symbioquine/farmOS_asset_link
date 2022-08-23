@@ -10,6 +10,8 @@ export default {
 
       widgetDecorator.appliesIf(context => context.asset.attributes.status === 'archived');
 
+      widgetDecorator.weight(50);
+
       widgetDecorator.component(handle.thisPlugin);
     });
   }

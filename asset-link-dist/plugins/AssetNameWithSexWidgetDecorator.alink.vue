@@ -23,6 +23,8 @@ export default {
 
       widgetDecorator.appliesIf(context => !!context.asset.attributes.sex);
 
+      widgetDecorator.weight(25);
+
       widgetDecorator.component(handle.thisPlugin);
     });
   }

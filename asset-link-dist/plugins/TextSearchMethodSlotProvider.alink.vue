@@ -21,7 +21,7 @@ const onSearchTextUpdated = (text) => {
     icon="mdi-keyboard">
 
     <template #search-interface>
-      <div class="q-pa-md">
+      <div class="q-px-md">
         <q-input v-model="searchText" @update:model-value="(evt) => onSearchTextUpdated(evt)" label="Search" />
       </div>
     </template>

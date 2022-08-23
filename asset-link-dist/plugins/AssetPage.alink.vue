@@ -2,7 +2,7 @@
 import { computed, inject, ref, watch } from 'vue';
 import { useRoute } from 'vue-router'
 
-const emit = defineEmits(['asset-resolved']);
+const emit = defineEmits(['expose-meta-actions']);
 
 const route = useRoute();
 
@@ -21,11 +21,15 @@ watch(metaActionDefs, () => {
 
 <template alink-route[net.symbioquine.farmos_asset_link.routes.v0.asset_page]="/asset/:assetRef">
   <q-page padding class="text-left">
-    <asset-resolver :asset-ref="$route.params.assetRef" #default="{ asset }" @asset-resolved="resolvedAsset = $event">
-        <h4 class="q-my-xs">Asset: <render-widget
+    <asset-resolver
+      :asset-ref="$route.params.assetRef"
+      #default="{ asset }"
+      @asset-resolved="resolvedAsset = $event"
+      :key="$route.params.assetRef">
+        <h4 class="q-my-xs"><render-widget
               name="asset-name"
               :context="{ asset }"
-              >{{ asset.attributes.name }}</render-widget>
+              ><span class="asset-name-text-prefix">Asset: </span>{{ asset.attributes.name }}</render-widget>
         </h4>
 
         <component

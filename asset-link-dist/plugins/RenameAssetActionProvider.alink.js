@@ -40,7 +40,7 @@ export default class RenameAssetActionProvider {
       };
 
       renameAction.component(({ asset }) =>
-        h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'no-caps': true },  "Rename" ));
+        h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'no-caps': true },  () => "Rename" ));
 
     });
 

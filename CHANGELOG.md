@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.4] - 2022-08-23
+
+### Added
+
+- Add a connection status description to the bottom of the sync tray
+- Add a menu to the bottom of the sync tray with an option to clear all local data
+- Add support for the `some` operator when querying entity relationships
+- Add a widget decorator for the asset name that shows the asset groups
+
+### Changed
+
+- Improved styling of asset selector to make the search results scroll and fit the page better
+- Improve service-worker cache-clearing/unregistering behavior
+- Load all asset relationships when loading assets
+- Improved how asset location is loaded/displayed/refreshed
+- Change the asset location to be a widget decorator on the asset name
+- Change the asset location/group to be links to the related location/group asset(s)
+- Move the "Asset:" prefix inside a span of the asset name render widget so widget decorator plugins can modify/hide it
+
+### Fixed
+
+- Show the asset search weight text under each search result
+- Fix loading of schemas so it works with latest Drupal JSON:API schema data
+- Fix reloading plugin lists so the `skipCache` parameter also skips the service worker cache
+- Fix a bug with the initial value of the Orbit.js request queue autoProcess setting
+- Fix a bug with the sync icon showing the wrong value when no network connection is available
+- Fix warnings from Cookie SameSite attribute
+- Fix warnings from non-function default slot in JS plugin component declarations
+- Fix warnings from non-numeric boot progress values
+- Fix warning for name of emitted event on the asset page
+- Fix styling of asset selector to have a minimum size for the list of search results
+- Fix more bad references to `assetLink.connectionStatus.isOnline`
+- Fix data-flow for the in-memory Orbit.js source so the initial call to `assetLink.assetTypes()` can return data
+- Remove `cacheOnly` behavior from asset name locations/groups wiget decorators since it was producing stale results
+- Add `key` param to asset page asset resolver to ensure the page updates when navigating from one asset to another
+
 ## [0.5.3] - 2022-08-17
 
 ### Added

@@ -28,7 +28,7 @@ const qrCodeScanned = async (qrCodeResult) => {
     icon="mdi-qrcode-scan">
 
     <template #search-interface>
-      <div class="q-pa-md">
+      <div class="q-px-md">
         <qr-code-scanner @qr-code-scanned="qrCodeScanned($event)" @qr-code-err="qrCodeErr"></qr-code-scanner>
         <q-input v-model="searchText" dense disabled />
       </div>

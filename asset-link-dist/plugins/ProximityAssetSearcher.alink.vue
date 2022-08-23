@@ -83,7 +83,7 @@ if (currentSearchMethod.value === 'proximity-search') {
     @tile-clicked="tryGetLocation">
 
     <template #search-interface>
-      <div class="q-pa-md">
+      <div class="q-px-md">
         <q-input v-model="searchText" disabled />
       </div>
     </template>

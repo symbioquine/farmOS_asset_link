@@ -100,9 +100,17 @@ edit CHANGELOG.md
 # Add your changes
 git add CHANGELOG.md [...]
 
-# Update NPM package version and commit
+# Update NPM package versions
 cd ./alinkjs
-npx lerna version --no-push --no-changelog --message "Release version %v" --tag-version-prefix="unbuilt-v" v9000.0.1
+npx lerna version --no-push --no-changelog --no-git-tag-version v9000.0.1
+
+# Add the version changes
+git add -u
+
+# Create the commit
+git commit -m "Release version v9000.0.1"
+# Tag the release with the unbuilt prefix
+git tag unbuilt-v9000.0.1
 
 # Push the development branch and new tag
 git push --atomic origin HEAD:development unbuilt-v9000.0.1
