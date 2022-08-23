@@ -29,7 +29,7 @@ watch(metaActionDefs, () => {
         <h4 class="q-my-xs"><render-widget
               name="asset-name"
               :context="{ asset }"
-              >{{ asset.attributes.name }}</render-widget>
+              ><span class="asset-name-text-prefix">Asset: </span>{{ asset.attributes.name }}</render-widget>
         </h4>
 
         <component

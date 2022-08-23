@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved how asset location is loaded/displayed/refreshed
 - Change the asset location to be a widget decorator on the asset name
 - Change the asset location/group to be links to the related location/group asset(s)
+- Move the "Asset:" prefix inside a span of the asset name render widget so widget decorator plugins can modify/hide it
 
 ### Fixed
 
