@@ -80,14 +80,20 @@ onUnmounted(() => unsubber && unsubber.$off());
 <template>
   <span>
     <slot></slot>
-    <q-chip
-      icon="mdi-group"
+    <q-btn
+      unelevated
+      rounded
+      dense
+      no-caps
       color="secondary"
       text-color="white"
+      icon="mdi-group"
+      :to="`/asset/${currentGroup.attributes.drupal_internal__id}`"
       v-for="currentGroup in currentGroups"
-      :key="currentGroup.id">
+      :key="currentGroup.id"
+      class="q-ml-sm q-px-sm q-py-none">
       {{ currentGroup.attributes.name }}
-    </q-chip>
+    </q-btn>
   </span>
 </template>
 

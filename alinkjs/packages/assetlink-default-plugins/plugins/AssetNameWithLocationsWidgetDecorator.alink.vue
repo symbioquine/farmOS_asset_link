@@ -80,14 +80,20 @@ onUnmounted(() => unsubber && unsubber.$off());
 <template>
   <span>
     <slot></slot>
-    <q-chip
-      icon="mdi-crosshairs"
+    <q-btn
+      unelevated
+      rounded
+      dense
+      no-caps
       color="primary"
       text-color="white"
+      icon="mdi-crosshairs"
+      :to="`/asset/${currentLocation.attributes.drupal_internal__id}`"
       v-for="currentLocation in currentLocations"
-      :key="currentLocation.id">
+      :key="currentLocation.id"
+      class="q-ml-sm q-px-sm q-py-none">
       {{ currentLocation.attributes.name }}
-    </q-chip>
+    </q-btn>
   </span>
 </template>
 

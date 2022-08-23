@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Load all asset relationships when loading assets
 - Improved how asset location is loaded/displayed/refreshed
 - Change the asset location to be a widget decorator on the asset name
+- Change the asset location/group to be links to the related location/group asset(s)
 
 ### Fixed
 
