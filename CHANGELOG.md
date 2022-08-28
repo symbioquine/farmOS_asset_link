@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Apply Drupal 10 fixes from https://www.drupal.org/project/farmos_asset_link/issues/3305281#comment-14661933
 - Clean up old default plugin files and config entities on building
+- Fix bug in connection status detection to honor all "^2" versions, not just the dev "2.x" version
 
 ## [0.5.4] - 2022-08-23
 

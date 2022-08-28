@@ -107,7 +107,7 @@ export default class FarmOSConnectionStatusDetector {
 
       const farmOsVersion = apiData.meta?.farm?.version;
 
-      if (farmOsVersion !== '2.x') {
+      if (typeof farmOsVersion !== 'string' || farmOsVersion.indexOf('2') !== 0) {
         this.canReachFarmOS.value = false;
         return;
       }
