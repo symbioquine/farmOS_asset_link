@@ -27,7 +27,7 @@ export default {};
 <script setup>
 import { inject, ref, computed, watch } from "vue";
 import { useRoute } from "vue-router";
-import RacingLocalRemoteAsyncIterator from "@/RacingLocalRemoteAsyncIterator";
+import RacingLocalRemoteAsyncIterator from "../RacingLocalRemoteAsyncIterator";
 
 const props = defineProps({
   title: { type: String, required: true },

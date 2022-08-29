@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add a CodeEditor component based on CodeMirror 5
+
+### Changed
+
+- Depend on the source files for the `assetlink-plugin-api` package rather than its bundle in the PWA/Sidecar so that code splitting will work correctly
+
 ### Fixed
 
 - Apply Drupal 10 fixes from https://www.drupal.org/project/farmos_asset_link/issues/3305281#comment-14661933
