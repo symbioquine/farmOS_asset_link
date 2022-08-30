@@ -61,11 +61,12 @@ export default class AssetLinkPluginLoaderCore {
     });
 
     let pluginInstance = undefined;
+    let rawPluginSource = undefined;
 
     try {
       const pluginDataUrl = await this._fetchPlugin(pluginUrl, options);
 
-      const rawPluginSource = await fetch(pluginDataUrl).then(r => r.text());
+      rawPluginSource = await fetch(pluginDataUrl).then(r => r.text());
 
       let pluginDecorator = p => p;
 
@@ -73,10 +74,8 @@ export default class AssetLinkPluginLoaderCore {
         const pluginUrlWithoutParams = new URL(pluginUrl.toString());
         pluginUrlWithoutParams.search = '';
 
-        let rawPluginFileData = await fetch(pluginDataUrl).then(r => r.text());
-
         if (pluginUrl.pathname.endsWith('alink.vue')) {
-          const component = parseComponent(rawPluginFileData);
+          const component = parseComponent(rawPluginSource);
 
           if (component.errors.length > 0) {
             throw new Error(`Could not parse component plugin: ${component.errors.join('\n')}`);
@@ -162,6 +161,7 @@ export default class AssetLinkPluginLoaderCore {
       console.log(error);
       pluginInstance = {};
       pluginInstance.pluginUrl = pluginUrl;
+      pluginInstance.rawSource = rawPluginSource;
       pluginInstance.error = error;
       this.registerPlugin(pluginInstance);
     } finally {
