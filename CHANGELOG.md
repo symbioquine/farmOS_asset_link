@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2022-08-30
+
 ### Added
 
 - Add a CodeEditor component based on CodeMirror 5
@@ -187,7 +189,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.4...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.0...HEAD
+[0.6.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.4...unbuilt-v0.6.0
 [0.5.4]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.3...unbuilt-v0.5.4
 [0.5.3]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.2...unbuilt-v0.5.3
 [0.5.2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.1...unbuilt-v0.5.2
