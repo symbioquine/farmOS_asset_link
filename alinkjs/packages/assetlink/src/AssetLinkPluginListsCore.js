@@ -77,8 +77,6 @@ export default class AssetLinkPluginListsCore {
     }
   }
 
-  async addPluginToLocalList(pluginUrl) {
-    const pluginListView = await this._localPluginList.addPlugin(pluginUrl);
   async addPluginToLocalBlacklist(pluginUrl) {
     this.vm.blacklist = await this._localBlacklist.addPlugin(pluginUrl);
   }
@@ -87,6 +85,10 @@ export default class AssetLinkPluginListsCore {
     this.vm.blacklist = await this._localBlacklist.removePlugin(pluginUrl);
   }
 
+  async addPluginToLocalList(pluginUrl, opts) {
+    const options = opts || {};
+
+    const pluginListView = await this._localPluginList.addPlugin(pluginUrl, options);
 
     this._updatePluginListViewInViewModel(pluginListView);
   }
@@ -498,7 +500,9 @@ class LocalPluginList {
     return await this.load();
   }
 
-  async addPlugin(pluginUrl) {
+  async addPlugin(pluginUrl, opts) {
+    const options = opts || {};
+
     const pluginList = await this._modifyAndWriteStoredList(pl => {
       if (pl.plugins.find(pRef => pRef.url === pluginUrl.toString())) {
         return false;
@@ -506,7 +510,11 @@ class LocalPluginList {
       pl.plugins.push({ url: pluginUrl.toString() });
     });
 
-    await this._pluginReferenceTracker.ackPluginReference(pluginUrl, this._url);
+    if (options.updated) {
+      await this._pluginReferenceTracker.updatePluginReference(pluginUrl, this._url);
+    } else {
+      await this._pluginReferenceTracker.ackPluginReference(pluginUrl, this._url);
+    }
 
     return postProcessPluginList(pluginList, this._isDefault, this._isLocal, this._url);
   }

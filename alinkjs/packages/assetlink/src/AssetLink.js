@@ -20,6 +20,7 @@ import FarmOSConnectionStatusDetector from '@/FarmOSConnectionStatusDetector';
 import PeekableAsyncIterator from '@/PeekableAsyncIterator';
 import AssetLinkPluginListsCore from '@/AssetLinkPluginListsCore';
 import AssetLinkPluginLoaderCore from '@/AssetLinkPluginLoaderCore';
+import AssetLinkLocalPluginStorageCore from '@/AssetLinkLocalPluginStorageCore';
 import HttpAccessDeniedException from '@/HttpAccessDeniedException';
 
 import { createDrupalUrl, currentEpochSecond, EventBus } from "assetlink-plugin-api";
@@ -69,6 +70,7 @@ export default class AssetLink {
     this._cores = {};
     this._cores.pluginLists = new AssetLinkPluginListsCore(this);
     this._cores.pluginLoader = new AssetLinkPluginLoaderCore(this);
+    this._cores.localPluginStorage = new AssetLinkLocalPluginStorageCore(this);
 
     this._memory = undefined;
     this._remote = undefined;
@@ -175,6 +177,10 @@ export default class AssetLink {
       await this._cores.pluginLoader.unloadPlugin(pluginUrl);
     });
 
+    this._cores.localPluginStorage.eventBus.$on('update-plugin', async pluginUrl => {
+      await this._cores.pluginLists.addPluginToLocalList(pluginUrl, { updated: true });
+    });
+
     this._cores.pluginLists.eventBus.$on('update-plugin', async pluginUrl => {
       await this._cores.pluginLoader.reloadPlugin(pluginUrl);
     });
@@ -191,6 +197,7 @@ export default class AssetLink {
       }
     });
 
+    await this._cores.localPluginStorage.boot();
     await this._cores.pluginLoader.boot();
     try {
       await this._cores.pluginLists.boot();

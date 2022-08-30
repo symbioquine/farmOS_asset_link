@@ -233,6 +233,10 @@ export default class AssetLinkPluginLoaderCore {
   async _fetchPlugin(url, opts) {
     const options = opts || {};
 
+    if (url.protocol === 'indexeddb:') {
+      return await this._assetLink.cores.localPluginStorage.readLocalPlugin(url);
+    }
+
     const skipCache = options.skipCache || (url.searchParams && url.searchParams.get('skipCache'));
 
     const cacheKey = `asset-link-cached-plugin-src:${url}`;

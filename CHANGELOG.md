@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add a CodeEditor component based on CodeMirror 5
 - Add the ability to enable/disable plugins by URL
+- Add support for plugins stored (not just cached) locally in indexeddb
 
 ### Changed
 
@@ -22,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clean up old default plugin files and config entities on building
 - Fix bug in connection status detection to honor all "^2" versions, not just the dev "2.x" version
 - Fix a bug with plugin reference tracking not dropping to zero correctly
+- Fix a bug with plugin source not being set when plugins produce certain errors
+- Fix a bug where plugins would get incorrectly fetched via HTTP after they are already loaded/cached
 
 ## [0.5.4] - 2022-08-23
 
