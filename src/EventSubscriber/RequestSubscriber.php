@@ -3,12 +3,12 @@
 
 namespace Drupal\farmos_asset_link\EventSubscriber;
 
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -53,10 +53,10 @@ class RequestSubscriber implements EventSubscriberInterface  {
   /**
    * The request event handler.
    *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The event.
    */
-  public function checkAppRequest(GetResponseEvent $event) {
+  public function checkAppRequest(RequestEvent $event) {
     $request = $event->getRequest();
     $path = $request->getPathInfo();
 

@@ -13,7 +13,7 @@
             <q-icon :name="prop.node.icon || 'mdi-share'" size="sm" class="q-mr-xs vertical-middle" />
           </div>
           <div class="col ellipsis" style="direction: rtl; text-align: left;">
-            <span class="text-grey-10 inline vertical-middle">{{ prop.node.label }}</span>
+            <span class="text-grey-10 inline vertical-middle" :class="{ 'text-strike': prop.node.isBlacklisted }">{{ prop.node.label }}</span>
           </div>
           <div class="self-end">
             <q-btn flat padding="xs" size="xs" icon="mdi-dots-vertical" class="q-ml-sm" @click.stop>
@@ -30,6 +30,15 @@
                   </q-item>
                   <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin'">
                     <q-item-section @click="removePluginByUrl(prop.node.pluginUrl)">remove</q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin'">
+                    <q-item-section @click="editPluginByUrl(prop.node.pluginUrl)">edit</q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin' && !prop.node.isBlacklisted">
+                    <q-item-section @click="disablePluginByUrl(prop.node.pluginUrl)">disable</q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin' && prop.node.isBlacklisted">
+                    <q-item-section @click="enablePluginByUrl(prop.node.pluginUrl)">enable</q-item-section>
                   </q-item>
                 </q-list>
               </q-menu>
@@ -68,25 +77,32 @@
             icon="mdi-puzzle-edit"
             aria-hidden="false"
             aria-label="Write a new plugin"
-            @click="editPluginDialogShown = true"
+            @click="() => createNewLocalPlugin()"
         ></q-fab-action>
       </q-fab>
     </q-page-sticky>
 
-    <q-dialog v-model="editPluginDialogShown" :transition="false">
-      <q-card>
+    <q-dialog v-model="editPluginDialogShown" :transition="false" full-height full-width>
+      <q-card class="full-height column">
         <q-card-section>
           <div class="text-h6 text-grey">Edit Plugin</div>
         </q-card-section>
 
-        <q-card-section class="q-pt-none">
-          <codemirror v-if="editPluginDialogShown" v-model="code" :options="cmOptions" ref="editor" @ready="onEditorReady()"></codemirror>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum repellendus sit voluptate voluptas eveniet porro. Rerum blanditiis perferendis totam, ea at omnis vel numquam exercitationem aut, natus minima, porro labore.
+        <q-card-section
+          class="col"
+          style="
+            height: auto;
+            min-height: 160px;
+            max-height: 100%;
+            position: relative;
+            contain: strict;
+          ">
+          <code-editor v-model="code" :code-mimetype="codeMimetype"></code-editor>
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn flat label="Save" color="primary" v-close-popup />
+          <q-btn flat label="Cancel" color="primary" @click="() => editPluginDialogCallback(undefined)" v-close-popup />
+          <q-btn flat label="Save" color="primary" @click="() => editPluginDialogCallback(code)" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -106,15 +122,11 @@ export default {
   data() {
     return {
       showAddPluginButtons: false,
+
       editPluginDialogShown: false,
+      editPluginDialogCallback: () => {},
+      codeMimetype: undefined,
       code: "<template>\n<div>Hello world!</div>\n</template>\n",
-      cmOptions: {
-        tabSize: 4,
-        mode: 'text/x-vue',
-        theme: 'base16-dark',
-        lineNumbers: true,
-        line: true,
-      },
     };
   },
 
@@ -127,7 +139,7 @@ export default {
         return;
       }
 
-      await this.assetLink.cores.pluginLists.addPluginToLocalList(url);
+      await this.assetLink.cores.pluginLists.addPluginToLocalList(new URL(url));
     },
     async reloadPluginByUrl(pluginUrl) {
       await this.assetLink.cores.pluginLoader.reloadPlugin(pluginUrl);
@@ -140,6 +152,93 @@ export default {
       }
 
       await this.assetLink.cores.pluginLists.removePluginFromLocalList(pluginUrl);
+    },
+    async editPluginByUrl(pluginUrl) {
+      const sourcePlugin = this.pluginsByUrl[pluginUrl.toString()];
+
+      this.code = this.pluginsByUrl[pluginUrl.toString()].rawSource;
+
+      let disableSourcePlugin = false;
+
+      let localPluginUrl = pluginUrl;
+      if (pluginUrl.protocol !== 'indexeddb:') {
+        disableSourcePlugin = true;
+
+        const pluginFilename = pluginUrl.pathname.split('/').pop();
+
+        localPluginUrl = new URL(`indexeddb://asset-link/data/${pluginFilename}`);
+      }
+
+      if (localPluginUrl.pathname.endsWith('alink.js')) {
+        this.codeMimetype = "text/javascript";
+      } else if (localPluginUrl.pathname.endsWith('alink.vue')) {
+        this.codeMimetype = "text/x-vue";
+      } else if (localPluginUrl.pathname.endsWith('.json')) {
+        this.codeMimetype = "application/json";
+      } else {
+        this.codeMimetype = undefined;
+      }
+
+      this.editPluginDialogShown = true;
+      const updatedCode = await new Promise((resolve) => {
+        this.editPluginDialogCallback = resolve;
+      });
+
+      if (updatedCode === undefined) {
+        return;
+      }
+
+      if (disableSourcePlugin) {
+        await this.assetLink.cores.pluginLists.addPluginToLocalBlacklist(pluginUrl);
+      }
+
+      await this.assetLink.cores.localPluginStorage.writeLocalPlugin(localPluginUrl, updatedCode);
+    },
+    async createNewLocalPlugin() {
+      const newPluginName = await this.assetLink.ui.dialog.promptText(`Give your new plugin a name... it must be in the format "{name}.alink.{extension}"`);
+
+      if (!newPluginName) {
+        return;
+      }
+
+      if (!/^.+\.alink\..+$/.test(newPluginName)) {
+        // TODO: Surface this more nicely
+        throw new Error("Invalid plugin name:", newPluginName);
+      }
+
+      const pluginUrl = new URL(`indexeddb://asset-link/data/${newPluginName}`);
+
+      const pluginBaseName = newPluginName.split('.alink.')[0];
+
+      let pluginTemplate = "";
+      if (pluginUrl.pathname.endsWith('alink.js')) {
+        this.codeMimetype = "text/javascript";
+        pluginTemplate = `export default class ${pluginBaseName} {\n  static onLoad(handle, assetLink) {\n\n  }\n\n}\n`;
+      } else if (pluginUrl.pathname.endsWith('alink.vue')) {
+        this.codeMimetype = "text/x-vue";
+        pluginTemplate = `<${'script'} setup>\n</${'script'}>\n\n<${'template'}>\n<div>Hello world!</div>\n</${'template'}>\n`;
+      } else if (pluginUrl.pathname.endsWith('.json')) {
+        this.codeMimetype = "application/json";
+      }
+
+      this.code = pluginTemplate;
+
+      this.editPluginDialogShown = true;
+      const updatedCode = await new Promise((resolve) => {
+        this.editPluginDialogCallback = resolve;
+      });
+
+      if (updatedCode === undefined) {
+        return;
+      }
+
+      await this.assetLink.cores.localPluginStorage.writeLocalPlugin(pluginUrl, updatedCode);
+    },
+    async disablePluginByUrl(pluginUrl) {
+      await this.assetLink.cores.pluginLists.addPluginToLocalBlacklist(pluginUrl);
+    },
+    async enablePluginByUrl(pluginUrl) {
+      await this.assetLink.cores.pluginLists.removePluginFromLocalBlacklist(pluginUrl);
     },
     async addPluginListFromUrl() {
       // TODO: Add a warning about only adding trusted code
@@ -192,6 +291,8 @@ export default {
     pluginListsTree() {
       const treeData = [];
 
+      const blacklistedPluginUrls = new Set(this.assetLink.cores.pluginLists.vm.blacklist.plugins.map(plugin => plugin.url.toString()));
+
       this.assetLink.cores.pluginLists.vm.lists.forEach((pluginList, index) => {
         const listRoot = {
           nodeType: 'plugin-list',
@@ -211,10 +312,18 @@ export default {
         pluginList.plugins.forEach(plugin => {
           const error = this.getPluginError(plugin);
 
+          const isBlacklisted = blacklistedPluginUrls.has(plugin.url.toString());
+
+          let pluginIcon = 'mdi-puzzle';
+          if (error || isBlacklisted) {
+            pluginIcon = 'mdi-puzzle-remove';
+          }
+
           listRoot.children.push({
             nodeType: 'plugin',
             label: plugin.url.toString(),
-            icon: error ? 'mdi-puzzle-remove' : 'mdi-puzzle',
+            icon: pluginIcon,
+            isBlacklisted,
             error,
             pluginUrl: plugin.url,
           });

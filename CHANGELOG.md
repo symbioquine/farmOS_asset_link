@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2022-08-30
+
+### Added
+
+- Add a CodeEditor component based on CodeMirror 5
+- Add the ability to enable/disable plugins by URL
+- Add support for plugins stored (not just cached) locally in indexeddb
+- Add the ability to create/edit plugins by writing their source code inside Asset Link
+- Add a default plugin which shows the parent/child hierarchy of assets
+
+### Changed
+
+- Depend on the source files for the `assetlink-plugin-api` package rather than its bundle in the PWA/Sidecar so that code splitting will work correctly
+
+### Fixed
+
+- Apply Drupal 10 fixes from https://www.drupal.org/project/farmos_asset_link/issues/3305281#comment-14661933
+- Clean up old default plugin files and config entities on building
+- Fix bug in connection status detection to honor all "^2" versions, not just the dev "2.x" version
+- Fix a bug with plugin reference tracking not dropping to zero correctly
+- Fix a bug with plugin source not being set when plugins produce certain errors
+- Fix a bug where plugins would get incorrectly fetched via HTTP after they are already loaded/cached
+- Fix a bug with plugins not being loaded correctly when first added to the local plugin list
+
 ## [0.5.4] - 2022-08-23
 
 ### Added
@@ -165,7 +189,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.4.1...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.0...HEAD
+[0.6.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.4...unbuilt-v0.6.0
+[0.5.4]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.3...unbuilt-v0.5.4
+[0.5.3]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.2...unbuilt-v0.5.3
+[0.5.2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.1...unbuilt-v0.5.2
+[0.5.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.4.1...unbuilt-v0.5.1
 [0.4.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.3.2...unbuilt-v0.4.1
 [0.3.2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.3.1...unbuilt-v0.3.2
 [0.3.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.2.1...unbuilt-v0.3.1
