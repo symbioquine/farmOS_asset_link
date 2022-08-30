@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add a CodeEditor component based on CodeMirror 5
+- Add the ability to enable/disable plugins by URL
 
 ### Changed
 

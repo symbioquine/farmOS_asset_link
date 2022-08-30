@@ -12,11 +12,14 @@ export default class AssetLinkPluginListsCore {
 
     this._vm = reactive({
       lists: [],
+      blacklist: { plugins: [] },
     });
 
     this._eventBus = new EventBus();
 
-    this._pluginReferenceTracker = new PluginReferenceTracker(this._eventBus);
+    this._localBlacklist = new PluginLocalBlacklist(this._store, this._eventBus);
+
+    this._pluginReferenceTracker = new PluginReferenceTracker(this._eventBus, this._localBlacklist);
 
     this._defaultPluginList = new HttpPluginList(
         assetLink._store, 
@@ -49,6 +52,8 @@ export default class AssetLinkPluginListsCore {
   }
 
   async boot() {
+    this.vm.blacklist = await this._localBlacklist.load();
+
     const extraPluginListUrls = await this._getExtraPluginListUrls();
 
     this._extraPluginLists = extraPluginListUrls.map(pluginListUrl =>
@@ -74,6 +79,14 @@ export default class AssetLinkPluginListsCore {
 
   async addPluginToLocalList(pluginUrl) {
     const pluginListView = await this._localPluginList.addPlugin(pluginUrl);
+  async addPluginToLocalBlacklist(pluginUrl) {
+    this.vm.blacklist = await this._localBlacklist.addPlugin(pluginUrl);
+  }
+
+  async removePluginFromLocalBlacklist(pluginUrl) {
+    this.vm.blacklist = await this._localBlacklist.removePlugin(pluginUrl);
+  }
+
 
     this._updatePluginListViewInViewModel(pluginListView);
   }
@@ -189,9 +202,51 @@ export default class AssetLinkPluginListsCore {
 
 }
 
-class PluginReferenceTracker {
-  constructor(eventBus) {
+class PluginLocalBlacklist {
+  constructor(store, eventBus) {
     this._eventBus = eventBus;
+
+    this._blacklistedPlugins = new Set();
+
+    const blacklistReferenceTracker = {
+      ackPluginReference: async (pluginUrl) => {
+        this._blacklistedPlugins.add(pluginUrl.toString());
+        await eventBus.$emit('plugin-blacklisted', pluginUrl);
+      },
+      freePluginReference: async (pluginUrl) => {
+        this._blacklistedPlugins.delete(pluginUrl.toString());
+        await eventBus.$emit('plugin-unblacklisted', pluginUrl);
+      },
+    };
+
+    this._delegate = new LocalPluginList(store, blacklistReferenceTracker, 'local-plugin-blacklist.repo.json');
+  }
+
+  isBlacklisted(pluginUrl) {
+    return this._blacklistedPlugins.has(pluginUrl.toString());
+  }
+
+  async load() {
+    return await this._delegate.load();
+  }
+
+  async reload() {
+    return await this._delegate.reload();
+  }
+
+  async addPlugin(pluginUrl) {
+    return await this._delegate.addPlugin(pluginUrl);
+  }
+
+  async removePlugin(pluginUrl) {
+    return await this._delegate.removePlugin(pluginUrl);
+  }
+}
+
+class PluginReferenceTracker {
+  constructor(eventBus, localBlacklist) {
+    this._eventBus = eventBus;
+    this._localBlacklist = localBlacklist;
 
     // Track which lists reference a given plugin by keeping
     // a mapping between the plugin url and the list urls which
@@ -199,6 +254,22 @@ class PluginReferenceTracker {
     this._pluginReferences = {
         // 'https://example.com/alink-plugins/MyAwesomePlugin.alink.js': [ 'https://example.com/cool-alink-plugins.repo.json' ],
     };
+
+    this._eventBus.$on('plugin-blacklisted', async pluginUrl => {
+      const pluginExists = Object.hasOwn(this._pluginReferences, pluginUrl.toString());
+
+      if (pluginExists) {
+        await this._eventBus.$emit('remove-plugin', pluginUrl);
+      }
+    });
+
+    this._eventBus.$on('plugin-unblacklisted', async pluginUrl => {
+      const pluginReferences = this._pluginReferences[pluginUrl.toString()] || [];
+
+      if (pluginReferences.length > 0) {
+        await this._eventBus.$emit('add-plugin', pluginUrl);
+      }
+    });
   }
 
   async ackPluginReference(pluginUrl, listUrl) {
@@ -216,7 +287,7 @@ class PluginReferenceTracker {
       pluginReferences.push(listUrl);
     }
 
-    if (!pluginExists) {
+    if (!pluginExists && !this._localBlacklist.isBlacklisted(pluginUrl)) {
       await this._eventBus.$emit('add-plugin', pluginUrl);
     }
   }
@@ -247,7 +318,9 @@ class PluginReferenceTracker {
       return;
     }
 
-    await this._eventBus.$emit('remove-plugin', pluginUrl);
+    if (!this._localBlacklist.isBlacklisted(pluginUrl)) {
+      await this._eventBus.$emit('remove-plugin', pluginUrl);
+    }
   }
 
   /**
@@ -396,10 +469,10 @@ class HttpPluginList {
 }
 
 class LocalPluginList {
-  constructor(store, pluginReferenceTracker) {
+  constructor(store, pluginReferenceTracker, storeKey) {
     this._store = store;
-    this._storeKey = 'local-plugin-list.repo.json';
-    this._url = new URL("indexeddb://asset-link/data/local-plugin-list.repo.json", window.location.origin);
+    this._storeKey = storeKey || 'local-plugin-list.repo.json';
+    this._url = new URL(`indexeddb://asset-link/data/${this._storeKey}`, window.location.origin);
     this._isDefault = false;
     this._isLocal = true;
     this._pluginReferenceTracker = pluginReferenceTracker;

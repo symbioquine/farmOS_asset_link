@@ -13,7 +13,7 @@
             <q-icon :name="prop.node.icon || 'mdi-share'" size="sm" class="q-mr-xs vertical-middle" />
           </div>
           <div class="col ellipsis" style="direction: rtl; text-align: left;">
-            <span class="text-grey-10 inline vertical-middle">{{ prop.node.label }}</span>
+            <span class="text-grey-10 inline vertical-middle" :class="{ 'text-strike': prop.node.isBlacklisted }">{{ prop.node.label }}</span>
           </div>
           <div class="self-end">
             <q-btn flat padding="xs" size="xs" icon="mdi-dots-vertical" class="q-ml-sm" @click.stop>
@@ -30,6 +30,12 @@
                   </q-item>
                   <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin'">
                     <q-item-section @click="removePluginByUrl(prop.node.pluginUrl)">remove</q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin' && !prop.node.isBlacklisted">
+                    <q-item-section @click="disablePluginByUrl(prop.node.pluginUrl)">disable</q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin' && prop.node.isBlacklisted">
+                    <q-item-section @click="enablePluginByUrl(prop.node.pluginUrl)">enable</q-item-section>
                   </q-item>
                 </q-list>
               </q-menu>
@@ -141,6 +147,12 @@ export default {
 
       await this.assetLink.cores.pluginLists.removePluginFromLocalList(pluginUrl);
     },
+    async disablePluginByUrl(pluginUrl) {
+      await this.assetLink.cores.pluginLists.addPluginToLocalBlacklist(pluginUrl);
+    },
+    async enablePluginByUrl(pluginUrl) {
+      await this.assetLink.cores.pluginLists.removePluginFromLocalBlacklist(pluginUrl);
+    },
     async addPluginListFromUrl() {
       // TODO: Add a warning about only adding trusted code
       const url = await this.assetLink.ui.dialog.promptText(`What is the url of the plugin list to be added?`);
@@ -192,6 +204,8 @@ export default {
     pluginListsTree() {
       const treeData = [];
 
+      const blacklistedPluginUrls = new Set(this.assetLink.cores.pluginLists.vm.blacklist.plugins.map(plugin => plugin.url.toString()));
+
       this.assetLink.cores.pluginLists.vm.lists.forEach((pluginList, index) => {
         const listRoot = {
           nodeType: 'plugin-list',
@@ -211,10 +225,18 @@ export default {
         pluginList.plugins.forEach(plugin => {
           const error = this.getPluginError(plugin);
 
+          const isBlacklisted = blacklistedPluginUrls.has(plugin.url.toString());
+
+          let pluginIcon = 'mdi-puzzle';
+          if (error || isBlacklisted) {
+            pluginIcon = 'mdi-puzzle-remove';
+          }
+
           listRoot.children.push({
             nodeType: 'plugin',
             label: plugin.url.toString(),
-            icon: error ? 'mdi-puzzle-remove' : 'mdi-puzzle',
+            icon: pluginIcon,
+            isBlacklisted,
             error,
             pluginUrl: plugin.url,
           });
