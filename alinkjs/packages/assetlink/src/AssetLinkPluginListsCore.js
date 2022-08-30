@@ -284,7 +284,7 @@ class PluginReferenceTracker {
     const listIdx = pluginReferences.indexOf(listUrl.toString());
 
     if (listIdx < 0) {
-      pluginReferences.push(listUrl);
+      pluginReferences.push(listUrl.toString());
     }
 
     if (!pluginExists && !this._localBlacklist.isBlacklisted(pluginUrl)) {
