@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix a bug with plugin reference tracking not dropping to zero correctly
 - Fix a bug with plugin source not being set when plugins produce certain errors
 - Fix a bug where plugins would get incorrectly fetched via HTTP after they are already loaded/cached
+- Fix a bug with plugins not being loaded correctly when first added to the local plugin list
 
 ## [0.5.4] - 2022-08-23
 

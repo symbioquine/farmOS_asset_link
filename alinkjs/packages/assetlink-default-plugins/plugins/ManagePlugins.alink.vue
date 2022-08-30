@@ -133,7 +133,7 @@ export default {
         return;
       }
 
-      await this.assetLink.cores.pluginLists.addPluginToLocalList(url);
+      await this.assetLink.cores.pluginLists.addPluginToLocalList(new URL(url));
     },
     async reloadPluginByUrl(pluginUrl) {
       await this.assetLink.cores.pluginLoader.reloadPlugin(pluginUrl);
