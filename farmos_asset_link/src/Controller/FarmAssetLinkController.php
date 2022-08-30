@@ -113,12 +113,46 @@ class FarmAssetLinkController extends ControllerBase {
 
     $file_path = $asset_link_dist_path . $path_suffix;
 
+    if (strpos($path_suffix, '/plugins/~') === 0) {
+        $modulePluginPathSuffix = substr($path_suffix, 10);
+
+        $modulePluginCfgIdEndPos = strpos($modulePluginPathSuffix, '.alink.');
+
+        if ($modulePluginCfgIdEndPos <= 0) {
+            return $this->textError(400, "Invalid module plugin URL. Must contain the plugin name followed by .alink.{ext}");
+        }
+
+        $modulePluginCfgId = substr($modulePluginPathSuffix, 0, $modulePluginCfgIdEndPos);
+
+        $storage = \Drupal::entityTypeManager()->getStorage('asset_link_default_plugin');
+
+        $defaultPluginConfig = $storage->load($modulePluginCfgId);
+
+        if (empty($defaultPluginConfig)) {
+            return $this->textError(404, "Unknown Asset Link Plugin config '$modulePluginCfgId'");
+        }
+
+        $moduleScopePos = strpos($defaultPluginConfig->url(), '{module}');
+
+        if ($moduleScopePos !== 0) {
+            return $this->textError(400, "Asset Link Plugin is not module scoped '$moduleScopePos'");
+        }
+
+        $moduleDeps = $defaultPluginConfig->getDependencies()['module'];
+
+        if (count($moduleDeps) !== 1) {
+            return $this->textError(500, "Asset Link Plugin has ambiguous module scoping");
+        }
+
+        $moduleName = $moduleDeps[0];
+
+        $module_base_path = \Drupal::service('file_system')->realpath(\Drupal::service('module_handler')->getModule($moduleName)->getPath());
+
+        $file_path = $module_base_path . '/' . $modulePluginPathSuffix;
+    }
+
     if ($require_file_exists && !file_exists($file_path)) {
-      $response = new Response();
-      $response->setStatusCode(404);
-      $response->headers->set('Content-Type', 'text/plain');
-      $response->setContent("No such file");
-      return $response;
+      return $this->textError(404, "No such file '$file_path'");
     }
 
     if (empty($path_suffix) || $path_suffix === '/' || !file_exists($file_path)) {
@@ -133,25 +167,12 @@ class FarmAssetLinkController extends ControllerBase {
     // serving the `index.html` file. If that doesn't exist it probably means our front-end
     // artifacts aren't available so return an HTTP 500 - our fault.
     if ($response_content === false) {
-      $response = new Response();
-      $response->setStatusCode(500);
-      $response->headers->set('Content-Type', 'text/plain');
-      $response->setContent("Could not find Asset Link front-end resources - if this is happening in a development environment, make sure ./alinkjs has been built.");
-      return $response;
+      return $this->textError(500, "Could not find Asset Link front-end resources - if this is happening in a development environment, make sure ./alinkjs has been built.");
     }
 
     $base_path = base_path();
 
     $response_content = str_replace('/__THIS_GETS_REPLACED_AT_RUNTIME_BY_THE_DRUPAL_CONTROLLER__/', $base_path . 'alink/', $response_content);
-
-    if (false) dd([
-      '$path' => $path,
-      '$file_path' => $file_path,
-      '$path_suffix' => $path_suffix,
-      'file_exists($file_path)' => file_exists($file_path),
-      '$content_type' => $content_type,
-      '$response_content' => $response_content,
-    ]);
 
     $response = new Response();
     $response->setStatusCode(200);
@@ -189,6 +210,14 @@ class FarmAssetLinkController extends ControllerBase {
     ];
 
     return $mime_types[$extname] ?? 'application/octet-stream';
+  }
+
+  private function textError($code, $msg) {
+    $response = new Response();
+    $response->setStatusCode($code);
+    $response->headers->set('Content-Type', 'text/plain');
+    $response->setContent($msg);
+    return $response;
   }
 
 }

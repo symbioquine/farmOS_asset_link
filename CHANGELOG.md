@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Make it simpler for other modules to provide default Asset Link plugins without their own controllers/routing
+
 ### Fixed
 
 - Cleaned up some warnings and unnecessary logging

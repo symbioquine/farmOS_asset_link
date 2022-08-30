@@ -10,6 +10,9 @@
     "children": {
       "simple-asset-action-plugin": {
         "title": "Simple Asset Action"
+      },
+      "plugin-as-farm-os-module": {
+        "title": "Packaging a plugin as a farmOS contrib module"
       }
     }
   }

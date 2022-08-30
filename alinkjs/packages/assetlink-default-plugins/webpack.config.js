@@ -58,6 +58,12 @@ const createDevServerConfig = () => {
         secure: targetUrl.protocol === "https:",
         changeOrigin: true,
         bypass: function (req, res) {
+          if (req.path.indexOf("/alink/plugins/~") === 0) {
+            console.log(
+              `'${req.path}' is a module scoped plugin url - passing to proxy...`
+            );
+            return null;
+          }
           if (req.path.indexOf("/alink/plugins") === 0) {
             return req.path;
           }
