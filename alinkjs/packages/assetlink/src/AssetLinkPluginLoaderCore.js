@@ -120,9 +120,7 @@ export default class AssetLinkPluginLoaderCore {
           async getFile(url) {
             const fileUrl = new URL(url);
 
-            const pluginSrcRes = await fetch(fileUrl);
-
-            const pluginSrc = await pluginSrcRes.text();
+            const pluginSrc = (fileUrl.toString() === pluginUrlWithoutParams.toString()) ? rawPluginSource : await fetch(fileUrl).then(r => r.text());
 
             if (fileUrl.pathname.endsWith('alink.js')) {
               return { getContentData: () => pluginSrc, type: ".mjs" }
