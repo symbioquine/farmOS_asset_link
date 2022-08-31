@@ -101,7 +101,7 @@ export default class AssetLinkPluginListsCore {
 
   async addExtraPluginList(pluginListUrl) {
     this._modifyAndWriteStoredExtraPluginListUrls(extraPluginListUrls => {
-      const idx = extraPluginListUrls.findIndex(plUrl => plUrl === pluginListUrl);
+      const idx = extraPluginListUrls.findIndex(plUrl => plUrl.toString() === pluginListUrl.toString());
       if (idx >= 0) {
         return false;
       }
@@ -125,7 +125,7 @@ export default class AssetLinkPluginListsCore {
 
   async removeExtraPluginList(pluginListUrl) {
     this._modifyAndWriteStoredExtraPluginListUrls(extraPluginListUrls => {
-      const idx = extraPluginListUrls.findIndex(plUrl => plUrl === pluginListUrl);
+      const idx = extraPluginListUrls.findIndex(plUrl => plUrl.toString() === pluginListUrl.toString());
       if (idx < 0) {
         return false;
       }
@@ -175,7 +175,7 @@ export default class AssetLinkPluginListsCore {
     const pluginListUrls = await this._getExtraPluginListUrls();
     const shouldWrite = mutatorFn(pluginListUrls) !== false;
     if (shouldWrite) {
-      await this._store.setItem(this._extraPluginListStoreKey, {key: this._extraPluginListStoreKey, timestamp: currentEpochSecond(), value: pluginListUrls});
+      await this._store.setItem(this._extraPluginListStoreKey, {key: this._extraPluginListStoreKey, timestamp: currentEpochSecond(), value: pluginListUrls.map(u => u.toString())});
     }
     return pluginListUrls;
   }
