@@ -5,12 +5,7 @@ import {
   setDefaultHandler,
   setCatchHandler,
 } from "workbox-routing";
-import {
-  Strategy,
-  CacheFirst,
-  NetworkOnly,
-  NetworkFirst,
-} from "workbox-strategies";
+import { Strategy, NetworkOnly, NetworkFirst } from "workbox-strategies";
 
 // define a prefix for your cache names. It is recommended to use your project name
 setCacheNameDetails({ prefix: "asset-link" });
@@ -19,11 +14,11 @@ setCacheNameDetails({ prefix: "asset-link" });
 precacheAndRoute(self.__WB_MANIFEST);
 // End of Precaching############################
 
-class SkipCacheAwareCacheFirstStrategy extends Strategy {
+class SkipCacheAwareNetworkFirstStrategy extends Strategy {
   constructor(options) {
     super(options);
-    this.cacheFirst = new CacheFirst();
     this.networkFirst = new NetworkFirst();
+    this.networkOnly = new NetworkOnly();
   }
 
   handleAll(options) {
@@ -42,9 +37,9 @@ class SkipCacheAwareCacheFirstStrategy extends Strategy {
         : options.request;
 
     if (request.headers["X-Skip-Cache"]) {
-      return this.networkFirst.handleAll(options);
+      return this.networkOnly.handleAll(options);
     }
-    return this.cacheFirst.handleAll(options);
+    return this.networkFirst.handleAll(options);
   }
 }
 
@@ -52,16 +47,16 @@ class SkipCacheAwareCacheFirstStrategy extends Strategy {
 // all the api request which matches the following pattern will use CacheFirst strategy for caching
 registerRoute(
   /https:\/\/.*\.repo\.json/,
-  new SkipCacheAwareCacheFirstStrategy()
+  new SkipCacheAwareNetworkFirstStrategy()
 );
 registerRoute(
   /https:\/\/.*\.alink\..*/,
-  new SkipCacheAwareCacheFirstStrategy()
+  new SkipCacheAwareNetworkFirstStrategy()
 );
 registerRoute(/https:\/\/.*\/api\/?.*/, new NetworkOnly());
 // End of CacheFirst Strategy####################
 
-setDefaultHandler(new SkipCacheAwareCacheFirstStrategy());
+setDefaultHandler(new NetworkFirst());
 
 setCatchHandler(async ({ event }) => {
   const url = new URL(event.request.url);

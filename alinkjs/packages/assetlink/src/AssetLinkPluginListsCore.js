@@ -9,6 +9,7 @@ export default class AssetLinkPluginListsCore {
 
   constructor(assetLink) {
     this._store = assetLink._store;
+    this._connectionStatus = assetLink._connectionStatus;
 
     this._vm = reactive({
       lists: [],
@@ -26,6 +27,7 @@ export default class AssetLinkPluginListsCore {
         createDrupalUrl('/alink/backend/default-plugins.repo.json'),
         this._pluginReferenceTracker,
         true,
+        () => this._connectionStatus.isOnline.value,
     );
     this._localPluginList = new LocalPluginList(
         assetLink._store,
@@ -57,7 +59,13 @@ export default class AssetLinkPluginListsCore {
     const extraPluginListUrls = await this._getExtraPluginListUrls();
 
     this._extraPluginLists = extraPluginListUrls.map(pluginListUrl =>
-      new HttpPluginList(this._store, pluginListUrl, this._pluginReferenceTracker, false));
+      new HttpPluginList(
+          this._store,
+          pluginListUrl,
+          this._pluginReferenceTracker,
+          false,
+          () => this._connectionStatus.hasNetworkConnection.value,
+        ));
 
     for (let pluginList of [
           this._defaultPluginList,
@@ -114,7 +122,13 @@ export default class AssetLinkPluginListsCore {
       return;
     }
 
-    const pluginList = new HttpPluginList(this._store, pluginListUrl, this._pluginReferenceTracker, false);
+    const pluginList = new HttpPluginList(
+        this._store,
+        pluginListUrl,
+        this._pluginReferenceTracker,
+        false,
+        () => this._connectionStatus.hasNetworkConnection.value,
+    );
 
     this._extraPluginLists.push(pluginList);
 
@@ -341,13 +355,15 @@ class PluginReferenceTracker {
 }
 
 class HttpPluginList {
-  constructor(store, url, pluginReferenceTracker, isDefault) {
+  constructor(store, url, pluginReferenceTracker, isDefault, isOnlineGetter) {
     this._store = store;
     this._storeKey = `asset-link-cached-plugin-list:${url}`;
     this._url = url;
     this._pluginReferenceTracker = pluginReferenceTracker;
     this._isDefault = isDefault;
     this._isLocal = false;
+
+    this._isOnlineGetter = isOnlineGetter;
 
     this._latestPluginListView = undefined;
   }
@@ -432,7 +448,9 @@ class HttpPluginList {
       cachedPluginList.cachedTimestamp = cacheItem.timestamp;
     }
 
-    if (cachedPluginList && (timestamp - cachedPluginList.cachedTimestamp) < 900) {
+    if (cachedPluginList
+        // Cache for at least 15 minutes or until we seem to be online enough to get a new list
+        && ((timestamp - cachedPluginList.cachedTimestamp) < 900 || !this._isOnlineGetter())) {
       return cachedPluginList;
     }
 

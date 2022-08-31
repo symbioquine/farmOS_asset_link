@@ -15,6 +15,7 @@ export default class AssetLinkPluginLoaderCore {
   constructor(assetLink) {
     this._assetLink = assetLink;
     this._store = assetLink._store;
+    this._connectionStatus = assetLink._connectionStatus;
     this._devToolsApi = assetLink._devToolsApi;
 
     this._vm = reactive({
@@ -245,7 +246,9 @@ export default class AssetLinkPluginLoaderCore {
 
     const timestamp = currentEpochSecond();
 
-    if (!skipCache && cacheItem && (timestamp - cacheItem.timestamp) < 900) {
+    if (!skipCache && cacheItem
+        // Cache for at least 15 minutes and until we have a network connection
+        && ((timestamp - cacheItem.timestamp) < 900 || !this._connectionStatus.hasNetworkConnection.value)) {
       return cacheItem.value;
     }
 

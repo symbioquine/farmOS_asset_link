@@ -96,7 +96,7 @@ export default class FarmOSConnectionStatusDetector {
     const apiUrl = createDrupalUrl(`api?cacheBust=${currentEpochSecond()}`);
 
     try {
-      const res = await fetch(apiUrl, {credentials: 'same-origin', cache: 'no-cache'});
+      const res = await fetch(apiUrl, {credentials: 'same-origin', cache: 'no-cache', 'X-Skip-Cache': "1"});
 
       if (res.status !== 200) {
         this.canReachFarmOS.value = false;

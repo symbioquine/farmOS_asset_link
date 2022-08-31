@@ -11,11 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Make it simpler for other modules to provide default Asset Link plugins without their own controllers/routing
 
+### Changed
+
+- More aggressively rely on indexeddb caching in preference to network/worker caching
+
 ### Fixed
 
 - Cleaned up some warnings and unnecessary logging
 - Fixed a bug with how different browsers handle 'indexeddb://' plugin urls - #2
 - Fixed a bug with how extra plugin lists are stored/updated - #3
+- Don't cache requests to `/api` used to check connectivity/login status
 
 ## [0.6.0] - 2022-08-30
 
