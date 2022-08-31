@@ -132,19 +132,12 @@ class FarmAssetLinkController extends ControllerBase {
             return $this->textError(404, "Unknown Asset Link Plugin config '$modulePluginCfgId'");
         }
 
-        $moduleScopePos = strpos($defaultPluginConfig->url(), '{module}');
-
-        if ($moduleScopePos !== 0) {
-            return $this->textError(400, "Asset Link Plugin is not module scoped '$moduleScopePos'");
+        $matches = [];
+        if (!preg_match('/^\{module:(?P<module>[^\}]+)\}/', $defaultPluginConfig->url(), $matches)) {
+            return $this->textError(400, "Asset Link Plugin is not module scoped '{$defaultPluginConfig->url()}'");
         }
 
-        $moduleDeps = $defaultPluginConfig->getDependencies()['module'];
-
-        if (count($moduleDeps) !== 1) {
-            return $this->textError(500, "Asset Link Plugin has ambiguous module scoping");
-        }
-
-        $moduleName = $moduleDeps[0];
+        $moduleName = $matches['module'];
 
         $module_base_path = \Drupal::service('file_system')->realpath(\Drupal::service('module_handler')->getModule($moduleName)->getPath());
 

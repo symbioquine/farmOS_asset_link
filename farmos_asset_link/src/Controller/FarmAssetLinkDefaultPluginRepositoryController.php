@@ -29,30 +29,23 @@ class FarmAssetLinkDefaultPluginRepositoryController extends ControllerBase {
 
       $url = $defaultPluginConfig->url();
 
-      $moduleScopePos = strpos($url, '{module}');
+      $moduleScopePos = strpos($url, '{module:');
       if ($moduleScopePos > -1) {
           if ($moduleScopePos !== 0) {
               \Drupal::logger('farmos_asset_link')->notice("Invalid use of module scope for Asset Link plugin url in config " . $defaultPluginConfig->getConfigDependencyName());
               continue;
           }
 
-          $moduleDeps = $defaultPluginConfig->getDependencies()['module'];
+          $urlSuffix = preg_replace('/^\{module:[^\}]+\}\/?/', "", $url);
 
-          if (count($moduleDeps) != 1) {
-              \Drupal::logger('farmos_asset_link')->notice("Ambiguous use of module scope for Asset Link plugin url - expected exactly one dependency for " . $defaultPluginConfig->getConfigDependencyName());
+          $expectedPrefix = $defaultPluginConfig->id() . ".alink.";
+
+          if (strpos($urlSuffix, $expectedPrefix) !== 0) {
+              \Drupal::logger('farmos_asset_link')->notice("Invalid use of module scope for Asset Link plugin url - expected url following module scope to be '$expectedSuffix'. Instead got '$urlSuffix'");
               continue;
           }
 
-          $urlSuffix = str_replace("{module}", "", $url);
-
-          $expectedSuffix = $defaultPluginConfig->id() . ".alink.";
-
-          if (strpos($urlSuffix, $expectedSuffix) !== 0) {
-              \Drupal::logger('farmos_asset_link')->notice("Invalid use of module scope for Asset Link plugin url - expected url following module to be '$expectedSuffix'. Instead got '$urlSuffix'");
-              continue;
-          }
-
-          $url = str_replace("{module}", "{base_path}alink/plugins/~", $url);
+          $url = "{base_path}alink/plugins/~$urlSuffix";
       }
 
       $url = str_replace("{base_path}", $base_path, $url);

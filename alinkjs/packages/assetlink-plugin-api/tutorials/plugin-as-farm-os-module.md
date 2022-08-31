@@ -24,5 +24,5 @@ dependencies:
   enforced:
     module:
       - name_bob_alink_plugin
-url: '{module}NameBobAssetActionProvider.alink.vue'
+url: '{module:name_bob_alink_plugin}/NameBobAssetActionProvider.alink.js'
 ```
