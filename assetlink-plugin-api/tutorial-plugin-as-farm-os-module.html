@@ -5,7 +5,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asset Link Plugin API docs Writing Plugins</title>
+  <title>Asset Link Plugin API docs Packaging a plugin as a farmOS contrib module</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -126,19 +126,32 @@
             <div class="content">
                 <header class="page-title">
                     <p>Tutorial</p>
-                    <h1>Writing Plugins</h1>
+                    <h1>Packaging a plugin as a farmOS contrib module</h1>
                 </header>
                 <section>
 
 <article>
-    <p>TODO: More top level information about writing plugins will go here...</p>
-<p>For now, check out the following resources:</p>
-<ul>
-<li><a href="tutorial-simple-asset-action-plugin.html">Simple Asset Action</a></li>
-<li><a href="tutorial-extension-model.html">Extension Model</a></li>
-<li><a href="tutorial-farm-data-access.html">Farm Data Access</a></li>
-<li><a href="https://github.com/symbioquine/farmOS_asset_link/tree/release/asset-link-dist/alink-plugins">The default plugins that come with Asset Link</a></li>
-</ul>
+    <p><strong>name_bob_alink_plugin.info.yml</strong></p>
+<pre class="prettyprint source"><code>name: Name Bob Plugin for farmOS Asset Link
+description: Provides an Asset Link asset action to name an asset &quot;bob&quot;
+type: module
+package: farmOS Asset Link Plugins
+core_version_requirement: ^9
+dependencies:
+  - farmos_asset_link
+</code></pre>
+<p><strong>NameBobAssetActionProvider.alink.js</strong></p>
+<p>See <a href="tutorial-simple-asset-action-plugin.html">Simple Asset Action</a>.</p>
+<p><strong>config/install/farmos_asset_link.asset_link_default_plugin.NameBobAssetActionProvider.yml</strong></p>
+<pre class="prettyprint source lang-yml"><code>langcode: en
+status: true
+id: NameBobAssetActionProvider
+dependencies:
+  enforced:
+    module:
+      - name_bob_alink_plugin
+url: '{module:name_bob_alink_plugin}/NameBobAssetActionProvider.alink.js'
+</code></pre>
 </article>
 
 </section>
