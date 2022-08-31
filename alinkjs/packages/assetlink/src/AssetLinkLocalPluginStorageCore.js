@@ -23,7 +23,7 @@ export default class AssetLinkLocalPluginStorageCore {
 
     this._validateUrl(url);
 
-    const storeKey = "asset-link-local-plugin-src:" + url.pathname.replace(/^\/data\//,"");
+    const storeKey = "asset-link-local-plugin-src:" + url.pathname.replace(/^(\/?\/asset-link)\/data\//,"");
 
     const storeItem = await this._store.getItem(storeKey);
 
@@ -39,7 +39,7 @@ export default class AssetLinkLocalPluginStorageCore {
 
     this._validateUrl(url);
 
-    const storeKey = "asset-link-local-plugin-src:" + url.pathname.replace(/^\/data\//,"");
+    const storeKey = "asset-link-local-plugin-src:" + url.pathname.replace(/^(\/?\/asset-link)\/data\//,"");
 
     const timestamp = currentEpochSecond();
 
@@ -51,9 +51,10 @@ export default class AssetLinkLocalPluginStorageCore {
   }
 
   _validateUrl(url) {
-    if (url.protocol !== 'indexeddb:' || url.host !== 'asset-link' || !url.pathname.startsWith('/data/')) {
-      throw new Error(`Unsupported local plugin URL: ${url.toString()}`);
+    if (/^indexeddb:\/\/asset-link\/data\/.*/.test(url.toString())) {
+      return;
     }
+    throw new Error(`Unsupported local plugin URL: ${url.toString()}`);
   }
 
 }
