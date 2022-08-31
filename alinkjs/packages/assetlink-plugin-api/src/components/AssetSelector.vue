@@ -47,7 +47,11 @@ const searchMethodTileDefs = computed(() =>
 
 const currentSearchMethod = ref(props.searchMethod);
 
-const emit = defineEmits(["changed:searchMethod", "update:searchRequest", "submit"]);
+const emit = defineEmits([
+  "changed:searchMethod",
+  "update:searchRequest",
+  "submit",
+]);
 
 watch(currentSearchMethod, () =>
   emit("changed:searchMethod", currentSearchMethod.value)
