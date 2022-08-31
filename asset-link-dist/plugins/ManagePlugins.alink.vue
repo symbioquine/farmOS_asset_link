@@ -345,8 +345,8 @@ export default {
       const targetUrl = createDrupalUrl(`/alink/manage-plugins`).toString();
 
       slot.component(() =>
-        h(QItem, { to: "/manage-plugins", clickable: true, 'v-close-popup': true }, [
-            h(QItemSection, {}, "Manage Plugins"),
+        h(QItem, { to: "/manage-plugins", clickable: true, 'v-close-popup': true }, () => [
+            h(QItemSection, {}, () => "Manage Plugins"),
         ])
       );
     });

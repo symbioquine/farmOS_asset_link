@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2022-08-31
+
+### Added
+
+- Make it simpler for other modules to provide default Asset Link plugins without their own controllers/routing
+
+### Changed
+
+- More aggressively rely on indexeddb caching in preference to network/worker caching
+
+### Fixed
+
+- Cleaned up some warnings and unnecessary logging
+- Fixed a bug with how different browsers handle 'indexeddb://' plugin urls - #2
+- Fixed a bug with how extra plugin lists are stored/updated - #3
+- Don't cache requests to `/api` used to check connectivity/login status
+
 ## [0.6.0] - 2022-08-30
 
 ### Added
@@ -189,7 +206,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.0...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.1...HEAD
+[0.6.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.0...unbuilt-v0.6.1
 [0.6.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.4...unbuilt-v0.6.0
 [0.5.4]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.3...unbuilt-v0.5.4
 [0.5.3]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.2...unbuilt-v0.5.3

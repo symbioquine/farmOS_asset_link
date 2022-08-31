@@ -27,8 +27,28 @@ class FarmAssetLinkDefaultPluginRepositoryController extends ControllerBase {
         continue;
       }
 
-      $raw_url = $defaultPluginConfig->url();
-      $url = str_replace("{base_path}", $base_path, $raw_url);
+      $url = $defaultPluginConfig->url();
+
+      $moduleScopePos = strpos($url, '{module:');
+      if ($moduleScopePos > -1) {
+          if ($moduleScopePos !== 0) {
+              \Drupal::logger('farmos_asset_link')->notice("Invalid use of module scope for Asset Link plugin url in config " . $defaultPluginConfig->getConfigDependencyName());
+              continue;
+          }
+
+          $urlSuffix = preg_replace('/^\{module:[^\}]+\}\/?/', "", $url);
+
+          $expectedPrefix = $defaultPluginConfig->id() . ".alink.";
+
+          if (strpos($urlSuffix, $expectedPrefix) !== 0) {
+              \Drupal::logger('farmos_asset_link')->notice("Invalid use of module scope for Asset Link plugin url - expected url following module scope to be '$expectedSuffix'. Instead got '$urlSuffix'");
+              continue;
+          }
+
+          $url = "{base_path}alink/plugins/~$urlSuffix";
+      }
+
+      $url = str_replace("{base_path}", $base_path, $url);
 
       $plugins[] = ['url' => $url];
     }

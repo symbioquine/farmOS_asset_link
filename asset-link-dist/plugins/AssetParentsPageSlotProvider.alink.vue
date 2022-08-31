@@ -42,8 +42,6 @@ const assetTypes = ref(null);
 const resolveParents = async (ofAsset, entitySource) => {
   const results = await entitySource.query(q => q.findRelatedRecords({ type: ofAsset.type, id: ofAsset.id }, 'parent'));
 
-  console.log("resolveParents", results);
-
   return results.map(asset => {
     return {
       type: asset.type,
@@ -66,8 +64,6 @@ const resolveChildren = async (ofAsset, entitySource) => {
       .sort('-created');
   }));
 
-  console.log("resolveChildren", results);
-
   return results.flatMap(l => l).map(asset => {
     return {
       type: asset.type,
@@ -80,8 +76,6 @@ const resolveChildren = async (ofAsset, entitySource) => {
 };
 
 const onLazyLoad = async ({ node, key, done, fail }) => {
-  console.log('onLazyLoad:', node, key, done, fail);
-
   let loaderFn = () => [];
   if (node.nodeType === 'parent') {
     loaderFn = resolveParents;
