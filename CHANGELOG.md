@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Autofocus the text search input when searching for assets
+- Improve the styling of the asset visual carousel so the controls are easier to see
 
 ### Fixed
 
