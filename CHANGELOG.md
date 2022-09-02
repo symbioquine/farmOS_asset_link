@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add support for creating/uploading 'file--file' entities as part of changing asset relationships
+
 ### Changed
 
 - Autofocus the text search input when searching for assets

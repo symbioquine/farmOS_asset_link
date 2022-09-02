@@ -57,3 +57,23 @@ const updatedAsset = await assetLink.resolveAsset(asset.id);
 
 // updatedAsset.attributes.name === 'Fred'
 ```
+
+Files can be uploaded as part of modifying asset/log relationships by specifying a '$upload' directive (key) along with the standard `type` and `id` properties:
+
+```js
+const fileDataUrl = 'data:image/gif;base64,R0lGODlhyAAyAKEAAAAAAP///wAAAAAAACH5BAEKAAIALAAAAADIADIAAAL+jI+py+0Po5y02ouz3rz7D4biSJbmiabqyrbuC8fyTNf2jef6zvf+DwwKh8Si8YhMKpfMpvMJjUp5gOr0mqpqO9qurgvAgscQsIecM1/Hakeb866hhVtK/FE/e3HsYV5y1xIYwxYWtDcxuKL4YhWAWJZYYdjAuGAJhwdJ42hZSInwySAa+glauTk690jWd4lYyFKnqPZWm2oKmhuByWqbm+rrKBxcMkw7bAD5J5zQFtdbyuyGi7aqvDmdpRucneedDM0cfUB+t3q+nLwY3q3u/A4/rq5NXf86LZ4Pu84u30/s1D+A0tb9uqcK4UAF+vrdInhinzZX+IoRW1jOYkLeiAyrzZPYiaMJkAIDeqSYERg3hR1ZpnQIDuYWjSNVljTVEqXNdi4LltwosGFQnIIIIkP58uDPikuBJjp5Kh1Rdj8xXRu4UmTSSRZ5yjQIFVvPDxCvfS2V0ycgmjmXeh368auhq8Y4HkwrFq9YrXubMk2oFuNWwXRHILzbMiU+wRkZ8yr2RypYkoEjHn4W9+U/rNI4P50YOazPqPTGXoiFdc+u0YFWp266U7UoUibDEEVKFvdU2qzt4k7qO/bc2ahr136LJbny5cybO38OPbr06dSrW7+OPbv27dy7GygAADs='
+
+await assetLink.entitySource.update((t) =>
+  t.addToRelatedRecords({ type: asset.type, id: asset.id }, 'image', {
+      type: "file--file",
+      // Placeholder UUID gets replaced by '$upload' directive below so the resulting 'file--file'
+      // entity will have a different ID once the file/relationship gets saved to the server
+      // Until https://www.drupal.org/project/drupal/issues/3021155 gets fixed anyway
+      id: uuidv4(),
+      '$upload': {
+        fileName,
+        fileDataUrl,
+      },
+  })
+, {label: `Add photo to asset: "${asset.attributes.name}"`});
+```

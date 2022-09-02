@@ -286,7 +286,11 @@ export default class AssetLink {
         target: 'remote',
         action: 'update',
 
-        blocking: false
+        blocking: false,
+
+        filter(query) {
+          return !query.options?.localOnly;
+        },
       })
     );
 
@@ -316,10 +320,43 @@ export default class AssetLink {
 
     this.vm.bootProgress = 100;
 
+    // Create a placeholder 'file--file' entry for pending file uploads
+    // Might be able to be simplified once https://www.drupal.org/project/drupal/issues/3021155 is fixed
+    this._memory.on('beforeUpdate', async (transform) => {
+
+      const uploadDirective = transform?.operations?.relatedRecord?.['$upload'];
+
+      if (transform?.operations?.relatedRecord?.type !== 'file--file' || !uploadDirective) {
+        return transform;
+      }
+
+      const placeholderFileEntity = {
+        type: 'file--file',
+        id: transform.operations.relatedRecord.id,
+        attributes: {
+          filename: uploadDirective.fileName,
+          uri: {
+            url: uploadDirective.fileData,
+          }
+        },
+      };
+
+      await this._memory.cache.update(
+            (t) => t.addRecord(placeholderFileEntity),
+            // Pass a flag so our coordinator knows not to sync these to the server
+            { localOnly: true });
+
+      await this._backup.update(
+            (t) => t.addRecord(placeholderFileEntity),
+            // Pass a flag so our coordinator knows not to sync these to the server
+            { localOnly: true });
+
+    });
+
     this._memory.on('update', update => {
       console.log('_memory::update', update);
 
-      if (update.operations.op === 'updateRecord' && update.operations.record.type.startsWith('asset--')) {
+      if (['updateRecord', 'replaceAttribute', 'addToRelatedRecords', 'removeFromRelatedRecords', 'replaceRelatedRecords', 'replaceRelatedRecord'].includes(update.operations.op) && update.operations.record.type.startsWith('asset--')) {
         this.eventBus.$emit('changed:asset', { assetType: update.operations.record.type, assetId: update.operations.record.id});
       }
 
@@ -330,6 +367,40 @@ export default class AssetLink {
 
         // TODO: Emit 'changed:assetLogs' more types of related asset changes (inventory references, etc)
       }
+
+    });
+
+    // Handle file uploads before their relationship transforms get applied to the server
+    this._remote.on('beforeUpdate', async (transform) => {
+      const uploadDirective = transform?.operations?.relatedRecord?.['$upload'];
+
+      if (transform?.operations?.relatedRecord?.type !== 'file--file' || !uploadDirective) {
+        return;
+      }
+
+      const recordType = transform?.operations?.record?.type || '';
+
+      const relationshipField = transform?.operations?.relationship || '';
+
+      const uploadUrl = createDrupalUrl(`/api/${recordType.split('--').join('/')}/${relationshipField}`);
+
+      const { fileName, fileDataUrl } = uploadDirective;
+
+      const fileBuffer = await fetch(fileDataUrl).then(r => r.arrayBuffer());
+
+      const uploadResult = await this._csrfAwareFetch(uploadUrl, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/vnd.api+json',
+          'Content-Type': 'application/octet-stream',
+          'Content-Disposition': `file; filename="${fileName}"`,
+        },
+        body: fileBuffer,
+      });
+
+      const uploadResultJson = await uploadResult.json();
+
+      transform.operations.relatedRecord.id = uploadResultJson.data.id;
     });
 
     watch(this.connectionStatus.isOnline, async (isOnline) => {
