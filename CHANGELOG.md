@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Autofocus the text search input when searching for assets
+
 ### Fixed
 
 - Change how relationship schemas are loaded so they are valid as Orbit.js models

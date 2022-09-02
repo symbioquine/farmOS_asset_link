@@ -22,7 +22,7 @@ const onSearchTextUpdated = (text) => {
 
     <template #search-interface>
       <div class="q-px-md">
-        <q-input v-model="searchText" @update:model-value="(evt) => onSearchTextUpdated(evt)" label="Search" />
+        <q-input autofocus v-model="searchText" @update:model-value="(evt) => onSearchTextUpdated(evt)" label="Search" />
       </div>
     </template>
 
