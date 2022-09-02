@@ -15,6 +15,7 @@ import AssetSelector from "./components/AssetSelector.vue";
 const CodeEditor = defineAsyncComponent(() =>
   import("./components/CodeEditor.vue")
 );
+import PhotoInput from "./components/PhotoInput.vue";
 import QrCodeScanner from "./components/QrCodeScanner.vue";
 import RenderWidget from "./components/RenderWidget";
 import SearchMethodTileTabber from "./components/SearchMethodTileTabber";
@@ -24,6 +25,7 @@ const components = {
   AssetResolver,
   AssetSelector,
   CodeEditor,
+  PhotoInput,
   QrCodeScanner,
   RenderWidget,
   SearchMethod,
