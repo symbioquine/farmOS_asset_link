@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for creating/uploading 'file--file' entities as part of changing asset relationships
 - Add a photo input widget to make capturing or providing image files easier
+- Add a pane to the asset visual carousel for uploading asset images
 
 ### Changed
 
