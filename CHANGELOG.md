@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Change how relationship schemas are loaded so they are valid as Orbit.js models
+- Remove example plugin that should not have been checked in
 
 ## [0.6.1] - 2022-08-31
 
