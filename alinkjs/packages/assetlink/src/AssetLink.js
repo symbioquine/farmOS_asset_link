@@ -719,7 +719,27 @@ export default class AssetLink {
                 return [attrName, attr];
               })
         ),
-        relationships: relatedItemSchema.definitions?.relationships?.properties || {},
+        relationships: Object.fromEntries(
+            Object.entries(relatedItemSchema.definitions?.relationships?.properties || {})
+              .map(([attrName, propSchema]) => {
+
+                // https://github.com/bradjones1/orbit-schema-from-openapi/blob/cde8d885152b3d88b9352669c97099ca1c13a2ff/index.js#L160-L172
+                if (propSchema.properties?.data?.type === 'array') {
+                  return [attrName, {
+                    kind: 'hasMany',
+                    type: propSchema.properties.data.items.properties.type.enum
+                  }];
+                } else {
+                  return [attrName, {
+                    kind: 'hasOne',
+                    type: (typeof propSchema.properties?.data?.properties?.type?.enum === 'undefined')
+                      ? []
+                      : propSchema.properties.data.properties.type.enum,
+                  }];
+                }
+
+              })
+        ),
       };
 
       this.vm.bootProgress = (Object.keys(models).length / serverRelatedSchemas.length) * 100;
