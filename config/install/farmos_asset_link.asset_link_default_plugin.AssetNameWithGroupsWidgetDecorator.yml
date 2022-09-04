@@ -1,8 +1,0 @@
-langcode: en
-status: true
-id: AssetNameWithGroupsWidgetDecorator
-dependencies:
-  enforced:
-    module:
-      - farmos_asset_link
-url: '{base_path}alink/plugins/AssetNameWithGroupsWidgetDecorator.alink.vue'

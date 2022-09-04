@@ -1,5 +1,5 @@
 <template>
-  <span><slot></slot> <q-icon name="mdi-archive-clock" /></span>
+  <span><slot></slot> {{ '\u{1F5C3}' }}</span>
 </template>
 
 <script>
