@@ -15,6 +15,7 @@ import AssetSelector from "./components/AssetSelector.vue";
 const CodeEditor = defineAsyncComponent(() =>
   import("./components/CodeEditor.vue")
 );
+import EntityName from "./components/EntityName.vue";
 import PhotoInput from "./components/PhotoInput.vue";
 import QrCodeScanner from "./components/QrCodeScanner.vue";
 import RenderWidget from "./components/RenderWidget";
@@ -25,6 +26,7 @@ const components = {
   AssetResolver,
   AssetSelector,
   CodeEditor,
+  EntityName,
   PhotoInput,
   QrCodeScanner,
   RenderWidget,
@@ -37,6 +39,8 @@ const components = {
  * * [AssetResolver](./module-AssetResolver.html)
  * * [AssetSelector](./module-AssetSelector.html)
  * * [CodeEditor](./module-CodeEditor.html)
+ * * [EntityName](./module-EntityName.html)
+ * * [PhotoInput](./module-PhotoInput.html)
  * * [QrCodeScanner](./module-QrCodeScanner.html)
  * * [RenderWidget](./module-RenderWidget.html)
  * * [SearchMethod](./module-SearchMethod.html)

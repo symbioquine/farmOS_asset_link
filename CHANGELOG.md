@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Create a new component to render decoratable entity name text
+
 ### Changed
 
 - Set the page title in index.html and upon route changes
