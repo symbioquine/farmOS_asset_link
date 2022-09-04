@@ -1,8 +1,8 @@
 <script setup>
-import { computed, inject, ref, watch } from 'vue';
+import { computed, inject, ref, watch, nextTick } from 'vue';
 import { useRoute } from 'vue-router'
 
-const emit = defineEmits(['expose-meta-actions']);
+const emit = defineEmits(['expose-meta-actions', 'expose-route-title']);
 
 const route = useRoute();
 
@@ -19,6 +19,13 @@ watch(metaActionDefs, () => {
 });
 
 const assetName = ref(null);
+
+watch([assetName, resolvedAsset], () => {
+  // We have to wait until after the new asset name text has rendered
+  nextTick(() => {
+    emit('expose-route-title', assetName?.value?.wrapper?.textContent);
+  });
+});
 </script>
 
 <template alink-route[net.symbioquine.farmos_asset_link.routes.v0.asset_page]="/asset/:assetRef">

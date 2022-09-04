@@ -130,6 +130,10 @@ export default {
     };
   },
 
+  mounted() {
+    this.$emit('expose-route-title', "Manage Plugins");
+  },
+
   methods: {
     async addPluginFromUrl() {
       // TODO: Add a warning about only adding trusted code
