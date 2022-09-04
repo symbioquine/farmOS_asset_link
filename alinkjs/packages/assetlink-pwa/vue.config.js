@@ -111,6 +111,13 @@ module.exports = defineConfig({
   runtimeCompiler: true,
   transpileDependencies: ["quasar"],
 
+  pages: {
+    index: {
+      entry: 'src/main.js',
+      title: 'Asset Link',
+    },
+  },
+
   pwa: {
     name: "Asset Link",
     themeColor: "#4CAF50",

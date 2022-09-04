@@ -103,6 +103,7 @@
         <router-view
           v-if="assetLink.vm.booted"
           @expose-meta-actions="metaActionDefs = $event"
+          @expose-route-title="onRouteTitleExposed($event)"
         />
 
         <q-inner-loading :showing="!assetLink.vm.booted">
@@ -174,6 +175,19 @@ export default defineComponent({
       { immediate: true }
     );
 
+    const onRouteTitleExposed = (title) => {
+      if (!title) {
+        window.document.title = "Asset Link";
+        return;
+      }
+
+      window.document.title = `${title} - Asset Link`;
+    };
+
+    router.afterEach(() => {
+      window.document.title = "Asset Link";
+    });
+
     expose({
       assetLink,
       async addRoute(routeDef) {
@@ -205,6 +219,7 @@ export default defineComponent({
       metaActionDefs,
       updateExists,
       refreshApp,
+      onRouteTitleExposed,
     };
   },
   created() {
