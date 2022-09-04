@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2] - 2022-09-03
+
+### Added
+
+- Add support for creating/uploading 'file--file' entities as part of changing asset relationships
+- Add a photo input widget to make capturing or providing image files easier
+- Add a pane to the asset visual carousel for uploading asset images
+
+### Changed
+
+- Autofocus the text search input when searching for assets
+- Improve the styling of the asset visual carousel so the controls are easier to see
+- Improve how asset photos are loaded so the 'file--file' entity can come from the local cache if available
+- Improved plugin model documentation
+
+### Fixed
+
+- Change how relationship schemas are loaded so they are valid as Orbit.js models
+- Remove example plugin that should not have been checked in
+
 ## [0.6.1] - 2022-08-31
 
 ### Added
@@ -206,7 +226,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.1...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.2...HEAD
+[0.6.2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.1...unbuilt-v0.6.2
 [0.6.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.0...unbuilt-v0.6.1
 [0.6.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.4...unbuilt-v0.6.0
 [0.5.4]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.5.3...unbuilt-v0.5.4

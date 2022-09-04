@@ -8,8 +8,10 @@
         v-model="carouselPosition"
         swipeable
         animated
-        control-type="flat"
         navigation
+        navigation-icon="mdi-radiobox-marked"
+        control-type="flat"
+        control-color="orange"
         :arrows="false"
         height="200px"
       >

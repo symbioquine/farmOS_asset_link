@@ -16,8 +16,15 @@ const imageEntity = ref(null);
 
 const resolveImageEntity = async () => {
   try {
-    // TODO: Improve implementation - this probably does work well offline...
-    const entity = await assetLink.entitySource.query(
+    let entity = await assetLink.entitySource.cache.query(
+        (q) => q.findRecord({ type: props.imgRef.type, id: props.imgRef.id }));
+
+    if (entity) {
+      imageEntity.value = entity;
+      return;
+    }
+
+    entity = await assetLink.entitySource.query(
         (q) => q.findRecord({ type: props.imgRef.type, id: props.imgRef.id }));
 
     imageEntity.value = entity;
