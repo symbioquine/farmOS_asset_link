@@ -47,7 +47,7 @@ const resolveParents = async (ofAsset, entitySource) => {
       type: asset.type,
       id: asset.id,
       nodeType: 'parent',
-      label: asset.attributes.name,
+      asset,
       lazy: true,
     };
   });
@@ -69,7 +69,7 @@ const resolveChildren = async (ofAsset, entitySource) => {
       type: asset.type,
       id: asset.id,
       nodeType: 'child',
-      label: asset.attributes.name,
+      asset,
       lazy: true,
     };
   });
@@ -104,7 +104,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <q-dialog ref="dialogRef" @hide="onDialogHide">
+  <q-dialog ref="dialogRef">
     <q-card class="q-dialog-plugin q-gutter-md" style="width: 700px; max-width: 80vw;">
       <h4 class="q-mb-sm">Hierarchy</h4>
 
@@ -115,6 +115,10 @@ onMounted(async () => {
         node-key="id"
         @lazy-load="onLazyLoad"
       >
+        <template v-slot:default-header="{ node }">
+          <entity-name v-if="node.nodeType === 'child' || node.nodeType === 'parent'" :entity="node.asset"></entity-name>
+          <div v-else>{{ node.label }}</div>
+        </template>
         <template v-slot:default-body="{ node }">
           <span v-if="!node.children || node.children.length === 0" class="text-weight-light q-ml-lg">
             <span v-if="node.nodeType === 'rootChild' || node.nodeType === 'child'">No known children</span>
