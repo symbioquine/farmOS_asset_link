@@ -133,7 +133,7 @@ import { defineComponent } from 'vue'
 export default {
   onLoad(handle, assetLink) {
     handle.defineWidgetDecorator('net.symbioquine.farmos_asset_link.widget_decorator.v0.hierarchy', widgetDecorator => {
-      widgetDecorator.targetWidgetName('asset-name');
+      widgetDecorator.targetWidgetName('asset-page-title');
 
       widgetDecorator.appliesIf(context => true);
 

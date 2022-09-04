@@ -17,6 +17,8 @@ const metaActionDefs = computed(() => {
 watch(metaActionDefs, () => {
   emit('expose-meta-actions', metaActionDefs.value);
 });
+
+const assetName = ref(null);
 </script>
 
 <template alink-route[net.symbioquine.farmos_asset_link.routes.v0.asset_page]="/asset/:assetRef">
@@ -27,9 +29,9 @@ watch(metaActionDefs, () => {
       @asset-resolved="resolvedAsset = $event"
       :key="$route.params.assetRef">
         <h4 class="q-my-xs"><render-widget
-              name="asset-name"
+              name="asset-page-title"
               :context="{ asset }"
-              ><span class="asset-name-text-prefix">Asset: </span>{{ asset.attributes.name }}</render-widget>
+              ><span class="asset-page-title-text-prefix">Asset: </span><entity-name ref="assetName" :entity="asset"></entity-name></render-widget>
         </h4>
 
         <component

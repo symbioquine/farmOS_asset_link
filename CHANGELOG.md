@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Set the page title in index.html and upon route changes
+- Refactored the asset name rendering to distinguish page title and asset name decorators
 
 ## [0.6.2] - 2022-09-03
 

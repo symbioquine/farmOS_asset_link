@@ -14,19 +14,19 @@ const props = defineProps({
 
 const assetLink = inject('assetLink');
 
-const loadingGroups = ref(false);
-const currentGroups = ref(null);
+const loadingLocations = ref(false);
+const currentLocations = ref(null);
 
-const resolveCurrentGroups = async () => {
-  loadingGroups.value = true;
+const resolveCurrentLocation = async () => {
+  loadingLocations.value = true;
 
   const logTypes = (await assetLink.getLogTypes()).map(t => t.attributes.drupal_internal__id);
 
-  const populateGroupsFromLatestGroupMembershipLogs = async (entitySource, entitySourceCache) => {
+  const populateLocationsFromLatestMovementLogs = async (entitySource, entitySourceCache) => {
 
     const results = await entitySource.query(q => logTypes.map(logType => {
       return q.findRecords(`log--${logType}`)
-        .filter({ attribute: 'is_group_assignment', op: 'equal', value: true })
+        .filter({ attribute: 'is_movement', op: 'equal', value: true })
         .filter({ attribute: 'status', op: 'equal', value: 'done' })
         .filter({ attribute: 'timestamp', op: '<=', value: currentEpochSecond() })
         .filter({
@@ -39,7 +39,7 @@ const resolveCurrentGroups = async () => {
     }), {
       sources: {
         remote: {
-          include: ['group']
+          include: ['location']
         }
       }
     });
@@ -49,15 +49,15 @@ const resolveCurrentGroups = async () => {
     const latestLog = logs.length ? logs.reduce((logA, logB) => parseJSONDate(logA.attributes.timestamp) > parseJSONDate(logB.attributes.timestamp) ? logA : logB) : null;
 
     if (latestLog) {
-      currentGroups.value = await entitySourceCache.query(q => q.findRelatedRecords(latestLog, 'group'))
+      currentLocations.value = await entitySourceCache.query(q => q.findRelatedRecords(latestLog, 'location'))
     }
   }
 
-  await populateGroupsFromLatestGroupMembershipLogs(assetLink.entitySource.cache, assetLink.entitySource.cache);
+  await populateLocationsFromLatestMovementLogs(assetLink.entitySource.cache, assetLink.entitySource.cache);
 
-  await populateGroupsFromLatestGroupMembershipLogs(assetLink.entitySource, assetLink.entitySource.cache);
+  await populateLocationsFromLatestMovementLogs(assetLink.entitySource, assetLink.entitySource.cache);
 
-  loadingGroups.value = false;
+  loadingLocations.value = false;
 };
 
 const onAssetLogsChanged = ({ assetType, assetId }) => {
@@ -65,13 +65,13 @@ const onAssetLogsChanged = ({ assetType, assetId }) => {
     props.asset.type === assetType &&
     props.asset.id === assetId
   ) {
-    resolveCurrentGroups();
+    resolveCurrentLocation();
   }
 };
 
 let unsubber;
 onMounted(() => {
-  resolveCurrentGroups();
+  resolveCurrentLocation();
   unsubber = assetLink.eventBus.$on("changed:assetLogs", onAssetLogsChanged);
 });
 onUnmounted(() => unsubber && unsubber.$off());
@@ -85,14 +85,14 @@ onUnmounted(() => unsubber && unsubber.$off());
       rounded
       dense
       no-caps
-      color="secondary"
+      color="primary"
       text-color="white"
-      icon="mdi-group"
-      :to="`/asset/${currentGroup.attributes.drupal_internal__id}`"
-      v-for="currentGroup in currentGroups"
-      :key="currentGroup.id"
+      icon="mdi-crosshairs"
+      :to="`/asset/${currentLocation.attributes.drupal_internal__id}`"
+      v-for="currentLocation in currentLocations"
+      :key="currentLocation.id"
       class="q-ml-sm q-px-sm q-py-none">
-      {{ currentGroup.attributes.name }}
+      {{ currentLocation.attributes.name }}
     </q-btn>
   </span>
 </template>
@@ -100,12 +100,12 @@ onUnmounted(() => unsubber && unsubber.$off());
 <script>
 export default {
   onLoad(handle) {
-    handle.defineWidgetDecorator('net.symbioquine.farmos_asset_link.widget_decorator.v0.asset_name_with_groups', widgetDecorator => {
-      widgetDecorator.targetWidgetName('asset-name');
+    handle.defineWidgetDecorator('net.symbioquine.farmos_asset_link.widget_decorator.v0.asset_name_with_locations', widgetDecorator => {
+      widgetDecorator.targetWidgetName('asset-page-title');
 
       widgetDecorator.appliesIf(context => true);
 
-      widgetDecorator.weight(75);
+      widgetDecorator.weight(95);
 
       widgetDecorator.component(handle.thisPlugin);
     });
