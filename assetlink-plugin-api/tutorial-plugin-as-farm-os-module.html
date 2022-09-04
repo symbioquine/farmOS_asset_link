@@ -152,6 +152,32 @@ dependencies:
       - name_bob_alink_plugin
 url: '{module:name_bob_alink_plugin}/NameBobAssetActionProvider.alink.js'
 </code></pre>
+<p><strong>Important:</strong> If the plugin is named &quot;NameBobAssetActionProvider.alink.js&quot;, then the <code>id</code> field of the config yml must be
+&quot;NameBobAssetActionProvider&quot; and the yml file itself must be named &quot;farmos_asset_link.asset_link_default_plugin.NameBobAssetActionProvider.yml&quot;.
+All three must match, otherwise the plugin cannot be served/loaded correctly by the Asset Link Drupal controller.</p>
+<p>Alternatively, plugins urls can be prefixed with <code>{base_path}</code> to make them relative to the Drupal installation base path.</p>
+<p>Plugin urls can also be absolute (starting with <code>/</code>) to make them relative to the domain or even fully qualified urls to other domains - that final
+case would of course require that the server hosting the plugins handle sending <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">CORS headers</a> correctly.</p>
+<p>The only requirement in general for all plugin urls is that the last part of the URL path follow the naming pattern <code>{PluginName}.alink.{ext}</code>.
+(e.g. NameBobAssetActionProvider.alink.js)</p>
+<p>Check out the <a href="tutorial-extension-model.html">Extension Model</a> guide for more information about plugins and their naming.</p>
+<h2>Optional plugins</h2>
+<p>The <code>yml</code> file above could be placed in <code>config/optional/</code> and list additional dependencies to make the plugin optional.</p>
+<p>In that case the Asset Link plugin will only be installed when all the dependnecies are also installed.</p>
+<p>For example:</p>
+<p><strong>config/optional/farmos_asset_link.asset_link_default_plugin.NameBobAssetActionProvider.yml</strong></p>
+<pre class="prettyprint source lang-yml"><code>langcode: en
+status: true
+id: NameBobAssetActionProvider
+dependencies:
+  enforced:
+    module:
+      - name_bob_alink_plugin
+      - farm_material
+url: '{module:name_bob_alink_plugin}/NameBobAssetActionProvider.alink.js'
+</code></pre>
+<p>Then the plugin would only be installed when the farmOS Material asset type is also available.</p>
+<p>Here is the most cogent description of this feature I have located so far: https://lightning.acquia.com/blog/optional-config-weirdness-drupal-8</p>
 </article>
 
 </section>
