@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored the asset name rendering to distinguish page title and asset name decorators
 - Set the route title for the asset and manage plugins pages
 - Change the archived asset name icon to use a unicode icon that can also be rendered as the `document.title`
+- Use the entity name component to render asset names in the asset selector component
 
 ## [0.6.2] - 2022-09-03
 

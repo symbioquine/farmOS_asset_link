@@ -86,7 +86,7 @@ const nodes = computed(() => {
   return searchResultEntries.value.map((entry) => {
     return {
       id: entry.asset.id,
-      label: entry.asset.attributes.name,
+      asset: entry.asset,
       weightText: entry.weightText,
       tickable: props.selectMultiple ? true : false,
     };
@@ -197,6 +197,10 @@ const onCancel = () => {
         no-nodes-label="No assets found"
         class="q-mx-lg q-mb-md"
       >
+        <template v-slot:default-header="prop">
+          <entity-name :entity="prop.node.asset"></entity-name>
+        </template>
+
         <template v-slot:default-body="prop">
           <div v-if="prop.node.weightText" class="q-ml-xl">
             {{ prop.node.weightText }}
