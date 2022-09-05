@@ -798,14 +798,12 @@ export default class AssetLink {
                 if (propSchema.properties?.data?.type === 'array') {
                   return [attrName, {
                     kind: 'hasMany',
-                    type: propSchema.properties.data.items.properties.type.enum
+                    type: propSchema.properties?.data?.items?.properties?.type?.enum,
                   }];
                 } else {
                   return [attrName, {
                     kind: 'hasOne',
-                    type: (typeof propSchema.properties?.data?.properties?.type?.enum === 'undefined')
-                      ? []
-                      : propSchema.properties.data.properties.type.enum,
+                    type: propSchema.properties?.data?.properties?.type?.enum,
                   }];
                 }
 
