@@ -4,6 +4,7 @@ const glob = require('glob');
 const chokidar = require('chokidar');
 const yaml = require('js-yaml');
 const path = require('path');
+const zlib = require('zlib');
 const CopyPlugin = require("copy-webpack-plugin");
 
 
@@ -57,6 +58,7 @@ const createDevServerConfig = () => {
         context: () => true,
         secure: targetUrl.protocol === "https:",
         changeOrigin: true,
+        selfHandleResponse: true,
         bypass: function (req, res) {
           if (req.path.indexOf("/alink/plugins/~") === 0) {
             console.log(
@@ -66,14 +68,6 @@ const createDevServerConfig = () => {
           }
           if (req.path.indexOf("/alink/plugins") === 0) {
             return req.path;
-          }
-          if (req.path.indexOf("/alink/backend/default-plugins.repo.json") === 0) {
-            const wsProtocol = (targetUrl.protocol === "https:") ? 'wss' : 'ws';
-            res.send({
-              plugins: fs.readdirSync(`${__dirname}/plugins`).map(pluginFilename => ({url: `/alink/plugins/${pluginFilename}`})),
-              updateChannel: `${wsProtocol}://${devHost}:${serverPort}/ws`,
-            });
-            return;
           }
           console.log(
             `'${req.path}' is not an alink plugin url - passing to proxy...`
@@ -91,6 +85,63 @@ const createDevServerConfig = () => {
           if (!proxyReq.getHeader("X-Forwarded-Host")) {
             proxyReq.setHeader("X-Forwarded-Host", `${devHost}:${serverPort}`);
           }
+        },
+        // Based on https://github.com/chimurai/http-proxy-middleware/issues/97#issuecomment-609891024
+        onProxyRes: (proxyRes, req, res) => {
+          let body = new Buffer('');
+          proxyRes.on('data', (chunk) => {
+            body = Buffer.concat([body, chunk]);
+          });
+          proxyRes.on('end', () => {
+              // forwarding source status
+              res.status(proxyRes.statusCode);
+
+              // forwarding source headers
+              Object.keys(proxyRes.headers).forEach((key) => {
+                  res.append(key, proxyRes.headers[key]);
+              });
+
+              // modifying repo data
+              if (proxyRes.statusCode === 200 && req.path.indexOf("/alink/backend/default-plugins.repo.json") === 0) {
+                const contentEncoding = proxyRes.headers['content-encoding'];
+
+                let repoJson = body;
+
+                if (contentEncoding === 'gzip') {
+                  repoJson = zlib.gunzipSync(repoJson);
+                } else if (contentEncoding === 'deflate') {
+                  repoJson = zlib.inflateSync(repoJson);
+                }
+
+                repoJson = repoJson.toString('utf8');
+
+                const repo = JSON.parse(repoJson);
+
+                const wsProtocol = (targetUrl.protocol === "https:") ? 'wss' : 'ws';
+                repo.updateChannel = `${wsProtocol}://${devHost}:${serverPort}/ws`;
+
+                const moduleScopedPlugins = repo.plugins.filter(p => p.url.indexOf('/alink/plugins/~') >= 0);
+
+                repo.plugins = [
+                  ...fs.readdirSync(`${__dirname}/plugins`).map(pluginFilename => ({url: `/alink/plugins/${pluginFilename}`})),
+                  ...moduleScopedPlugins,
+                ];
+
+                repoJson = JSON.stringify(repo);
+
+                if (contentEncoding === 'gzip') {
+                  repoJson = zlib.gzipSync(repoJson);
+                } else if (contentEncoding === 'deflate') {
+                  repoJson = zlib.deflateSync(repoJson);
+                }
+
+                res.send(new Buffer.from(repoJson));
+              } else {
+                res.send(body);
+              }
+
+              res.end();
+          });
         },
       },
     },
