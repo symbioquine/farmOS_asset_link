@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix dev server proxy for default plugins repo to pass through module-scoped plugin urls
 - Fix loading of asset relationship type enums to always be `undefined` or a non-empty list
+- Fix warnings from OpenInFarmOSMetaActionProvider
 
 ## [0.6.3] - 2022-09-04
 
