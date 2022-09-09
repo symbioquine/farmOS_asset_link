@@ -77,3 +77,31 @@ await assetLink.entitySource.update((t) =>
   })
 , {label: `Add photo to asset: "${asset.attributes.name}"`});
 ```
+
+Similarly, files can be uploaded as part of asset/log (entity) creation/updates:
+
+```js
+await assetLink.entitySource.update((t) => {
+  return t.updateRecord({
+    type: asset.type,
+    id: asset.id,
+    attributes: {
+      name: "Fred",
+    },
+    relationships: {
+      image: {
+        data: [
+          {
+            type: "file--file",
+            id: uuidv4(),
+            '$upload': {
+              fileName,
+              fileDataUrl,
+            },
+          }
+        ]
+      }
+    }
+  });
+}, {label: `Rename asset: "${asset.attributes.name}" to "Fred" and replace images with a single new one`});
+```
