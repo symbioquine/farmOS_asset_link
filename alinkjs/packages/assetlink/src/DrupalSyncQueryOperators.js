@@ -83,7 +83,12 @@ function applyFilter(recordModel, record, filter) {
 
     const attributeModel = deepGet(recordModel || {}, ['attributes', ...attributeKey]) || {};
 
-    let actual = deepGet(record, ['attributes', ...attributeKey]);
+    let actual;
+    if (filter.attribute === 'id') {
+      actual = record.id;
+    } else {
+      actual = deepGet(record, ['attributes', ...attributeKey]);
+    }
 
     let expected = filter.value;
 
