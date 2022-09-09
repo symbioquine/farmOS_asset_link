@@ -23,17 +23,18 @@ const searchMethod = ref('text-search');
 </script>
 
 <template>
-  <q-dialog ref="dialogRef" @hide="onDialogHide">
+  <q-dialog ref="dialogRef">
     <q-card class="q-dialog-plugin q-gutter-md" style="width: 700px; max-width: 80vw;">
-      <asset-selector
+      <entity-search
         title="Find Destination"
         confirm-label="Move to"
+        entity-type="asset"
         :search-method="searchMethod"
         :key="searchMethod"
         @changed:search-method="newSearchMethod => searchMethod = newSearchMethod"
         @submit="onSubmit"
         :additional-filters="[{ attribute: 'is_location', op: 'equal', value: true }]"
-      ></asset-selector>
+      ></entity-search>
     </q-card>
   </q-dialog>
 </template>

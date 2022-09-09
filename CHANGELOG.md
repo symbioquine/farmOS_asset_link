@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support double-clicking on an result in the EntitySearch component to choose it immediately
 
+### Fixed
+
+- Fix MoveAssetActionProvider to use the new EntitySearch component and resolve a minor warning
+
 ## [0.7.1] - 2022-09-09
 
 ### Added
