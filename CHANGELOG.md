@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix PhotoInput to only show capture button when it is supported
 - Fix JSON:API permission issue so non-admin users can upload files
 - Fix race condition where Orbit.js queries/updates can fail while online/offline status is changing
+- Hide the edit action for plugins without loaded source code e.g. disabled plugins
 
 ## [0.6.3] - 2022-09-04
 
