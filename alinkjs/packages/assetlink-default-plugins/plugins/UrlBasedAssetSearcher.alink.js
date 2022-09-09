@@ -3,8 +3,8 @@
  */
 export default class UrlBasedAssetSearcher {
 
-  static searchAssets(assetLink, searchRequest) {
-    if (searchRequest.type !== 'text-search') {
+  static searchEntities(assetLink, searchRequest) {
+    if (searchRequest.entityType !== 'asset' || searchRequest.type !== 'text-search') {
       return undefined;
     }
 
@@ -25,7 +25,7 @@ export default class UrlBasedAssetSearcher {
     const assetDrupalInternalId = matches[1];
 
     async function* assetResultsIterator() {
-      const asset = await assetLink.resolveAsset(assetDrupalInternalId, additionalFilters);
+      const asset = await assetLink.resolveAsset(assetDrupalInternalId, additionalFilters, searchRequest.entityBundles);
 
       if (!asset) {
         return;
@@ -34,7 +34,7 @@ export default class UrlBasedAssetSearcher {
       yield {
         weight: 0,
         weightText: `Asset with id=${assetDrupalInternalId}`,
-        asset,
+        entity: asset,
       };
     }
 

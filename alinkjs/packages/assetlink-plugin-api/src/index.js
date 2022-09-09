@@ -9,13 +9,14 @@ export { default as summarizeAssetNames } from "./summarizeAssetNames";
 export { default as RacingLocalRemoteAsyncIterator } from "./RacingLocalRemoteAsyncIterator";
 export { default as EventBus } from "./EventBus";
 
-import AssetResolver from "./components/AssetResolver.vue";
-import AssetSelector from "./components/AssetSelector.vue";
 // Code mirror is pretty big so we'll make it an async component with its own chunk
 const CodeEditor = defineAsyncComponent(() =>
   import("./components/CodeEditor.vue")
 );
 import EntityName from "./components/EntityName.vue";
+import EntityResolver from "./components/EntityResolver.vue";
+import EntitySearch from "./components/EntitySearch.vue";
+import EntitySelect from "./components/EntitySelect.vue";
 import PhotoInput from "./components/PhotoInput.vue";
 import QrCodeScanner from "./components/QrCodeScanner.vue";
 import RenderWidget from "./components/RenderWidget";
@@ -23,9 +24,10 @@ import SearchMethodTileTabber from "./components/SearchMethodTileTabber";
 import SearchMethod from "./components/SearchMethod.vue";
 
 const components = {
-  AssetResolver,
-  AssetSelector,
   CodeEditor,
+  EntityResolver,
+  EntitySearch,
+  EntitySelect,
   EntityName,
   PhotoInput,
   QrCodeScanner,
@@ -36,10 +38,11 @@ const components = {
 /**
  * @export components
  * @desc
- * * [AssetResolver](./module-AssetResolver.html)
- * * [AssetSelector](./module-AssetSelector.html)
  * * [CodeEditor](./module-CodeEditor.html)
  * * [EntityName](./module-EntityName.html)
+ * * [EntityResolver](./module-EntityResolver.html)
+ * * [EntitySearch](./module-EntitySearch.html)
+ * * [EntitySelect](./module-EntitySelect.html)
  * * [PhotoInput](./module-PhotoInput.html)
  * * [QrCodeScanner](./module-QrCodeScanner.html)
  * * [RenderWidget](./module-RenderWidget.html)

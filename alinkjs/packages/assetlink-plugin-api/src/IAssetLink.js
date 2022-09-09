@@ -29,23 +29,27 @@ export default class IAssetLink {}
 IAssetLink.prototype.getEntityModel = async function (typeName) {};
 
 /**
- * Get an asset by UUID or Drupal internal id.
+ * Get an entity by type and UUID or Drupal internal id.
  *
  * ##### Usage
  *
  * ```js
- * const asset = await assetLink.resolveAsset(42);
+ * const log = await assetLink.resolveEntity('log', 42);
  *
- * console.log(asset.attributes.name);
+ * console.log(log.attributes.name);
  * ```
  *
- * @method IAssetLink#resolveAsset
- * @param {String|Number} assetRef the ID/UUID of the asset
+ * @method IAssetLink#resolveEntity
+ * @param {String} entityType the type of the entity
+ * @param {String|Number} entityRef the ID/UUID of the entity
  * @param {Object[]} additionalFilters additional resolution criteria in Orbit.js filter format
  *   e.g. `[{ attribute: 'is_location', op: 'equal', value: true }]`
+ * @param {String[]} limitedEntityBundles Limit the entity bundles that will be resolved from
+ *   e.g. `['activity', 'observation']`
  */
-IAssetLink.prototype.resolveAsset = async function (
-  assetRef,
+IAssetLink.prototype.resolveEntity = async function (
+  entityType,
+  entityRef,
   additionalFilters
 ) {};
 
@@ -64,19 +68,27 @@ IAssetLink.prototype.getAssetTypes = async function () {};
 IAssetLink.prototype.getLogTypes = async function () {};
 
 /**
- * Central asset searching entry-point. Responsible for delegating to asset searching plugins.
+ * Get a list of the taxonomy_vocabulary entities.
  *
- * *Note: It would be unusual to call this directly. Most use-cases should use the [RenderWidget](module-AssetSelector.html) component which
- * internally handles `searchAssets` and presents the results.*
+ * @method IAssetLink#getTaxonomyVocabularies
+ */
+IAssetLink.prototype.getTaxonomyVocabularies = async function () {};
+
+/**
+ * Central entity searching entry-point. Responsible for delegating to entity searching plugins.
  *
- * @method IAssetLink#searchAssets
+ * *Note: It would be unusual to call this directly. Most use-cases should use the [EntitySearch](module-EntitySearch.html)
+ * or [EntitySearch](module-EntitySelect.html) components which internally handles calling `searchEntities` and presenting
+ * the results.*
+ *
+ * @method IAssetLink#searchEntities
  * @param {Object} searchRequest An object with varying structure produced by
- *   a search method plugin - passed through to {@link IAssetLinkPlugin.searchAssets}
+ *   a search method plugin - passed through to {@link IAssetLinkPlugin.searchEntities}
  *   implementations.
  * @param {String} searchPhase One of "local" or "remote" to request
- *   offline or online asset search results respectively.
+ *   offline or online entity search results respectively.
  */
-IAssetLink.prototype.searchAssets = function (searchRequest, searchPhase) {};
+IAssetLink.prototype.searchEntities = function (searchRequest, searchPhase) {};
 
 /**
  * @typedef RenderableDef

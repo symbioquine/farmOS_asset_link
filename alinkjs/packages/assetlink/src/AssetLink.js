@@ -453,6 +453,15 @@ export default class AssetLink {
     return this._models[typeName];
   }
 
+  /**
+   * Synchronously gets the model for an entity type given that the type name. e.g. "asset--plant".
+   * 
+   * Will only return results if Asset Link is already booted.
+   */
+  getEntityModelSync(typeName) {
+    return this._models[typeName];
+  }
+
   async _precache() {
     const precachingEventGroup = this._devToolsApi.startTimelineEventGroup({
       data: {},
@@ -465,7 +474,7 @@ export default class AssetLink {
       // Precache the current page's asset
       const matches = window.location.href.match(/https?:\/\/.*\/asset\/(\d+)/);
       if (matches && matches.length >= 2) {
-        await this.resolveAsset(matches[1]);
+        await this.resolveEntity('asset', matches[1]);
       }
 
       const timestamp = currentEpochSecond();
@@ -485,7 +494,7 @@ export default class AssetLink {
       await this._memory.query((q) => assetTypes.map(assetType => {
         const entityType = `asset--${assetType}`;
 
-        const model = this._models[entityType];
+        const model = this.getEntityModelSync(entityType);
 
         const include = Object.keys(model.relationships);
 
@@ -547,69 +556,110 @@ export default class AssetLink {
   }
 
   /**
-   * Get an asset by UUID or Drupal internal id.
+   * Get a list of the taxonomy_vocabulary entities.
    */
-  async resolveAsset(assetRef, additionalFilters) {
+  async getTaxonomyVocabularies() {
     await this._booted;
 
-    const assetTypes = (await this.getAssetTypes()).map(t => t.attributes.drupal_internal__id);
+    const listTaxonomyVocabularies = async (source) => {
+      return await source.query((q) => q
+          .findRecords(`taxonomy_vocabulary--taxonomy_vocabulary`)
+          .sort('drupal_internal__vid'));
+    };
 
-    const isRefNumeric = /^-?\d+$/.test(assetRef);
+    const taxonomyVocabularies = await listTaxonomyVocabularies(this.entitySource.cache);
 
-    let idFilter = { attribute: 'id', value: assetRef };
-    if (isRefNumeric) {
-      idFilter = { attribute: 'drupal_internal__id', value: parseInt(assetRef) };
+    if (taxonomyVocabularies.length) {
+      return taxonomyVocabularies;
     }
 
-    const findAsset = async entitySource => {
-      const results = await entitySource.query(q => assetTypes.map(assetType => {
-        const entityType = `asset--${assetType}`;
+    return await listTaxonomyVocabularies(this.entitySource);
+  }
+
+  /**
+   * Get an entity by UUID or Drupal internal (t|v)?id.
+   */
+  async resolveEntity(entityType, entityRef, additionalFilters, limitedEntityBundles) {
+    await this._booted;
+
+    let entityBundles = limitedEntityBundles;
+
+    if (!entityBundles && entityType === 'asset') {
+      entityBundles = (await this.getAssetTypes()).map(t => t.attributes.drupal_internal__id);
+    }
+
+    if (!entityBundles && entityType === 'log') {
+      entityBundles = (await this.getLogTypes()).map(t => t.attributes.drupal_internal__id);
+    }
+
+    if (!entityBundles && entityType === 'taxonomy_term') {
+      entityBundles = (await this.getTaxonomyVocabularies()).map(t => t.attributes.drupal_internal__vid);
+    }
+
+    if (!entityBundles || !entityBundles.length) {
+      return;
+    }
+
+    const isRefNumeric = /^-?\d+$/.test(entityRef);
+
+    const findEntity = async entitySource => {
+      const results = await entitySource.query(q => entityBundles.flatMap(entityBundle => {
+        const typeName = `${entityType}--${entityBundle}`;
+
+        const model = this.getEntityModelSync(typeName);
+
+        const numericIdKey = Object.keys(model.attributes).find(k => /^drupal_internal__.?id$/.test(k));
+
+        if (!numericIdKey && isRefNumeric) {
+          return [];
+        }
+
+        let idFilter = { attribute: 'id', value: entityRef };
+        if (isRefNumeric) {
+          idFilter = { attribute: numericIdKey, value: parseInt(entityRef) };
+        }
 
         let baseQuery = q
-          .findRecords(entityType)
+          .findRecords(typeName)
           .filter(idFilter);
-
-        const model = this._models[entityType];
 
         const include = Object.keys(model.relationships);
 
         return (additionalFilters || [])
           .reduce((query, f) => query.filter(f), baseQuery)
-          .sort('drupal_internal__id')
+          .sort(numericIdKey || 'id')
           .options({ include });
       }));
 
-      const assets = results.flatMap(l => l);
-      return assets.find(a => a);
+      const entities = results.flatMap(l => l);
+
+      return entities.find(e => e);
     };
 
-    const asset = await findAsset(this._memory.cache);
+    const entity = await findEntity(this.entitySource.cache);
 
-    if (asset) {
-      return asset;
+    if (entity) {
+      return entity;
     }
 
-    return await findAsset(this._memory);
+    return await findEntity(this.entitySource);
   }
 
   /**
-   * Central asset searching entry-point. Responsible for delegating to asset searching plugins.
+   * Central asset searching entry-point. Responsible for delegating to entity searching plugins.
    */
-  searchAssets(searchRequest, searchPhase) {
-    const assetSearchPlugins = this.plugins.filter(p => typeof p.searchAssets === 'function');
+  searchEntities(searchRequest, searchPhase) {
+    const entitySearchPlugins = this.plugins.filter(p => typeof p.searchEntities === 'function');
 
-    const searchResultCursors = [];
+    const searchResultCursors = entitySearchPlugins.flatMap(plugin => {
+        const searchResultCursor = plugin.searchEntities(this, searchRequest, searchPhase);
 
-    for (let i = 0; i < assetSearchPlugins.length; i += 1) {
-      const plugin = assetSearchPlugins[i];
+        if (searchResultCursor !== undefined) {
+          return [searchResultCursor];
+        }
 
-      /* eslint-disable no-await-in-loop */
-      const searchResultCursor = plugin.searchAssets(this, searchRequest, searchPhase);
-
-      if (searchResultCursor !== undefined) {
-        searchResultCursors.push(searchResultCursor);
-      }
-    }
+        return [];
+    });
 
     async function* coiterateSearchCursors() {
       const peekableSearchResultCursors = searchResultCursors.map(c => new PeekableAsyncIterator(c));

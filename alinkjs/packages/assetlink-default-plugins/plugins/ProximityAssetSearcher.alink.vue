@@ -100,8 +100,8 @@ import haversine from 'haversine-distance';
  * Searches for assets by their proximity to a given location.
  */
 export default {
-  searchAssets(assetLink, searchRequest, searchPhase) {
-    if (searchRequest.type !== 'proximity-search') {
+  searchEntities(assetLink, searchRequest, searchPhase) {
+    if (searchRequest.entityType !== 'asset' || searchRequest.type !== 'proximity-search') {
       return undefined;
     }
 
@@ -144,7 +144,7 @@ export default {
   /* eslint-disable class-methods-use-this */
   async _searchAssetsWithGeohashPrefix(assetLink, searchRequest, searchPhase, ghashPrefix, excludedGhashPrefix) {
 
-    const assetTypes = (await assetLink.getAssetTypes()).map(t => t.attributes.drupal_internal__id);
+    const assetTypes = searchRequest.entityBundles || (await assetLink.getAssetTypes()).map(t => t.attributes.drupal_internal__id);
 
     const entitySource = searchPhase === 'local' ? assetLink.entitySource.cache : assetLink.entitySource;
 
@@ -182,7 +182,7 @@ export default {
       filteredAssetResults.push({
         weight,
         weightText: `~${weight.toFixed(2)}m away`,
-        asset,
+        entity: asset,
       });
     }
 

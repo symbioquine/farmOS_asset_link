@@ -7,14 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added entity selection component
+
+### Changed
+
+- Generalized asset searching/resolution functionality to work for all entity types
+
 ### Fixed
 
 - Fix dev server proxy for default plugins repo to pass through module-scoped plugin urls
 - Fix loading of asset relationship type enums to always be `undefined` or a non-empty list
 
 ## [0.6.3] - 2022-09-04
-
-### Added
 
 - Create a new component to render decoratable entity name text
 

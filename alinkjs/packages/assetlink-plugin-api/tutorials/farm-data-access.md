@@ -30,10 +30,10 @@ if (assetLink.connectionStatus.isOnline) {
 }
 ```
 
-Asset Link also provides some convenience methods that handle common cases like loading an asset by ID. For example, see [IAssetLink#resolveAsset](IAssetLink.html#resolveAsset).
+Asset Link also provides some convenience methods that handle common cases like loading an entity by type and ID. For example, see [IAssetLink#resolveEntity](IAssetLink.html#resolveEntity).
 
 ```js
-const asset = await assetLink.resolveAsset(42);
+const asset = await assetLink.resolveEntity('asset', 42);
 
 console.log(asset.attributes.name);
 ```
@@ -53,7 +53,7 @@ await assetLink.entitySource.update((t) => {
   });
 }, {label: `Rename asset: "${asset.attributes.name}" to "Fred"`});
 
-const updatedAsset = await assetLink.resolveAsset(asset.id);
+const updatedAsset = await assetLink.resolveEntity('asset', asset.id);
 
 // updatedAsset.attributes.name === 'Fred'
 ```
