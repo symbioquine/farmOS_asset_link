@@ -1,6 +1,6 @@
 {
   "name": "assetlink-pwa",
-  "version": "0.6.3",
+  "version": "0.7.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
-    "assetlink": "^0.6.3",
-    "assetlink-plugin-api": "^0.6.3",
+    "assetlink": "^0.7.1",
+    "assetlink-plugin-api": "^0.7.1",
     "core-js": "^3.8.3",
     "js-cookie": "^3.0.1",
     "path-browserify": "^1.0.1",
