@@ -44,10 +44,9 @@ try {
       <q-icon name="mdi-folder-image" size="6em" />
       <q-file accept=".jpg, image/*" filled v-model="model" label="Filled" />
     </div>
-    <div class="col-4 add-photo-action-cell">
+    <div class="col-4 add-photo-action-cell" v-if="captureSupported">
       <q-icon name="mdi-camera" size="6em" />
       <q-file
-        v-if="captureSupported"
         capture="environment"
         accept=".jpg, image/*"
         filled

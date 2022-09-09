@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix loading of asset relationship type enums to always be `undefined` or a non-empty list
 - Fix warnings from OpenInFarmOSMetaActionProvider
 - Fix searching by entity UUID
+- Fix PhotoInput to only show capture button when it is supported
 
 ## [0.6.3] - 2022-09-04
 
