@@ -131,8 +131,11 @@ export default class AssetLinkPluginLoaderCore {
               throw new Error(`Secondary imports are not supported. url=${url}`);
             }
           },
-          addStyle() {
-            /* TODO: https://github.com/FranckFreiburger/vue3-sfc-loader/blob/80f10f9fd82d7dde6c8681d23d36e9ac3ab9a654/docs/examples.md?plain=1#L403-L453 */
+          addStyle(textContent) {
+            const style = Object.assign(document.createElement('style'), { textContent });
+            style.setAttribute("data-alink-style-plugin-id", pluginOccurrenceId);
+            const ref = document.head.getElementsByTagName('style')[0] || null;
+            document.head.insertBefore(style, ref);
           },
         };
 
@@ -152,6 +155,7 @@ export default class AssetLinkPluginLoaderCore {
         pluginInstance = {};
       }
 
+      pluginInstance.occurrenceId = pluginOccurrenceId;
       pluginInstance.pluginUrl = pluginUrl;
       pluginInstance.rawSource = rawPluginSource;
 
@@ -159,6 +163,7 @@ export default class AssetLinkPluginLoaderCore {
     } catch (error) {
       console.log(error);
       pluginInstance = {};
+      pluginInstance.occurrenceId = pluginOccurrenceId;
       pluginInstance.pluginUrl = pluginUrl;
       pluginInstance.rawSource = rawPluginSource;
       pluginInstance.error = error;
@@ -212,6 +217,9 @@ export default class AssetLinkPluginLoaderCore {
     if (plugin && typeof plugin.onUnload === 'function') {
       plugin.onUnload(this._assetLink);
     }
+
+    const pluginStyles = document.head.querySelectorAll(`style[data-alink-style-plugin-id="${plugin.occurrenceId}"]`) || [];
+    pluginStyles.forEach(e => e.parentNode.removeChild(e));
 
     if (pluginIdx !== -1) {
       this.vm.plugins.splice(pluginIdx, 1);

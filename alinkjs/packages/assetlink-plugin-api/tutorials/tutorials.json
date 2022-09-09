@@ -13,6 +13,9 @@
       },
       "plugin-as-farm-os-module": {
         "title": "Packaging a plugin as a farmOS contrib module"
+      },
+      "custom-styles-in-plugins": {
+        "title": "Custom styles in plugins"
       }
     }
   }
