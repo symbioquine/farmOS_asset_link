@@ -12,8 +12,8 @@ export default class OpenInFarmOSMetaActionProvider {
       const getTargetUrl = (asset) => createDrupalUrl(`/asset/${asset.attributes.drupal_internal__id}`).toString();
 
       slot.component(({ asset }) =>
-        h(QItem, { href: getTargetUrl(asset) }, [
-            h(QItemSection, {}, "Open in farmOS"),
+        h(QItem, { href: getTargetUrl(asset) }, () => [
+            h(QItemSection, {}, () => "Open in farmOS"),
         ])
       );
     });

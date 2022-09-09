@@ -31,7 +31,7 @@
                   <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin'">
                     <q-item-section @click="removePluginByUrl(prop.node.pluginUrl)">remove</q-item-section>
                   </q-item>
-                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin'">
+                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin' && pluginsByUrl[prop.node.pluginUrl.toString()]?.rawSource">
                     <q-item-section @click="editPluginByUrl(prop.node.pluginUrl)">edit</q-item-section>
                   </q-item>
                   <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin' && !prop.node.isBlacklisted">

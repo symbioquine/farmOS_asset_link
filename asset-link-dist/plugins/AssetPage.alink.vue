@@ -30,22 +30,23 @@ watch([assetName, resolvedAsset], () => {
 
 <template alink-route[net.symbioquine.farmos_asset_link.routes.v0.asset_page]="/asset/:assetRef">
   <q-page padding class="text-left">
-    <asset-resolver
-      :asset-ref="$route.params.assetRef"
-      #default="{ asset }"
-      @asset-resolved="resolvedAsset = $event"
+    <entity-resolver
+      entity-type="asset"
+      :entity-ref="$route.params.assetRef"
+      #default="{ entity }"
+      @entity-resolved="resolvedAsset = $event"
       :key="$route.params.assetRef">
         <h4 class="q-my-xs"><render-widget
               name="asset-page-title"
-              :context="{ asset }"
-              ><span class="asset-page-title-text-prefix">Asset: </span><entity-name ref="assetName" :entity="asset"></entity-name></render-widget>
+              :context="{ asset: entity }"
+              ><span class="asset-page-title-text-prefix">Asset: </span><entity-name ref="assetName" :entity="entity"></entity-name></render-widget>
         </h4>
 
         <component
-            v-for="slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, pageName: 'asset-page', asset })"
+            v-for="slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, pageName: 'asset-page', asset: entity })"
             :key="slotDef.id"
             :is="slotDef.component"
             v-bind="slotDef.props"></component>
-    </asset-resolver>
+    </entity-resolver>
   </q-page>
 </template>

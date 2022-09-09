@@ -1,8 +1,0 @@
-langcode: en
-status: true
-id: NameBasedAssetSearcher
-dependencies:
-  enforced:
-    module:
-      - farmos_asset_link
-url: '{base_path}alink/plugins/NameBasedAssetSearcher.alink.js'

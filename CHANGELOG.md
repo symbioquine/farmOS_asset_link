@@ -7,9 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.3] - 2022-09-04
+## [0.7.1] - 2022-09-09
 
 ### Added
+
+- Added entity selection component
+- Support custom styles in Vue plugins
+- Expose currently logged in user id via the connection status detector
+- Add support for creating/uploading 'file--file' entities as part of creating/updating entities
+
+### Changed
+
+- Generalized asset searching/resolution functionality to work for all entity types
+
+### Fixed
+
+- Fix dev server proxy for default plugins repo to pass through module-scoped plugin urls
+- Fix loading of asset relationship type enums to always be `undefined` or a non-empty list
+- Fix warnings from OpenInFarmOSMetaActionProvider
+- Fix searching by entity UUID
+- Fix PhotoInput to only show capture button when it is supported
+- Fix JSON:API permission issue so non-admin users can upload files
+- Fix race condition where Orbit.js queries/updates can fail while online/offline status is changing
+- Hide the edit action for plugins without loaded source code e.g. disabled plugins
+
+## [0.6.3] - 2022-09-04
 
 - Create a new component to render decoratable entity name text
 
@@ -241,7 +263,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.3...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.1...HEAD
+[0.7.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.3...unbuilt-v0.7.1
 [0.6.3]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.2...unbuilt-v0.6.3
 [0.6.2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.1...unbuilt-v0.6.2
 [0.6.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.0...unbuilt-v0.6.1
