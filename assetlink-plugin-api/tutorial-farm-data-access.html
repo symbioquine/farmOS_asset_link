@@ -118,7 +118,7 @@
             
             <nav>
                 
-                    <div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-extension-model.html">Extension Model</a></li><li><a href="tutorial-farm-data-access.html">Farm Data Access</a></li><li><a href="tutorial-writing-plugins.html">Writing Plugins</a><ul><li><a href="tutorial-simple-asset-action-plugin.html">Simple Asset Action</a></li><li><a href="tutorial-plugin-as-farm-os-module.html">Packaging a plugin as a farmOS contrib module</a></li></ul></li></ul></div>
+                    <div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-extension-model.html">Extension Model</a></li><li><a href="tutorial-farm-data-access.html">Farm Data Access</a></li><li><a href="tutorial-writing-plugins.html">Writing Plugins</a><ul><li><a href="tutorial-simple-asset-action-plugin.html">Simple Asset Action</a></li><li><a href="tutorial-plugin-as-farm-os-module.html">Packaging a plugin as a farmOS contrib module</a></li><li><a href="tutorial-custom-styles-in-plugins.html">Custom styles in plugins</a></li></ul></li></ul></div>
                 
             </nav>
         </div>
@@ -156,8 +156,8 @@ if (assetLink.connectionStatus.isOnline) {
   // Update the UI with more up-to-date data if/when it becomes available
 }
 </code></pre>
-<p>Asset Link also provides some convenience methods that handle common cases like loading an asset by ID. For example, see <a href="IAssetLink.html#resolveAsset">IAssetLink#resolveAsset</a>.</p>
-<pre class="prettyprint source lang-js"><code>const asset = await assetLink.resolveAsset(42);
+<p>Asset Link also provides some convenience methods that handle common cases like loading an entity by type and ID. For example, see <a href="IAssetLink.html#resolveEntity">IAssetLink#resolveEntity</a>.</p>
+<pre class="prettyprint source lang-js"><code>const asset = await assetLink.resolveEntity('asset', 42);
 
 console.log(asset.attributes.name);
 </code></pre>
@@ -174,7 +174,7 @@ include the unsynchronized changes.</p>
   });
 }, {label: `Rename asset: &quot;${asset.attributes.name}&quot; to &quot;Fred&quot;`});
 
-const updatedAsset = await assetLink.resolveAsset(asset.id);
+const updatedAsset = await assetLink.resolveEntity('asset', asset.id);
 
 // updatedAsset.attributes.name === 'Fred'
 </code></pre>
@@ -194,6 +194,31 @@ await assetLink.entitySource.update((t) =>
       },
   })
 , {label: `Add photo to asset: &quot;${asset.attributes.name}&quot;`});
+</code></pre>
+<p>Similarly, files can be uploaded as part of asset/log (entity) creation/updates:</p>
+<pre class="prettyprint source lang-js"><code>await assetLink.entitySource.update((t) => {
+  return t.updateRecord({
+    type: asset.type,
+    id: asset.id,
+    attributes: {
+      name: &quot;Fred&quot;,
+    },
+    relationships: {
+      image: {
+        data: [
+          {
+            type: &quot;file--file&quot;,
+            id: uuidv4(),
+            '$upload': {
+              fileName,
+              fileDataUrl,
+            },
+          }
+        ]
+      }
+    }
+  });
+}, {label: `Rename asset: &quot;${asset.attributes.name}&quot; to &quot;Fred&quot; and replace images with a single new one`});
 </code></pre>
 </article>
 

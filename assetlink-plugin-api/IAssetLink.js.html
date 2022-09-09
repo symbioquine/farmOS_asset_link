@@ -120,7 +120,7 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-@orbit_jsonapi.html">@orbit/jsonapi</a></li><li><a href="external-@orbit_memory.html">@orbit/memory</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-URL.html">URL</a></li></ul><h3>Classes</h3><ul><li><a href="external-@orbit_jsonapi.JSONAPISource.html">JSONAPISource</a></li><li><a href="external-@orbit_memory.MemorySource.html">MemorySource</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li><li><a href="IAssetLinkUI.html">IAssetLinkUI</a></li><li><a href="IAssetLinkUIDialogs.html">IAssetLinkUIDialogs</a></li><li><a href="IFarmOSConnectionStatus.html">IFarmOSConnectionStatus</a></li></ul><h3>Global</h3><ul><li><a href="global.html#components">components</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#EventBus">EventBus</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-AssetResolver.html">AssetResolver</a></li><li><a href="module-AssetSelector.html">AssetSelector</a></li><li><a href="module-EntityName.html">EntityName</a></li><li><a href="module-PhotoInput.html">PhotoInput</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-@orbit_jsonapi.html">@orbit/jsonapi</a></li><li><a href="external-@orbit_memory.html">@orbit/memory</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-URL.html">URL</a></li></ul><h3>Classes</h3><ul><li><a href="external-@orbit_jsonapi.JSONAPISource.html">JSONAPISource</a></li><li><a href="external-@orbit_memory.MemorySource.html">MemorySource</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li><li><a href="IAssetLinkUI.html">IAssetLinkUI</a></li><li><a href="IAssetLinkUIDialogs.html">IAssetLinkUIDialogs</a></li><li><a href="IFarmOSConnectionStatus.html">IFarmOSConnectionStatus</a></li></ul><h3>Global</h3><ul><li><a href="global.html#components">components</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#EventBus">EventBus</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-EntityName.html">EntityName</a></li><li><a href="module-EntityResolver.html">EntityResolver</a></li><li><a href="module-EntitySearch.html">EntitySearch</a></li><li><a href="module-EntitySelect.html">EntitySelect</a></li><li><a href="module-PhotoInput.html">PhotoInput</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
                 
             </nav>
         </div>
@@ -168,23 +168,27 @@ export default class IAssetLink {}
 IAssetLink.prototype.getEntityModel = async function (typeName) {};
 
 /**
- * Get an asset by UUID or Drupal internal id.
+ * Get an entity by type and UUID or Drupal internal id.
  *
  * ##### Usage
  *
  * ```js
- * const asset = await assetLink.resolveAsset(42);
+ * const log = await assetLink.resolveEntity('log', 42);
  *
- * console.log(asset.attributes.name);
+ * console.log(log.attributes.name);
  * ```
  *
- * @method IAssetLink#resolveAsset
- * @param {String|Number} assetRef the ID/UUID of the asset
+ * @method IAssetLink#resolveEntity
+ * @param {String} entityType the type of the entity
+ * @param {String|Number} entityRef the ID/UUID of the entity
  * @param {Object[]} additionalFilters additional resolution criteria in Orbit.js filter format
  *   e.g. `[{ attribute: 'is_location', op: 'equal', value: true }]`
+ * @param {String[]} limitedEntityBundles Limit the entity bundles that will be resolved from
+ *   e.g. `['activity', 'observation']`
  */
-IAssetLink.prototype.resolveAsset = async function (
-  assetRef,
+IAssetLink.prototype.resolveEntity = async function (
+  entityType,
+  entityRef,
   additionalFilters
 ) {};
 
@@ -203,19 +207,27 @@ IAssetLink.prototype.getAssetTypes = async function () {};
 IAssetLink.prototype.getLogTypes = async function () {};
 
 /**
- * Central asset searching entry-point. Responsible for delegating to asset searching plugins.
+ * Get a list of the taxonomy_vocabulary entities.
  *
- * *Note: It would be unusual to call this directly. Most use-cases should use the [RenderWidget](module-AssetSelector.html) component which
- * internally handles `searchAssets` and presents the results.*
+ * @method IAssetLink#getTaxonomyVocabularies
+ */
+IAssetLink.prototype.getTaxonomyVocabularies = async function () {};
+
+/**
+ * Central entity searching entry-point. Responsible for delegating to entity searching plugins.
  *
- * @method IAssetLink#searchAssets
+ * *Note: It would be unusual to call this directly. Most use-cases should use the [EntitySearch](module-EntitySearch.html)
+ * or [EntitySearch](module-EntitySelect.html) components which internally handles calling `searchEntities` and presenting
+ * the results.*
+ *
+ * @method IAssetLink#searchEntities
  * @param {Object} searchRequest An object with varying structure produced by
- *   a search method plugin - passed through to {@link IAssetLinkPlugin.searchAssets}
+ *   a search method plugin - passed through to {@link IAssetLinkPlugin.searchEntities}
  *   implementations.
  * @param {String} searchPhase One of "local" or "remote" to request
- *   offline or online asset search results respectively.
+ *   offline or online entity search results respectively.
  */
-IAssetLink.prototype.searchAssets = function (searchRequest, searchPhase) {};
+IAssetLink.prototype.searchEntities = function (searchRequest, searchPhase) {};
 
 /**
  * @typedef RenderableDef

@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,7 +5,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asset Link Plugin API docs IAssetLinkPluginRouteHandle.js</title>
+  <title>Asset Link Plugin API docs Custom styles in plugins</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -110,7 +108,7 @@
 </div>
     <div id="main">
         <div
-            class="sidebar "
+            class="sidebar tutorials"
             id="sidebarNav"
         >
             
@@ -120,69 +118,57 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-@orbit_jsonapi.html">@orbit/jsonapi</a></li><li><a href="external-@orbit_memory.html">@orbit/memory</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-URL.html">URL</a></li></ul><h3>Classes</h3><ul><li><a href="external-@orbit_jsonapi.JSONAPISource.html">JSONAPISource</a></li><li><a href="external-@orbit_memory.MemorySource.html">MemorySource</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li><li><a href="IAssetLinkUI.html">IAssetLinkUI</a></li><li><a href="IAssetLinkUIDialogs.html">IAssetLinkUIDialogs</a></li><li><a href="IFarmOSConnectionStatus.html">IFarmOSConnectionStatus</a></li></ul><h3>Global</h3><ul><li><a href="global.html#components">components</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#EventBus">EventBus</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-EntityName.html">EntityName</a></li><li><a href="module-EntityResolver.html">EntityResolver</a></li><li><a href="module-EntitySearch.html">EntitySearch</a></li><li><a href="module-EntitySelect.html">EntitySelect</a></li><li><a href="module-PhotoInput.html">PhotoInput</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
+                    <div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-extension-model.html">Extension Model</a></li><li><a href="tutorial-farm-data-access.html">Farm Data Access</a></li><li><a href="tutorial-writing-plugins.html">Writing Plugins</a><ul><li><a href="tutorial-simple-asset-action-plugin.html">Simple Asset Action</a></li><li><a href="tutorial-plugin-as-farm-os-module.html">Packaging a plugin as a farmOS contrib module</a></li><li><a href="tutorial-custom-styles-in-plugins.html">Custom styles in plugins</a></li></ul></li></ul></div>
                 
             </nav>
         </div>
         <div class="core" id="main-content-wrapper">
             <div class="content">
                 <header class="page-title">
-                    <p>Source</p>
-                    <h1>IAssetLinkPluginRouteHandle.js</h1>
+                    <p>Tutorial</p>
+                    <h1>Custom styles in plugins</h1>
                 </header>
-                
+                <section>
 
+<article>
+    <p>Vue plugins can also provide custom styles for themselves or the rest of Asset Link.</p>
+<p>For example we can write a plugin that turns the toolbar blue;</p>
+<p><strong>MakeHeaderBlue.alink.vue</strong></p>
+<pre class="prettyprint source lang-vue"><code>&lt;style>
+  #app .q-header .q-toolbar {
+    background: #00F !important;
+  }
+&lt;/style>
 
-
-    
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/* eslint-disable no-unused-vars */
-
-/**
- * An object which is passed into the method a plugin provides for declaring a
- * route via {@link IAssetLinkPluginHandle#defineRoute}.
- *
- * @interface
- */
-export default class IAssetLinkPluginRouteHandle {}
-
-/**
- * Specify the path for this plugin-provided route.
- *
- * ### Usage
- *
- * ```js
- * pageRoute.path("/my-page/:arg");
- * ```
- *
- * @method IAssetLinkPluginRouteHandle#path
- * @param {String} path The path of this plugin-provided route. See
- *   https://router.vuejs.org/guide/essentials/dynamic-matching.html for route path format.
- */
-IAssetLinkPluginRouteHandle.prototype.path = function (path) {};
-
-/**
- * Specify the component for this plugin-provided route.
- *
- * ### Usage
- *
- * ```js
- * pageRoute.component(SomeVueComponent);
- * ```
- *
- * @method IAssetLinkPluginRouteHandle#component
- * @param {VueComponent} component The component for this plugin-provided route.
- *   this can be anything that is valid as the first argument to Vue's [`h()` function](https://vuejs.org/api/render-function.html#h).
- *   See Vue's documentation on [render functions](https://vuejs.org/guide/extras/render-function.html).
- */
-IAssetLinkPluginRouteHandle.prototype.component = function (component) {};
 </code></pre>
-        </article>
-    </section>
+<p>We can also use Vue's scoped style support to ensure styles only apply to our plugin's component;</p>
+<p><strong>RotatingPony.alink.vue</strong></p>
+<pre class="prettyprint source lang-vue"><code>&lt;template alink-slot[com.example.farmos_asset_link.tb_item.v0.rotating_pony]=&quot;toolbar-item(weight: 15)&quot;>
+  &lt;q-btn flat padding=&quot;xs&quot; icon=&quot;mdi-horse&quot;>&lt;/q-btn>
+&lt;/template>
 
+&lt;style scoped>
+.q-btn {
+  animation-name: spin;
+  animation-duration: 5000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear; 
+}
 
+@keyframes spin {
+  from {
+    transform:rotate(0deg);
+  }
+  to {
+    transform:rotate(360deg);
+  }
+}
+&lt;/style>
 
+</code></pre>
+</article>
+
+</section>
 
             </div>
             
