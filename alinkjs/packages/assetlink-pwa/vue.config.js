@@ -113,8 +113,8 @@ module.exports = defineConfig({
 
   pages: {
     index: {
-      entry: 'src/main.js',
-      title: 'Asset Link',
+      entry: "src/main.js",
+      title: "Asset Link",
     },
   },
 
