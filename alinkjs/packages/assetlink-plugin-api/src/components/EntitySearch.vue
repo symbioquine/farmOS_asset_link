@@ -164,6 +164,15 @@ const onAccept = () => {
   emit("submit", selectedEntities.value);
 };
 
+const onNodeDoubleClicked = (node) => {
+  if (props.multiple) {
+    return;
+  }
+
+  selectedKey.value = node.id;
+  onAccept();
+};
+
 const onCancel = () => {
   emit("submit", undefined);
 };
@@ -205,11 +214,11 @@ const onCancel = () => {
         class="q-mx-lg q-mb-md"
       >
         <template v-slot:default-header="prop">
-          <entity-name :entity="prop.node.entity"></entity-name>
+          <entity-name :entity="prop.node.entity" @dblclick="() => onNodeDoubleClicked(prop.node)"></entity-name>
         </template>
 
         <template v-slot:default-body="prop">
-          <div v-if="prop.node.weightText" class="q-ml-xl">
+          <div v-if="prop.node.weightText" class="q-ml-xl" @dblclick="() => onNodeDoubleClicked(prop.node)">
             {{ prop.node.weightText }}
           </div>
         </template>
