@@ -1,4 +1,4 @@
-import { reactive, watch } from 'vue';
+import { reactive, watchEffect } from 'vue';
 
 import { Coordinator, RequestStrategy, SyncStrategy } from '@orbit/coordinator';
 import { Orbit } from '@orbit/core';
@@ -6,6 +6,9 @@ import { IndexedDBBucket } from '@orbit/indexeddb-bucket';
 import { IndexedDBSource } from '@orbit/indexeddb';
 import { RecordSchema } from '@orbit/records';
 import { MemorySource } from '@orbit/memory';
+
+import Barrier from '@/Barrier';
+import BarrierAwareOrbitSourceDecorator from '@/BarrierAwareOrbitSourceDecorator';
 
 import DrupalJSONAPISource from '@/DrupalJSONAPISource';
 import DrupalSyncQueryOperators from '@/DrupalSyncQueryOperators';
@@ -75,6 +78,9 @@ export default class AssetLink {
     this._memory = undefined;
     this._remote = undefined;
 
+    this._entitySource = undefined;
+    this._remoteEntitySource = undefined;
+
     this._ui = new AssetLinkUI();
   }
 
@@ -127,7 +133,7 @@ export default class AssetLink {
    * Will be {undefined} until Asset Link has booted.
    */
   get entitySource() {
-    return this._memory;
+    return this._entitySource;
   }
 
   /**
@@ -138,7 +144,7 @@ export default class AssetLink {
    * Will be {undefined} until Asset Link has booted.
    */
   get remoteEntitySource() {
-    return this._remote;
+    return this._remoteEntitySource;
   }
 
   /**
@@ -213,6 +219,8 @@ export default class AssetLink {
     this.vm.bootText = "Loading models...";
     this._models = await this._loadModels();
 
+    const orbitCoordinatorActivationBarrier = new Barrier(true);
+
     Orbit.fetch = this._csrfAwareFetch.bind(this);
 
     this._schema = new RecordSchema({ models: this._models });
@@ -226,6 +234,8 @@ export default class AssetLink {
       },
     });
 
+    this._entitySource = new BarrierAwareOrbitSourceDecorator(this._memory, orbitCoordinatorActivationBarrier);
+
     this._remote = new DrupalJSONAPISource({
       schema: this._schema,
       name: 'remote',
@@ -238,6 +248,8 @@ export default class AssetLink {
         autoProcess: this.connectionStatus.isOnline.value || false,
       },
     });
+
+    this._remoteEntitySource = new BarrierAwareOrbitSourceDecorator(this._remote, orbitCoordinatorActivationBarrier);
 
     const updateViewModelPendingUpdates = () => {
       this.vm.pendingUpdates = this._remote.requestQueue.entries.filter(r => r.type === 'update');
@@ -317,6 +329,8 @@ export default class AssetLink {
     await this._memory.sync((t) => allRecordsFromBackup.map((r) => t.addRecord(r)));
 
     await this._coordinator.activate();
+
+    orbitCoordinatorActivationBarrier.lower();
 
     this.vm.bootProgress = 100;
 
@@ -454,11 +468,15 @@ export default class AssetLink {
 
     });
 
-    watch(this.connectionStatus.isOnline, async (isOnline) => {
+    watchEffect(async () => {
+      const isOnline = this.connectionStatus.isOnline.value;
+
       this._remote.requestQueue.autoProcess = isOnline;
       if (isOnline && !this._remote.requestQueue.empty) {
         this._remote.requestQueue.process();
       }
+
+      orbitCoordinatorActivationBarrier.raise();
 
       await this._coordinator.deactivate();
       if (isOnline) {
@@ -471,6 +489,8 @@ export default class AssetLink {
         }
       }
       await this._coordinator.activate();
+
+      orbitCoordinatorActivationBarrier.lower();
     });
 
     this.eventBus.$emit('booted');
@@ -542,7 +562,7 @@ export default class AssetLink {
       // Precache recently changed assets
       const assetTypes = (await this.getAssetTypes()).map(t => t.attributes.drupal_internal__id);
 
-      await this._memory.query((q) => assetTypes.map(assetType => {
+      await this.entitySource.query((q) => assetTypes.map(assetType => {
         const entityType = `asset--${assetType}`;
 
         const model = this.getEntityModelSync(entityType);
@@ -576,13 +596,13 @@ export default class AssetLink {
           .sort('drupal_internal__id'));
     };
 
-    const assetTypes = await listAssetTypes(this._memory.cache);
+    const assetTypes = await listAssetTypes(this.entitySource.cache);
 
     if (assetTypes.length) {
       return assetTypes;
     }
 
-    return await listAssetTypes(this._memory);
+    return await listAssetTypes(this.entitySource);
   }
 
   /**
@@ -597,13 +617,13 @@ export default class AssetLink {
           .sort('drupal_internal__id'));
     };
 
-    const logTypes = await listLogTypes(this._memory.cache);
+    const logTypes = await listLogTypes(this.entitySource.cache);
 
     if (logTypes.length) {
       return logTypes;
     }
 
-    return await listLogTypes(this._memory);
+    return await listLogTypes(this.entitySource);
   }
 
   /**

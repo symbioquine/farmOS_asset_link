@@ -3,6 +3,8 @@ import fetch from 'cross-fetch';
 import throttle from '@jcoreio/async-throttle'
 import { createDrupalUrl } from "assetlink-plugin-api";
 
+import Barrier from '@/Barrier';
+
 const DEFAULT_FETCHER_DELEGATE = { fetch };
 
 /**
@@ -20,7 +22,7 @@ export default class FarmOSConnectionStatusDetector {
     this.fetcherDelegate = options.fetcherDelegate || DEFAULT_FETCHER_DELEGATE;
 
     this.$_running = false;
-    this.$_barrier = new Barrier();
+    this.$_barrier = new Barrier(true);
 
     this.hasNetworkConnection = ref(window.navigator.onLine);
     this.canReachFarmOS = ref(null);
@@ -123,32 +125,9 @@ export default class FarmOSConnectionStatusDetector {
       this.canReachFarmOS.value = false;
     }
   }
-  
 
-}
-
-function sleep(millis) {
-  return new Promise(resolve => setTimeout(resolve, millis));
 }
 
 function currentEpochSecond() {
   return parseInt(new Date().getTime() / 1000);
-}
-
-class Barrier {
-  constructor() {
-    this.waiting = [];
-  }
-
-  arrive(timeoutMillis) {
-    return Promise.race([
-      sleep(timeoutMillis),
-      new Promise(resolve => this.waiting.push(resolve)),
-    ]);
-  }
-
-  release() {
-    const toBeReleased = this.waiting.splice(0);
-    toBeReleased.forEach(p => p());
-  }
 }
