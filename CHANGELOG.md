@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix warnings from OpenInFarmOSMetaActionProvider
 - Fix searching by entity UUID
 - Fix PhotoInput to only show capture button when it is supported
+- Fix JSON:API permission issue so non-admin users can upload files
 
 ## [0.6.3] - 2022-09-04
 
