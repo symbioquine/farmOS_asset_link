@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added entity selection component
 - Support custom styles in Vue plugins
+- Expose currently logged in user id via the connection status detector
 
 ### Changed
 

@@ -8,5 +8,6 @@
  * @property {Boolean} canReachFarmOS Can the app reach farmOS?
  * @property {Boolean} isLoggedIn Is the app currently logged in as a farmOS user?
  * @property {Boolean} isOnline Is the app both logged in and able to reach farmOS?
+ * @property {String} userId The UUID of the currently logged in farmOS user
  */
 export default class IFarmOSConnectionStatus {}

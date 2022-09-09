@@ -24,7 +24,11 @@ export default class FarmOSConnectionStatusDetector {
 
     this.hasNetworkConnection = ref(window.navigator.onLine);
     this.canReachFarmOS = ref(null);
-    this.isLoggedIn = ref(null);
+    this.userRef = ref(null);
+    this.isLoggedIn = computed(() => this.userRef.value !== undefined);
+    this.userId = computed(() => {
+      return this.userRef.value && this.userRef.value.split('/').pop();
+    });
     this.isOnline = computed(() => {
       return this.canReachFarmOS.value && this.isLoggedIn.value;
     });
@@ -114,9 +118,7 @@ export default class FarmOSConnectionStatusDetector {
 
       this.canReachFarmOS.value = true;
 
-      const userRef = apiData.meta?.links?.me?.href;
-
-      this.isLoggedIn.value = userRef !== undefined
+      this.userRef.value = apiData.meta?.links?.me?.href;
     } catch (error) {
       this.canReachFarmOS.value = false;
     }
