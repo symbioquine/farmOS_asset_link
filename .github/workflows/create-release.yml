@@ -38,6 +38,7 @@ jobs:
 
       - name: Copy Module to Release Working Dir
         run: |
+          rm -rf ./release/asset-link-dist
           rm -f ./release/config/install/farmos_asset_link.asset_link_default_plugin.*.yml
           cp ./main/{README.md,CHANGELOG.md,LICENSE} ./release/
           cp -r ./main/farmos_asset_link/* ./release/
