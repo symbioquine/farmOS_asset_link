@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix MoveAssetActionProvider to use the new EntitySearch component and resolve a minor warning
+- Fix Sidecar FloatingSidebar to use newly generalized EntityResolver component
 
 ## [0.7.1] - 2022-09-09
 

@@ -75,10 +75,11 @@ onMounted(() => {
         </template>
       </q-fab>
 
-      <asset-resolver
+      <entity-resolver
+        entity-type="asset"
         v-if="assetLink.vm.booted"
-        :asset-ref="assetRef"
-        @asset-resolved="resolvedAsset = $event"
+        :entity-ref="assetRef"
+        @entity-resolved="resolvedAsset = $event"
       >
         <q-fab
           color="orange-5"
@@ -97,7 +98,7 @@ onMounted(() => {
             v-bind="slotDef.props"
           ></component>
         </q-fab>
-      </asset-resolver>
+      </entity-resolver>
     </q-page-sticky>
   </q-layout>
 </template>
