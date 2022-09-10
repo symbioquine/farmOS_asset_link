@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add slot to 'add plugin' FAB menu so plugins can define their own buttons there
+
 ### Changed
 
 - Support double-clicking on an result in the EntitySearch component to choose it immediately

@@ -80,6 +80,11 @@
             aria-label="Write a new plugin"
             @click="() => createNewLocalPlugin()"
         ></q-fab-action>
+        <component
+            v-for="slotDef in assetLink.getSlots({ type: 'add-plugin-fab-action' })"
+            :key="slotDef.id"
+            :is="slotDef.component"
+            v-bind="slotDef.props"></component>
       </q-fab>
     </q-page-sticky>
 
