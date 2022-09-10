@@ -6,6 +6,7 @@
       node-key="label"
       default-expand-all
       dense
+      class="q-mb-xl q-pb-md"
     >
       <template v-slot:default-header="prop">
         <div class="row items-center" style="width: 100%">
