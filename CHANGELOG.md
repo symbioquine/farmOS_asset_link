@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Support double-clicking on an result in the EntitySearch component to choose it immediately
+- Improve reactivity of asynchronously defined plugin functionality - slots/widgets/etc
 
 ### Fixed
 

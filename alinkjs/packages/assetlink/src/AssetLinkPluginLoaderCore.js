@@ -178,20 +178,29 @@ export default class AssetLinkPluginLoaderCore {
    * will not persist between sessions/reloads.
    */
   registerPlugin(plugin) {
-    plugin.definedRoutes = {};
-    plugin.definedSlots = {};
-    plugin.definedWidgetDecorators = {};
+    plugin.definedRoutes = reactive({});
+    plugin.definedSlots = reactive({});
+    plugin.definedWidgetDecorators = reactive({});
     plugin.definedPluginIngestor = undefined;
-    plugin.attributedErrors = {};
+    plugin.attributedErrors = reactive({});
 
     this.vm.plugins.push(plugin);
-
-    // console.log(plugin);
 
     if (typeof plugin.onLoad === 'function') {
       const handle = new AssetLinkPluginHandle(plugin, this.vm, this._eventBus);
 
-      plugin.onLoad(handle, this._assetLink);
+      const onLoadRes = plugin.onLoad(handle, this._assetLink);
+
+      const onLoadObserver = async () => {
+        try {
+          await Promise.resolve(onLoadRes);
+        } catch (e) {
+          handle.recordError(e.toString());
+        }
+      };
+      onLoadObserver();
+
+      handle._onLoadDone = true;
     }
 
     this.vm.plugins.forEach(p => {
@@ -290,6 +299,7 @@ class AssetLinkPluginHandle {
     this._vm = vm;
     this._eventBus = eventBus;
     this._attributedTo = attributedTo || pluginInstance;
+    this._onLoadDone = false;
   }
 
   get thisPlugin() {
@@ -450,6 +460,9 @@ class AssetLinkPluginHandle {
   }
 
   definePluginIngestor(pluginIngestorDefiner) {
+    if (this._onLoadDone) {
+      throw new Error("Plugin ingestors must be defined synchronously.");
+    }
     if (this._pluginInstance !== this._attributedTo) {
       throw new Error("Plugin ingestors cannot be attributed to other plugins.");
     }
