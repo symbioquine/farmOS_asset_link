@@ -77,14 +77,19 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
               filterSpecifier.relation
             );
 
+          const filter = {
+            path: resourceRelationAttribute,
+            operator: 'IN',
+            value: {},
+          };
+
+          filterSpecifier.records.forEach((e, idx) => {
+            // filter[`value[${idx}]`] = e.id;
+            filter.value[idx] = e.id;
+          });
+
           filters.push({
-            ['client-' + resourceRelationAttribute + '-' + index]: {
-              path: resourceRelationAttribute,
-              operator: 'CONTAINS',
-              value: filterSpecifier.records
-                .map((e) => e.id)
-                .join(',')
-            }
+            ['client-' + resourceRelationAttribute + '-' + index]: filter,
           });
         } else {
           throw new Error(
