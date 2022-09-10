@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add the ability to navigate by clicking on group members and location occupants on the asset page
+
 ## [0.7.3] - 2022-09-10
 
 ### Fixed
