@@ -64,16 +64,7 @@ const resolveCurrentGroupMembers = async () => {
             op: 'some',
             records: chunkOfPossibleMembers
           })
-          .sort('-timestamp')
-          .options({
-            sources: {
-              remote: {
-                fields: {
-                  [logTypeName]: ['name', 'timestamp'],
-                },
-              },
-            }
-          });
+          .sort('-timestamp');
       })));
     }
 
@@ -164,12 +155,12 @@ onUnmounted(() => unsubber && unsubber.$off());
 <script>
 export default {
   onLoad(handle) {
-    handle.defineSlot('net.symbioquine.farmos_asset_link.slots.v0.actions', actionsSlot => {
-      actionsSlot.type('page-slot');
+    handle.defineSlot('net.symbioquine.farmos_asset_link.slots.v0.group_members', slot => {
+      slot.type('page-slot');
 
-      actionsSlot.showIf(({ asset }) => asset.type === 'asset--group');
+      slot.showIf(({ asset }) => asset.type === 'asset--group');
 
-      actionsSlot.component(handle.thisPlugin);
+      slot.component(handle.thisPlugin);
     });
   }
 }
