@@ -3,8 +3,6 @@ import { inject, ref, onMounted, onUnmounted } from 'vue';
 
 import { currentEpochSecond, parseJSONDate } from "assetlink-plugin-api";
 
-const emit = defineEmits(['asset-resolved']);
-
 const props = defineProps({
   asset: {
     type: Object,

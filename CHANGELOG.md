@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] - 2022-09-10
+
+### Added
+
+- Add slot to 'add plugin' FAB menu so plugins can define their own buttons there
+- Add a list of group members to the asset page when viewing group assets
+- Add a list of location occupants to the asset page when viewing location assets
+
+### Changed
+
+- Support double-clicking on an result in the EntitySearch component to choose it immediately
+- Improve reactivity of asynchronously defined plugin functionality - slots/widgets/etc
+
+### Fixed
+
+- Fix MoveAssetActionProvider to use the new EntitySearch component and resolve a minor warning
+- Fix Sidecar FloatingSidebar to use newly generalized EntityResolver component
+- Fix styling of manage plugins page so 'add plugin' FAB does not obscure plugin tree actions
+- Fix Orbit.js 'some' queries to use Drupal JSON:API 'IN' operator
+
 ## [0.7.1] - 2022-09-09
 
 ### Added
@@ -263,7 +283,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.1...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.2...HEAD
+[0.7.2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.1...unbuilt-v0.7.2
 [0.7.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.3...unbuilt-v0.7.1
 [0.6.3]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.2...unbuilt-v0.6.3
 [0.6.2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.1...unbuilt-v0.6.2

@@ -1,0 +1,8 @@
+langcode: en
+status: true
+id: AssetLocationOccupantPageSlotProvider
+dependencies:
+  enforced:
+    module:
+      - farmos_asset_link
+url: '{base_path}alink/plugins/AssetLocationOccupantPageSlotProvider.alink.vue'
