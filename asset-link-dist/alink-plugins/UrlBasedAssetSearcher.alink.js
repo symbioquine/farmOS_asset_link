@@ -1,1 +1,0 @@
-export default class UrlBasedAssetSearcher{searchAssets(t,e){if("text-search"!==e.type)return;const s=e.term;if(!s)return;const r=s.match(/https?:\/\/.*\/asset\/(\d+)/);if(console.log(r),!r||r.length<2)return;const n=r[1];async function*a(){const e=await t.resolveAsset(n);e&&(yield{weight:0,weightText:`Asset with id=${n}`,asset:e})}return a()}}

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.3] - 2022-09-10
+
+### Fixed
+
+- Clean up stale files as part of release GitHub action to reduce release/install size
+
 ## [0.7.2] - 2022-09-10
 
 ### Added
