@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix a bug where group members or location occupants not in the cache would break the display on the asset page
 
+### Removed
+
+- Remove the default routes/views for the home and about pages to open those route paths up for plugins in the future
+
 ## [0.7.3] - 2022-09-10
 
 ### Fixed
