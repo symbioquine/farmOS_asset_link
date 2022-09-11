@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add the ability to navigate by clicking on group members and location occupants on the asset page
 
+### Fixed
+
+- Fix a bug where group members or location occupants not in the cache would break the display on the asset page
+
 ## [0.7.3] - 2022-09-10
 
 ### Fixed

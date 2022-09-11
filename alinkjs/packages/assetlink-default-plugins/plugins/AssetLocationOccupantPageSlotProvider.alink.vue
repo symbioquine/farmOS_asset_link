@@ -102,7 +102,7 @@ const resolveCurrentLocationOccupants = async () => {
 
           const currentOccupant = entitySourceCache.query((q) => q.findRecord({ type: possibleOccupant.type, id: possibleOccupant.id }));
 
-          if (currentOccupant.attributes.status === 'archived') {
+          if (!currentOccupant || currentOccupant.attributes.status === 'archived') {
             return [];
           }
 
