@@ -117,6 +117,7 @@ const SearchMethodTileTabber = defineComponent({
             outline: currentSearchMethod.value === m.name,
             icon: m.icon,
             class: "q-py-lg",
+            padding: "lg xs",
             size: "35px",
             onClick: () => {
               currentSearchMethod.value = m.name;

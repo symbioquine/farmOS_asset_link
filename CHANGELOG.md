@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix a bug where group members or location occupants not in the cache would break the display on the asset page
+- Fix styling of search tabs so up to 5 can fit reasonably well
 
 ### Removed
 
