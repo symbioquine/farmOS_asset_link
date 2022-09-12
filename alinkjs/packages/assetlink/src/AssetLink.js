@@ -16,20 +16,17 @@ import DrupalSyncQueryOperators from '@/DrupalSyncQueryOperators';
 import localforage from 'localforage';
 
 import fetch from 'cross-fetch';
-import { v4 as uuidv4 } from 'uuid';
 
 import AssetLinkUI from '@/AssetLinkUI';
 import FarmOSConnectionStatusDetector from '@/FarmOSConnectionStatusDetector';
+import SubrequestsGroupingRequestFetcher from '@/SubrequestsGroupingRequestFetcher';
 import PeekableAsyncIterator from '@/PeekableAsyncIterator';
 import AssetLinkPluginListsCore from '@/AssetLinkPluginListsCore';
 import AssetLinkPluginLoaderCore from '@/AssetLinkPluginLoaderCore';
 import AssetLinkLocalPluginStorageCore from '@/AssetLinkLocalPluginStorageCore';
 import HttpAccessDeniedException from '@/HttpAccessDeniedException';
 
-import { createDrupalUrl, currentEpochSecond, EventBus } from "assetlink-plugin-api";
-
-const fetchJson = (url, args) => fetch(url, args).then(response => response.json());
-
+import { createDrupalUrl, currentEpochSecond, EventBus, uuidv4 } from "assetlink-plugin-api";
 
 
 /**
@@ -55,6 +52,8 @@ export default class AssetLink {
     });
 
     this._connectionStatus = new FarmOSConnectionStatusDetector();
+
+    this._fetcherDelegate = new SubrequestsGroupingRequestFetcher(this._connectionStatus);
 
     this._eventBus = new EventBus();
 
@@ -167,6 +166,7 @@ export default class AssetLink {
    * 
    * - Automatically gets CSRF tokens for certain HTTP methods that need them
    * - Automatically tracks farmOS connection status
+   * - Automatically uses subrequests to reduce the number of HTTP requests when practical
    */
   get fetch() {
     return this._csrfAwareFetch.bind(this);
@@ -247,7 +247,7 @@ export default class AssetLink {
 
     const orbitCoordinatorActivationBarrier = new Barrier(true);
 
-    Orbit.fetch = this._csrfAwareFetch.bind(this);
+    Orbit.fetch = this.fetch;
 
     this._schema = new RecordSchema({ models: this._models });
 
@@ -824,7 +824,7 @@ export default class AssetLink {
 
     try {
       if (addCsrfHeader) {
-        const tokenResponse = await this.connectionStatus.fetch(createDrupalUrl('/session/token'));
+        const tokenResponse = await this._fetcherDelegate.fetch(createDrupalUrl('/session/token'));
 
         console.log("tokenResponse:", tokenResponse);
 
@@ -835,7 +835,7 @@ export default class AssetLink {
         options.headers['X-CSRF-Token'] = token;
       }
   
-      return await this.connectionStatus.fetch(url, options);
+      return await this._fetcherDelegate.fetch(url, options);
     } catch (error) {
       console.log("Error in _csrfAwareFetch", typeof error, error);
       if (error.message === 'Network request failed') {
@@ -869,6 +869,8 @@ export default class AssetLink {
 
   async _loadModelsFromServer() {
     this.vm.bootText = "Loading server schema";
+    const fetchJson = (url, args) => this.fetch(url, args).then(response => response.json());
+
     const serverSchema = await fetchJson(createDrupalUrl('/api/schema'));
 
     const serverRelatedSchemas = serverSchema.allOf.flatMap(schemaRef => schemaRef.links || []);
@@ -876,7 +878,9 @@ export default class AssetLink {
     const models = {};
 
     await Promise.all(serverRelatedSchemas.map(async (serverRelatedSchema) => {
-      const relatedSchema = await fetchJson(typeof serverRelatedSchema.targetSchema === 'object' ? serverRelatedSchema.targetSchema.$ref : serverRelatedSchema.targetSchema);
+      const schemaUrl = typeof serverRelatedSchema.targetSchema === 'object' ? serverRelatedSchema.targetSchema.$ref : serverRelatedSchema.targetSchema;
+
+      const relatedSchema = await fetchJson(schemaUrl);
 
       const relatedItemSchema = await fetchJson(relatedSchema.definitions.data.items.$ref);
 

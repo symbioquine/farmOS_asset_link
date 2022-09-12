@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Automatically group requests via subrequests #1
+
 ## [0.7.6] - 2022-10-21
 
 ### Added
