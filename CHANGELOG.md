@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add the ability to navigate by clicking on group members and location occupants on the asset page
 - Add a entity searcher plugin to find entities by their old farmOS 1.x urls
 
+### Changed
+
+- Automatically group requests via subrequests #1
+
 ### Fixed
 
 - Fix a bug where group members or location occupants not in the cache would break the display on the asset page
