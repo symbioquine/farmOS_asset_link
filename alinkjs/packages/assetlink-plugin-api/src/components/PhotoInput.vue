@@ -16,7 +16,7 @@ export default {};
 </script>
 
 <script setup>
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 
 const props = defineProps({
   modelValue: { type: Object, default: null },
@@ -36,6 +36,22 @@ try {
   e
   /* eslint-disable no-empty */
 ) {}
+
+const clipboardInputShown = ref(false);
+const clipboardInputPopupEdit = ref(null);
+
+watch(clipboardInputShown, () => {
+  nextTick(() => {
+    clipboardInputPopupEdit.value && clipboardInputPopupEdit.value.show();
+  });
+});
+
+const onPasted = (e) => {
+  if (!e?.clipboardData?.files?.length) {
+    return;
+  }
+  model.value = e.clipboardData.files[0];
+};
 </script>
 
 <template>
@@ -54,6 +70,34 @@ try {
         label="Filled"
       />
     </div>
+
+    <q-menu touch-position context-menu>
+      <q-list dense style="min-width: 100px">
+        <q-item clickable v-close-popup @click="clipboardInputShown = true">
+          <q-item-section side>
+            <q-icon name="mdi-content-paste" />
+          </q-item-section>
+          <q-item-section>Enable clipboard input</q-item-section>
+        </q-item>
+      </q-list>
+    </q-menu>
+
+    <q-popup-edit
+      anchor="center middle"
+      self="center middle"
+      :cover="false"
+      v-if="clipboardInputShown"
+      ref="clipboardInputPopupEdit"
+      modelValue=""
+      @hide="clipboardInputShown = false"
+    >
+      <q-input
+        dense
+        autofocus
+        @paste="onPasted"
+        hint="Paste an image here..."
+      />
+    </q-popup-edit>
   </div>
 </template>
 
