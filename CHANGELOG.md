@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.4] - 2022-10-09
+
 ### Added
 
 - Add the ability to navigate by clicking on group members and location occupants on the asset page
@@ -307,7 +309,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.2...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.4...HEAD
+[0.7.4]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.3...unbuilt-v0.7.4
+[0.7.3]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.2...unbuilt-v0.7.3
 [0.7.2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.1...unbuilt-v0.7.2
 [0.7.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.3...unbuilt-v0.7.1
 [0.6.3]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.2...unbuilt-v0.6.3
