@@ -161,6 +161,17 @@ export default class AssetLink {
     return this._booted;
   }
 
+  /**
+   * A decorated version of the fetch API which has some tricks up its
+   * sleeve.
+   * 
+   * - Automatically gets CSRF tokens for certain HTTP methods that need them
+   * - Automatically tracks farmOS connection status
+   */
+  get fetch() {
+    return this._csrfAwareFetch.bind(this);
+  }
+
   /* eslint-disable no-console,no-unused-vars */
   async boot() {
     const bootingEventGroup = this._devToolsApi.startTimelineEventGroup({
