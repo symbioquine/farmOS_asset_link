@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix a bug where group members or location occupants not in the cache would break the display on the asset page
 - Fix styling of search tabs so up to 5 can fit reasonably well
 - Fix the exception types in BarrierAwareOrbitSourceDecorator
+- Fix the resource field path inflector for Orbit.js so it doesn't 'dasherize' relationships like 'plant_type'
 
 ### Removed
 

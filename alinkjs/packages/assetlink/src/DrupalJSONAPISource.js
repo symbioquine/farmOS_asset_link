@@ -31,7 +31,10 @@ export default class DrupalJSONAPISource extends JSONAPISource {
         settingsByType: {
           [JSONAPISerializers.ResourceTypePath]: {
             serializationOptions: {inflectors: ['drupal']}
-          }
+          },
+          [JSONAPISerializers.ResourceFieldPath]: {
+            serializationOptions: {inflectors: []}
+          },
         }
       }),
       URLBuilderClass: DrupalJSONAPIURLBuilder,
