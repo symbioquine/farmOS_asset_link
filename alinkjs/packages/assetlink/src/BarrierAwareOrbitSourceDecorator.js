@@ -16,7 +16,7 @@ export default class BarrierAwareOrbitSourceDecorator {
   async query(queryOrExpressions, options, id) {
     const passedBarrier = await this._barrier.arrive(500);
     if (!passedBarrier) {
-      throw new Exception("Could not execute query - barrier was closed for >500ms");
+      throw new Error("Could not execute query - barrier was closed for >500ms");
     }
     return await this._delegate.query(queryOrExpressions, options, id);
   }
@@ -24,7 +24,7 @@ export default class BarrierAwareOrbitSourceDecorator {
   async update(transformOrOperations, options, id) {
     const passedBarrier = await this._barrier.arrive(500);
     if (!passedBarrier) {
-      throw new Exception("Could not execute update - barrier was closed for >500ms");
+      throw new Error("Could not execute update - barrier was closed for >500ms");
     }
     return await this._delegate.update(transformOrOperations, options, id);
   }
