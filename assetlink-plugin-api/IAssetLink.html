@@ -437,6 +437,194 @@ farmOS assets/logs/etc - unless you know what you are doing, use <code>IAssetLin
 
 
     
+    <h4 class="name" id="fetch">
+        <a class="href-link" href="#fetch">#</a>
+        
+        <span class="code-name">
+            
+                fetch<span class="signature">(resource, options)</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <p>A decorated version of the fetch API which has some tricks up its
+sleeve.</p>
+<ul>
+<li>Automatically gets CSRF tokens for certain HTTP methods that need them</li>
+<li>Automatically tracks farmOS connection status</li>
+</ul>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>resource</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">String</code>
+|
+
+<code class="param-type">URL</code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>the URL of the resource you want to fetch</p></td>
+</tr>
+
+
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>options</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">Object</code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>an object containing any custom settings that you want to apply to the request</p></td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/fetch">https://developer.mozilla.org/en-US/docs/Web/API/fetch</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="IAssetLink.js.html" class="button">View Source</a>
+            <span>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line23">line 23</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
     <h4 class="name" id="getAssetTypes">
         <a class="href-link" href="#getAssetTypes">#</a>
         
@@ -502,7 +690,7 @@ farmOS assets/logs/etc - unless you know what you are doing, use <code>IAssetLin
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line56">line 56</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line70">line 70</a>
             </span>
         </p>
     
@@ -650,7 +838,7 @@ farmOS assets/logs/etc - unless you know what you are doing, use <code>IAssetLin
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line23">line 23</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line37">line 37</a>
             </span>
         </p>
     
@@ -747,7 +935,7 @@ farmOS assets/logs/etc - unless you know what you are doing, use <code>IAssetLin
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line63">line 63</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line77">line 77</a>
             </span>
         </p>
     
@@ -902,7 +1090,7 @@ farmOS assets/logs/etc - unless you know what you are doing, use <code>IAssetLin
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line113">line 113</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line127">line 127</a>
             </span>
         </p>
     
@@ -1024,7 +1212,7 @@ farmOS assets/logs/etc - unless you know what you are doing, use <code>IAssetLin
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line70">line 70</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line84">line 84</a>
             </span>
         </p>
     
@@ -1179,7 +1367,7 @@ which internally calls <code>getWidgetDecorators</code> and composes the resulti
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line132">line 132</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line146">line 146</a>
             </span>
         </p>
     
@@ -1437,7 +1625,7 @@ e.g. <code>['activity', 'observation']</code></p></td>
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line31">line 31</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line45">line 45</a>
             </span>
         </p>
     
@@ -1616,7 +1804,7 @@ offline or online entity search results respectively.</p></td>
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line77">line 77</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line91">line 91</a>
             </span>
         </p>
     
