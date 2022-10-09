@@ -1,7 +1,11 @@
 <script setup>
-import { inject, ref, onMounted, onUnmounted } from 'vue';
+import { computed, inject, ref, onMounted, onUnmounted } from 'vue';
 
 import { currentEpochSecond, parseJSONDate } from "assetlink-plugin-api";
+
+import { useRouter } from 'vue-router'
+
+const router = useRouter();
 
 const props = defineProps({
   asset: {
@@ -14,6 +18,16 @@ const assetLink = inject('assetLink');
 
 const loadingGroupMembers = ref(false);
 const groupMembers = ref([]);
+
+const groupMemberNodes = computed(() => {
+  return groupMembers.value.map(member => {
+    return {
+      id: member.id,
+      member,
+      selectable: true,
+    };
+  });
+});
 
 const resolveCurrentGroupMembers = async () => {
   loadingGroupMembers.value = true;
@@ -88,7 +102,7 @@ const resolveCurrentGroupMembers = async () => {
 
           const currentMember = entitySourceCache.query((q) => q.findRecord({ type: possibleMember.type, id: possibleMember.id }));
 
-          if (currentMember.attributes.status === 'archived') {
+          if (!currentMember || currentMember.attributes.status === 'archived') {
             return [];
           }
 
@@ -122,6 +136,15 @@ onMounted(() => {
   unsubber = assetLink.eventBus.$on("changed:assetLogs", onAssetLogsChanged);
 });
 onUnmounted(() => unsubber && unsubber.$off());
+
+const onGroupMemberClicked = (id) => {
+  if (!id) {
+    return;
+  }
+  const clickedMember = groupMembers.value.find(l => l.id === id);
+
+  router.push(`/asset/${clickedMember.attributes.drupal_internal__id}`);
+};
 </script>
 
 <template>
@@ -140,12 +163,14 @@ onUnmounted(() => unsubber && unsubber.$off());
     >
       <q-tree
         node-key="id"
-        :nodes="groupMembers"
+        :nodes="groupMemberNodes"
+        :selected="null"
         no-nodes-label="No group members found"
-         class="q-ml-md"
+        @update:selected="(id) => onGroupMemberClicked(id)"
+        class="q-ml-md"
       >
         <template v-slot:default-header="prop">
-          <entity-name :entity="prop.node"></entity-name>
+          <entity-name :entity="prop.node.member"></entity-name>
         </template>
       </q-tree>
     </div>

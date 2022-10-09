@@ -1,7 +1,11 @@
 <script setup>
-import { inject, ref, onMounted, onUnmounted } from 'vue';
+import { computed, inject, ref, onMounted, onUnmounted } from 'vue';
 
 import { currentEpochSecond, parseJSONDate } from "assetlink-plugin-api";
+
+import { useRouter } from 'vue-router'
+
+const router = useRouter();
 
 const props = defineProps({
   asset: {
@@ -14,6 +18,18 @@ const assetLink = inject('assetLink');
 
 const loadingLocationOccupants = ref(false);
 const locationOccupants = ref([]);
+
+const locationOccupantNodes = computed(() => {
+  return locationOccupants.value.map(occupant => {
+    return {
+      id: occupant.id,
+      occupant,
+      selectable: true,
+    };
+  });
+});
+
+const selectedOccupant = ref(null);
 
 const resolveCurrentLocationOccupants = async () => {
   loadingLocationOccupants.value = true;
@@ -75,22 +91,18 @@ const resolveCurrentLocationOccupants = async () => {
       return byId;
     }, {}));
 
-    console.log(logsForAllPossibleOccupants);
-
     const currentOccupants = allPossibleOccupants.flatMap(possibleOccupant => {
           const latestLog = logsForAllPossibleOccupants
               .filter(log => log.relationships.asset.data.find(a => a.id === possibleOccupant.id))
               .reduce((logA, logB) => parseJSONDate(logA.attributes.timestamp) > parseJSONDate(logB.attributes.timestamp) ? logA : logB);
 
-          const currentOccupant = entitySourceCache.query((q) => q.findRecord({ type: possibleOccupant.type, id: possibleOccupant.id }));
-
-          console.log(currentOccupant.attributes.name, latestLog);
-
           if (!latestLog.relationships.location.data.find(l => l.id === props.asset.id)) {
             return [];
           }
 
-          if (currentOccupant.attributes.status === 'archived') {
+          const currentOccupant = entitySourceCache.query((q) => q.findRecord({ type: possibleOccupant.type, id: possibleOccupant.id }));
+
+          if (!currentOccupant || currentOccupant.attributes.status === 'archived') {
             return [];
           }
 
@@ -124,6 +136,15 @@ onMounted(() => {
   unsubber = assetLink.eventBus.$on("changed:assetLogs", onAssetLogsChanged);
 });
 onUnmounted(() => unsubber && unsubber.$off());
+
+const onLocationClicked = (id) => {
+  if (!id) {
+    return;
+  }
+  const clickedLocation = locationOccupants.value.find(l => l.id === id);
+
+  router.push(`/asset/${clickedLocation.attributes.drupal_internal__id}`);
+};
 </script>
 
 <template>
@@ -142,12 +163,14 @@ onUnmounted(() => unsubber && unsubber.$off());
     >
       <q-tree
         node-key="id"
-        :nodes="locationOccupants"
+        :nodes="locationOccupantNodes"
+        :selected="null"
         no-nodes-label="No assets found in this location"
-         class="q-ml-md"
+        @update:selected="(id) => onLocationClicked(id)"
+        class="q-ml-md"
       >
         <template v-slot:default-header="prop">
-          <entity-name :entity="prop.node"></entity-name>
+          <entity-name :entity="prop.node.occupant"></entity-name>
         </template>
       </q-tree>
     </div>

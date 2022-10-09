@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.4] - 2022-10-09
+
+### Added
+
+- Add the ability to navigate by clicking on group members and location occupants on the asset page
+- Add a entity searcher plugin to find entities by their old farmOS 1.x urls
+- Accept pasted images in PhotoInput component
+- Expose the AssetLink.fetch method to help support non-JSON:API or certain advanced use-cases
+
+### Fixed
+
+- Fix a bug where group members or location occupants not in the cache would break the display on the asset page
+- Fix styling of search tabs so up to 5 can fit reasonably well
+- Fix the exception types in BarrierAwareOrbitSourceDecorator
+- Fix the resource field path inflector for Orbit.js so it doesn't 'dasherize' relationships like 'plant_type'
+
+### Removed
+
+- Remove the default routes/views for the home and about pages to open those route paths up for plugins in the future
+
 ## [0.7.3] - 2022-09-10
 
 ### Fixed
@@ -289,7 +309,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.2...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.4...HEAD
+[0.7.4]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.3...unbuilt-v0.7.4
+[0.7.3]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.2...unbuilt-v0.7.3
 [0.7.2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.1...unbuilt-v0.7.2
 [0.7.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.3...unbuilt-v0.7.1
 [0.6.3]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.6.2...unbuilt-v0.6.3
