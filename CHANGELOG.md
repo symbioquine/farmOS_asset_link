@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Move the precaching out into a plugin since some use-cases will likely require precaching customization
+
 ## [0.7.4] - 2022-10-09
 
 ### Added

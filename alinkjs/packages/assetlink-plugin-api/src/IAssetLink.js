@@ -9,6 +9,8 @@
  * @property {EventBus} eventBus An async event bus used to signal certain key occurrences.
  * @property {IAssetLinkUI} ui UI components/methods exposed for Asset Link plugins.
  * @property {external:Promise} booted A Promise that is fulfilled once Asset Link has booted.
+ * @property {external:localForage} store A localForage instance that is used to store and retrieve data from IndexedDB.
+ * @property {Object} devToolsApi A semi-private mechanism to interact with the browser dev tools.
  * @property {IAssetLinkPlugin[]} plugins The currently loaded plugins.
  * @property {external:@orbit/memory.MemorySource} entitySource The Orbit.js MemorySource which is used to access/modify farmOS assets/logs/etc.
  *
@@ -193,4 +195,10 @@ IAssetLink.prototype.getWidgetDecorators = function (context) {};
  * The Orbit.js in-memory data source package.
  * @external @orbit/jsonapi
  * @see https://orbitjs.com/docs/api/jsonapi
+ */
+
+/**
+ * The localForage API.
+ * @external localForage
+ * @see https://localforage.github.io/localForage/
  */

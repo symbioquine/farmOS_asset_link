@@ -172,6 +172,21 @@ export default class AssetLink {
     return this._csrfAwareFetch.bind(this);
   }
 
+  /**
+   * A localForage instance that is used to store and retrieve data from
+   * IndexedDB.
+   */
+  get store() {
+    return this._store;
+  }
+
+  /**
+   * A semi-private mechanism to interact with the browser dev tools.
+   */
+  get devToolsApi() {
+    return this._devToolsApi;
+  }
+
   /* eslint-disable no-console,no-unused-vars */
   async boot() {
     const bootingEventGroup = this._devToolsApi.startTimelineEventGroup({
@@ -506,10 +521,6 @@ export default class AssetLink {
 
     this.eventBus.$emit('booted');
 
-    if (this.connectionStatus.isOnline.value) {
-      this._precache();
-    }
-
     bootingEventGroup.end();
 
     return true;
@@ -542,57 +553,6 @@ export default class AssetLink {
    */
   getEntityModelSync(typeName) {
     return this._models[typeName];
-  }
-
-  async _precache() {
-    const precachingEventGroup = this._devToolsApi.startTimelineEventGroup({
-      data: {},
-      title: `precaching`,
-      groupId: `precaching-${uuidv4()}`,
-    });
-
-    try {
-
-      // Precache the current page's asset
-      const matches = window.location.href.match(/https?:\/\/.*\/asset\/(\d+)/);
-      if (matches && matches.length >= 2) {
-        await this.resolveEntity('asset', matches[1]);
-      }
-
-      const timestamp = currentEpochSecond();
-
-      const lastPrecacheTimeKey = `asset-link-last-precache-time`;
-
-      const lastPrecacheTime = await this._store.getItem(lastPrecacheTimeKey);
-
-      if (lastPrecacheTime && (timestamp - lastPrecacheTime) < 900) {
-        console.log("Skipping Asset Link precaching because it was done recently...");
-        return;
-      }
-
-      // Precache recently changed assets
-      const assetTypes = (await this.getAssetTypes()).map(t => t.attributes.drupal_internal__id);
-
-      await this.entitySource.query((q) => assetTypes.map(assetType => {
-        const entityType = `asset--${assetType}`;
-
-        const model = this.getEntityModelSync(entityType);
-
-        const include = Object.keys(model.relationships);
-
-        return q.findRecords(entityType)
-          .sort('-changed')
-          .page({ offset: 0, limit: 100 })
-          .options({ include });
-      }));
-
-      // TODO: Consider also precaching recently changed and recent/upcoming logs
-
-      await this._store.setItem(lastPrecacheTimeKey, timestamp);
-
-    } finally {
-      precachingEventGroup.end();
-    }
   }
 
   /**

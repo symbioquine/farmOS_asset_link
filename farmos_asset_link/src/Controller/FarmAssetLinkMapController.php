@@ -26,16 +26,16 @@ class FarmAssetLinkMapController extends ControllerBase {
       ],
       '#attached' => [
         'library' => [
-          'core/drupal',
+          // 'core/drupal',
           'core/drupalSettings',
-          'farm_map/farm_map',
+          // 'farm_map/farm_map',
         ],
       ],
     ];
 
     $response = new AjaxResponse();
 
-    $response->addCommand(new InsertCommand('#selected-zzz', $build));
+    $response->addCommand(new InsertCommand('#farm-asset-link-map-prototype-target', $build));
 
     return $response;
   }
