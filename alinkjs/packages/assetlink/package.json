@@ -1,6 +1,6 @@
 {
   "name": "assetlink",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "description": "",
   "main": "index.js",
   "publishConfig": {
@@ -29,7 +29,7 @@
     "@orbit/records": "^0.17.0",
     "@orbit/serializers": "^0.17.0",
     "@vue/devtools-api": "^6.1.4",
-    "assetlink-plugin-api": "^0.7.4",
+    "assetlink-plugin-api": "^0.7.5",
     "cross-fetch": "^3.1.5",
     "haversine-distance": "^1.2.1",
     "js-cookie": "^3.0.1",
