@@ -118,7 +118,7 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-@orbit_jsonapi.html">@orbit/jsonapi</a></li><li><a href="external-@orbit_memory.html">@orbit/memory</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-URL.html">URL</a></li></ul><h3>Classes</h3><ul><li><a href="external-@orbit_jsonapi.JSONAPISource.html">JSONAPISource</a></li><li><a href="external-@orbit_memory.MemorySource.html">MemorySource</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li><li><a href="IAssetLinkUI.html">IAssetLinkUI</a></li><li><a href="IAssetLinkUIDialogs.html">IAssetLinkUIDialogs</a></li><li><a href="IFarmOSConnectionStatus.html">IFarmOSConnectionStatus</a></li></ul><h3>Global</h3><ul><li><a href="global.html#components">components</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#EventBus">EventBus</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-EntityName.html">EntityName</a></li><li><a href="module-EntityResolver.html">EntityResolver</a></li><li><a href="module-EntitySearch.html">EntitySearch</a></li><li><a href="module-EntitySelect.html">EntitySelect</a></li><li><a href="module-PhotoInput.html">PhotoInput</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-@orbit_jsonapi.html">@orbit/jsonapi</a></li><li><a href="external-@orbit_memory.html">@orbit/memory</a></li><li><a href="external-localForage.html">localForage</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-URL.html">URL</a></li></ul><h3>Classes</h3><ul><li><a href="external-@orbit_jsonapi.JSONAPISource.html">JSONAPISource</a></li><li><a href="external-@orbit_memory.MemorySource.html">MemorySource</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li><li><a href="IAssetLinkUI.html">IAssetLinkUI</a></li><li><a href="IAssetLinkUIDialogs.html">IAssetLinkUIDialogs</a></li><li><a href="IFarmOSConnectionStatus.html">IFarmOSConnectionStatus</a></li></ul><h3>Global</h3><ul><li><a href="global.html#components">components</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#EventBus">EventBus</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-EntityName.html">EntityName</a></li><li><a href="module-EntityResolver.html">EntityResolver</a></li><li><a href="module-EntitySearch.html">EntitySearch</a></li><li><a href="module-EntitySelect.html">EntitySelect</a></li><li><a href="module-PhotoInput.html">PhotoInput</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
                 
             </nav>
         </div>
@@ -287,6 +287,52 @@
     
 
     <td class="description last"><p>A Promise that is fulfilled once Asset Link has booted.</p></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>store</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type"><a href="external-localForage.html">external:localForage</a></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>A localForage instance that is used to store and retrieve data from IndexedDB.</p></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>devToolsApi</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Object</code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>A semi-private mechanism to interact with the browser dev tools.</p></td>
 </tr>
 
         
@@ -593,7 +639,7 @@ sleeve.</p>
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line23">line 23</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line25">line 25</a>
             </span>
         </p>
     
@@ -690,7 +736,7 @@ sleeve.</p>
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line70">line 70</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line72">line 72</a>
             </span>
         </p>
     
@@ -838,7 +884,7 @@ sleeve.</p>
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line37">line 37</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line39">line 39</a>
             </span>
         </p>
     
@@ -935,7 +981,7 @@ sleeve.</p>
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line77">line 77</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line79">line 79</a>
             </span>
         </p>
     
@@ -1090,7 +1136,7 @@ sleeve.</p>
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line127">line 127</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line129">line 129</a>
             </span>
         </p>
     
@@ -1212,7 +1258,7 @@ sleeve.</p>
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line84">line 84</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line86">line 86</a>
             </span>
         </p>
     
@@ -1367,7 +1413,7 @@ which internally calls <code>getWidgetDecorators</code> and composes the resulti
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line146">line 146</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line148">line 148</a>
             </span>
         </p>
     
@@ -1625,7 +1671,7 @@ e.g. <code>['activity', 'observation']</code></p></td>
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line45">line 45</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line47">line 47</a>
             </span>
         </p>
     
@@ -1804,7 +1850,7 @@ offline or online entity search results respectively.</p></td>
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line91">line 91</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line93">line 93</a>
             </span>
         </p>
     
