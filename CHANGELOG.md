@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Move the precaching out into a plugin since some use-cases will likely require precaching customization
 
+### Fixed
+
+- Fix the hook_entity_create_access implementation name so our file upload fix actually works
+
 ## [0.7.4] - 2022-10-09
 
 ### Added

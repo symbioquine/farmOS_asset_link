@@ -23,7 +23,7 @@ function farmos_asset_link_page_attachments(array &$attachments) {
  *
  * TODO: Follow up on https://github.com/farmOS/farmOS/pull/563#issuecomment-1241952618
  */
-function farmos_asset_link_create_access($account, $context, $entity_bundle) {
+function farmos_asset_link_entity_create_access($account, $context, $entity_bundle) {
   $route_match = \Drupal::routeMatch();
 
   if (empty($route_match)) {
