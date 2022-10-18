@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.5] - 2022-10-18
+
+### Changed
+
+- Move the precaching out into a plugin since some use-cases will likely require precaching customization
+
+### Fixed
+
+- Fix the hook_entity_create_access implementation name so our file upload fix actually works
+
 ## [0.7.4] - 2022-10-09
 
 ### Added
@@ -309,7 +319,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.4...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.5...HEAD
+[0.7.5]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.4...unbuilt-v0.7.5
 [0.7.4]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.3...unbuilt-v0.7.4
 [0.7.3]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.2...unbuilt-v0.7.3
 [0.7.2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.1...unbuilt-v0.7.2
