@@ -15,6 +15,7 @@
   "devDependencies": {
     "@babel/cli": "^7.18.10",
     "@babel/core": "^7.18.10",
+    "@babel/plugin-syntax-decorators": "^7.19.0",
     "babel-plugin-module-resolver": "^4.1.0"
   },
   "dependencies": {
@@ -35,6 +36,7 @@
     "js-cookie": "^3.0.1",
     "localforage": "^1.10.0",
     "ngeohash": "^0.6.3",
+    "priorityqueuejs": "^2.0.0",
     "qr-scanner": "^1.4.1",
     "quasar": "^2.6.0",
     "uuid": "^8.3.2",

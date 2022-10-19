@@ -2,6 +2,7 @@ import JSONAPISource, { JSONAPISerializers } from '@orbit/jsonapi';
 import { buildSerializerSettingsFor, buildInflector } from '@orbit/serializers';
 
 import DrupalJSONAPIURLBuilder from '@/DrupalJSONAPIURLBuilder';
+import OrbitPriorityTaskQueue from '@/OrbitPriorityTaskQueue';
 
 
 /**
@@ -18,6 +19,7 @@ export default class DrupalJSONAPISource extends JSONAPISource {
     });
 
     super(Object.assign({}, settings, {
+      autoActivate: false,
       defaultFetchSettings,
       serializerSettingsFor: buildSerializerSettingsFor({
         sharedSettings: {
@@ -39,6 +41,23 @@ export default class DrupalJSONAPISource extends JSONAPISource {
       }),
       URLBuilderClass: DrupalJSONAPIURLBuilder,
     }));
+
+    const requestQueueSettings = settings.requestQueueSettings || {};
+
+    this._requestQueue = new OrbitPriorityTaskQueue(this, {
+      name: this._name ? `${this._name}-requests` : undefined,
+      bucket: this._bucket,
+      autoActivate: false,
+      ...requestQueueSettings
+    });
+
+    const autoActivate =
+      settings.autoActivate === undefined || settings.autoActivate;
+
+    if (autoActivate) {
+      this.activate();
+    }
+
   }
 
 }
