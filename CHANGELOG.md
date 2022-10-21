@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Perform precaching with lower priority than other JSON:API requests
+- Perform precaching requests serially to avoid blocking all browser request threads
 
 ## [0.7.5] - 2022-10-18
 

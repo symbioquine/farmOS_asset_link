@@ -52,6 +52,7 @@ export default class DefaultPrecacher {
           .page({ offset: 0, limit: 100 })
           .options({ include });
       }), {
+        parallelRequests: false,
         priority: 10,
       });
 
