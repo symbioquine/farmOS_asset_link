@@ -7,10 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Emit the 'changed:assetLogs' event when inventory quantities referencing an asset change
+
 ### Changed
 
 - Perform precaching with lower priority than other JSON:API requests
 - Perform precaching requests serially to avoid blocking all browser request threads
+
+### Fixed
+
+- Fix orbit.js record updated listener so it works when multiple update operations occur together
 
 ## [0.7.5] - 2022-10-18
 

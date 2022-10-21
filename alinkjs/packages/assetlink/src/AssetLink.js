@@ -449,17 +449,34 @@ export default class AssetLink {
     this._memory.on('update', update => {
       console.log('_memory::update', update);
 
-      if (['updateRecord', 'replaceAttribute', 'addToRelatedRecords', 'removeFromRelatedRecords', 'replaceRelatedRecords', 'replaceRelatedRecord'].includes(update.operations.op) && update.operations.record.type.startsWith('asset--')) {
-        this.eventBus.$emit('changed:asset', { assetType: update.operations.record.type, assetId: update.operations.record.id});
+      let operations = update?.operations || [];
+      if (!Array.isArray(operations)) {
+        operations = [operations];
       }
 
-      if (['addRecord', 'updateRecord'].includes(update.operations.op) && update.operations.record.type.startsWith('log--')) {
-        update.operations.record.relationships.asset.data.forEach(assetRel => {
-          this.eventBus.$emit('changed:assetLogs', { assetType: assetRel.type, assetId: assetRel.id});
-        });
+      operations.forEach(operation => {
+        console.log(operation);
 
-        // TODO: Emit 'changed:assetLogs' more types of related asset changes (inventory references, etc)
-      }
+        if (['updateRecord', 'replaceAttribute', 'addToRelatedRecords', 'removeFromRelatedRecords', 'replaceRelatedRecords', 'replaceRelatedRecord']
+            .includes(operation.op) && operation.record.type.startsWith('asset--')) {
+          this.eventBus.$emit('changed:asset', { assetType: operation.record.type, assetId: operation.record.id});
+        }
+
+        if (['addRecord', 'updateRecord'].includes(operation.op) && operation.record.type.startsWith('log--')) {
+          operation.record.relationships.asset.data.forEach(assetRel => {
+            this.eventBus.$emit('changed:assetLogs', { assetType: assetRel.type, assetId: assetRel.id});
+          });
+        }
+
+        if (['addRecord', 'updateRecord'].includes(operation.op) && operation.record.type.startsWith('quantity--')) {
+          const assetRel = operation.record.relationships?.inventory_asset?.data;
+
+          if (assetRel) {
+            this.eventBus.$emit('changed:assetLogs', { assetType: assetRel.type, assetId: assetRel.id});
+          }
+        }
+
+      });
 
     });
 
