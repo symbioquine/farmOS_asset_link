@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix orbit.js record updated listener so it works when multiple update operations occur together
+- Set the default plugin config entity yml 'user_defined' property to null to avoid that appearing in the config sync updates report
 
 ## [0.7.5] - 2022-10-18
 

@@ -206,6 +206,7 @@ function GenerateDefaultPluginConfigYmlFilesPlugin() {
           id: nameWithoutExt,
           dependencies: { enforced: { module: [ 'farmos_asset_link' ] } },
           url: `{base_path}alink/plugins/${filename}`,
+          user_defined : null,
         }));
       });
 
