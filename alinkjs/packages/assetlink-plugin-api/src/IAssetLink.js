@@ -25,10 +25,10 @@ export default class IAssetLink {}
 /**
  * A decorated version of the fetch API which has some tricks up its
  * sleeve.
- * 
+ *
  * - Automatically gets CSRF tokens for certain HTTP methods that need them
  * - Automatically tracks farmOS connection status
- * 
+ *
  * @method IAssetLink#fetch
  * @param {String|URL} resource the URL of the resource you want to fetch
  * @param {Object} options an object containing any custom settings that you want to apply to the request

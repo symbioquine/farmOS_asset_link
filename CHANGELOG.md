@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Perform precaching with lower priority than other JSON:API requests
 - Perform precaching requests serially to avoid blocking all browser request threads
+- Debounce search requests to no more than 1 per 500ms
 
 ### Fixed
 
