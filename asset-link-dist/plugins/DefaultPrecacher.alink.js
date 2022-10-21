@@ -51,7 +51,10 @@ export default class DefaultPrecacher {
           .sort('-changed')
           .page({ offset: 0, limit: 100 })
           .options({ include });
-      }));
+      }), {
+        parallelRequests: false,
+        priority: 10,
+      });
 
       // TODO: Consider also precaching recently changed and recent/upcoming logs
 

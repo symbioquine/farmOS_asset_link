@@ -6,3 +6,4 @@ dependencies:
     module:
       - farmos_asset_link
 url: '{base_path}alink/plugins/AssetNameWithSexWidgetDecorator.alink.vue'
+user_defined: null

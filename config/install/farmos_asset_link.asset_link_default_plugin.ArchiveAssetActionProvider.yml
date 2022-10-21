@@ -6,3 +6,4 @@ dependencies:
     module:
       - farmos_asset_link
 url: '{base_path}alink/plugins/ArchiveAssetActionProvider.alink.js'
+user_defined: null

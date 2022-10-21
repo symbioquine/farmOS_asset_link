@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.6] - 2022-10-21
+
+### Added
+
+- Emit the 'changed:assetLogs' event when inventory quantities referencing an asset change
+- Add a plugin to show asset inventory quantities as badges in the asset page title
+
+### Changed
+
+- Perform precaching with lower priority than other JSON:API requests
+- Perform precaching requests serially to avoid blocking all browser request threads
+- Debounce search requests to no more than 1 per 500ms
+
+### Fixed
+
+- Fix orbit.js record updated listener so it works when multiple update operations occur together
+- Set the default plugin config entity yml 'user_defined' property to null to avoid that appearing in the config sync updates report
+
 ## [0.7.5] - 2022-10-18
 
 ### Changed
@@ -319,7 +337,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.5...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.6...HEAD
+[0.7.6]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.5...unbuilt-v0.7.6
 [0.7.5]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.4...unbuilt-v0.7.5
 [0.7.4]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.3...unbuilt-v0.7.4
 [0.7.3]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.2...unbuilt-v0.7.3
