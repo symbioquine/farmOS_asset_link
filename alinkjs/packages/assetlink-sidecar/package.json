@@ -1,6 +1,6 @@
 {
   "name": "assetlink-sidecar",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -9,8 +9,8 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
-    "assetlink": "^0.7.5",
-    "assetlink-plugin-api": "^0.7.5",
+    "assetlink": "^0.7.6",
+    "assetlink-plugin-api": "^0.7.6",
     "core-js": "^3.8.3",
     "js-cookie": "^3.0.1",
     "quasar": "^2.6.0",
