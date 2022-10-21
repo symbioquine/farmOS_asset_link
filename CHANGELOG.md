@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Emit the 'changed:assetLogs' event when inventory quantities referencing an asset change
+- Add a plugin to show asset inventory quantities as badges in the asset page title
 
 ### Changed
 
