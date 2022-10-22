@@ -68,7 +68,10 @@ const resolveEntity = async () => {
   }
 };
 
-const onEntityChanged = ({ type, id }) => {
+const onEntityChanged = (changedEvent) => {
+  const type = changedEvent[`${props.entityType}Type`];
+  const id = changedEvent[`${props.entityType}Id`];
+
   if (
     resolvedEntity.value &&
     resolvedEntity.value.type === type &&

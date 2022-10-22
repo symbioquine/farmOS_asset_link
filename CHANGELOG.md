@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Automatically group requests via subrequests #1
 
+### Fixed
+
+- Fix bug where changed events wouldn't be honored by the EntityResolver component
+
 ## [0.7.6] - 2022-10-21
 
 ### Added
