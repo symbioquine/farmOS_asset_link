@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add support for slot showIf predicates using jmespath
+- Add support for widget decorator vue template shorthand
 
 ### Changed
 

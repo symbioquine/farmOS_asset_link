@@ -128,6 +128,19 @@ Plugins can define URL Paths (routes) within Asset Link - e.g. `https://my-farmo
   }
 ```
 
+#### Shorthand
+
+Asset Link provides a shorthand for defining simple routes. The above route can be written like this;
+
+```vue
+<template alink-route[com.example.farmos_asset_link.routes.v0.my_page]="/my-page/:arg">
+  <q-page padding class="text-left">
+    <h4>My Custom page</h4>
+    ...
+  </q-page>
+</template>
+```
+
 ### Slots
 
 ```javascript
@@ -243,6 +256,8 @@ export default {
 
       widgetDecorator.appliesIf(context => context.asset.attributes.status !== 'archived');
 
+      widgetDecorator.weight(150);
+
       widgetDecorator.component(handle.thisPlugin);
     });
 
@@ -253,6 +268,18 @@ export default {
 
 ***Note:** The above example uses a Vue.js slot to render the content it is decorating. The slot concept
 seen here is different from Asset Link slots.*
+
+#### Shorthand
+
+Asset Link provides a shorthand for defining simple widget decorators. The above widget decorator can be written like this;
+
+```vue
+<template
+    alink-widget-decorator[com.example.farmos_asset_link.widget_decorator.v0.asset_name_with_peace_sign]
+      ="asset-name(weight: 150, appliesIf: 'asset.attributes.status != `archived`')">
+  <span><slot></slot> &#9774;</span>
+</template>
+```
 
 #### Consuming Widget Decorators
 

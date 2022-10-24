@@ -12,6 +12,7 @@ export default class VuePluginShorthandDecorator {
 
     const shorthandRoutes = {};
     const shorthandSlots = {};
+    const shorthandWidgetDecorators = {};
     for (const [key, value] of Object.entries(component.template.attrs || {})) {
       if (key.indexOf("alink-route") !== -1) {
         const { routeName, routeParams } = parseShorthandRoute(key, value);
@@ -23,9 +24,17 @@ export default class VuePluginShorthandDecorator {
         shorthandSlots[slotName] = slotParams;
       }
 
+      if (key.indexOf("alink-widget-decorator") !== -1) {
+        const { widgetDecoratorName, widgetDecoratorParams } = parseShorthandWidgetDecorator(key, value);
+        shorthandWidgetDecorators[widgetDecoratorName] = widgetDecoratorParams;
+      }
+
     }
 
-    if (Object.keys(shorthandRoutes).length === 0 && Object.keys(shorthandSlots).length === 0) {
+    if (
+        Object.keys(shorthandRoutes).length === 0 &&
+        Object.keys(shorthandSlots).length === 0 &&
+        Object.keys(shorthandWidgetDecorators).length === 0) {
       return existingPluginDecorator;
     }
 
@@ -58,9 +67,22 @@ export default class VuePluginShorthandDecorator {
             slot.component(handle.thisPlugin);
           });
         }
-  
+
+        for (const [widgetDecoratorName, widgetDecoratorParams] of Object.entries(shorthandWidgetDecorators)) {
+          handle.defineWidgetDecorator(widgetDecoratorName, widgetDecorator => {
+            widgetDecorator.targetWidgetName(widgetDecoratorParams.targetWidgetName);
+            if (widgetDecoratorParams.weight !== undefined) {
+              widgetDecorator.weight(widgetDecoratorParams.weight);
+            }
+            if (widgetDecoratorParams.appliesIf !== undefined) {
+              widgetDecorator.appliesIf(widgetDecoratorParams.appliesIf);
+            }
+            widgetDecorator.component(handle.thisPlugin);
+          });
+        }
+
       };
-  
+
       return p;
     };
   
@@ -142,6 +164,11 @@ function parseArgs(rawArgStr) {
         continue;
       }
 
+      if (c === ',' && !quoteType) {
+        offsetIdx += 1;
+        break;
+      }
+
       if (rawArgStr.at(offsetIdx) === quoteType) {
         quotesClosed = true;
         let argEndIdx = rawArgStr.indexOf(',', offsetIdx);
@@ -155,8 +182,8 @@ function parseArgs(rawArgStr) {
           throw new Error(`Plugin shorthand args in quotes cannot have text following the quotes. Got: '${argEndChars}' after value for arg '${argName}'`);
         }
 
-        offsetIdx = argEndIdx;
-        continue;
+        offsetIdx = argEndIdx + 1;
+        break;
       }
 
       rawArgValue += c;
@@ -227,10 +254,10 @@ function parseShorthandSlot(key, value) {
 
     if (argName === 'showIf') {
       if (typeof argValue !== 'string') {
-        throw new Error(`Got invalid (non-string) appliesIf predicate for shorthand slot: '${slotName}'`);
+        throw new Error(`Got invalid (non-string) showIf predicate for shorthand slot: '${slotName}'`);
       }
       if (slotParams.showIf !== undefined) {
-        throw new Error(`Got multiple appliesIf predicates for shorthand slot: '${slotName}'`);
+        throw new Error(`Got multiple showIf predicates for shorthand slot: '${slotName}'`);
       }
       slotParams.showIf = (context) => !!jmespath.search(context, argValue);
       return;
@@ -242,5 +269,70 @@ function parseShorthandSlot(key, value) {
   return {
     slotName,
     slotParams,
+  };
+}
+
+function parseShorthandWidgetDecorator(key, value) {
+  const m = key.match(/alink-widget-decorator\[([\w\.]+)\]/);
+  if (!m) {
+    throw new Error(`Plugin widget decorator shorthand must be in the format 'alink-widget-decorator[my.unique.identifier]="target-widget-name"' or 'alink-widget-decorator[my.unique.identifier]="target-widget-name(weight: 99)"'. Got: '${key}="${value}"'`);
+  }
+  const widgetDecoratorName = m[1];
+
+  let targetWidgetName = value;
+  let slotWeight = undefined;
+  let slotPredicate = undefined;
+
+  const openingArgParenIdx = value.indexOf("(");
+  const closingArgParenIdx = value.lastIndexOf(")");
+
+  const fmtError = () => `Plugin slot shorthand must be in the format 'alink-slot[my.unique.identifier]="slot-type"' or 'alink-slot[my.unique.identifier]="slot-type(weight: 99)"'. Got: '${key}="${value}"'`;
+
+  let args = [];
+  if (openingArgParenIdx !== -1) {
+    if (closingArgParenIdx < openingArgParenIdx) {
+      throw new Error(fmtError());
+    }
+
+    targetWidgetName = value.slice(0, openingArgParenIdx).trim();
+
+    const rawArgStr = value.slice(openingArgParenIdx + 1, closingArgParenIdx).trim();
+
+    args = parseArgs(rawArgStr);
+  }
+
+  const widgetDecoratorParams = {
+      targetWidgetName,
+  };
+
+  args.forEach(([argName, argValue]) => {
+    if (argName === 'weight') {
+      if (typeof argValue !== 'number') {
+        throw new Error(`Got invalid (non-numeric) weight for shorthand slot: '${slotName}'`);
+      }
+      if (widgetDecoratorParams.weight !== undefined) {
+        throw new Error(`Got multiple weight values for shorthand slot: '${slotName}'`);
+      }
+      widgetDecoratorParams.weight = argValue;
+      return;
+    }
+
+    if (argName === 'appliesIf') {
+      if (typeof argValue !== 'string') {
+        throw new Error(`Got invalid (non-string) appliesIf predicate for shorthand widget decorator: '${widgetDecoratorName}'`);
+      }
+      if (widgetDecoratorParams.appliesIf !== undefined) {
+        throw new Error(`Got multiple appliesIf predicates for shorthand widget decorator: '${widgetDecoratorName}'`);
+      }
+      widgetDecoratorParams.appliesIf = (context) => !!jmespath.search(context, argValue);
+      return;
+    }
+
+    throw new Error(`Got unknown arg '${argName}' for shorthand widget decorator: '${widgetDecoratorName}'`);
+  });
+
+  return {
+    widgetDecoratorName,
+    widgetDecoratorParams,
   };
 }
