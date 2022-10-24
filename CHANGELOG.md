@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add support for slot showIf predicates using jmespath
+
 ### Changed
 
 - Automatically group requests via subrequests #1

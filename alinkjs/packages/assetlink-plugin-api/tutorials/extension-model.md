@@ -178,6 +178,45 @@ The same slot can be defined via an attribute on the `<template>` tag;
 </template>
 ```
 
+#### Shorthand with `weight` and `appliesIf` Predicate Arguments
+
+The shorthand syntax also supports providing some kinds of arguments. For example, the following;
+
+```vue
+<template>
+  <q-btn flat dense to="/another/asset-link-page" icon="mdi-alarm-bell"></q-btn>
+</template>
+
+<script>
+export default {
+  onLoad(handle, assetLink) {
+
+    handle.defineSlot('com.example.farmos_asset_link.slots.v0.my_slot', slot => {
+      slot.type('toolbar-item');
+
+      slot.weight(200);
+
+      slot.showIf(context => context.pageName === 'asset-page');
+
+      slot.component(handle.thisPlugin);
+    });
+
+  }
+}
+</script>
+```
+
+can be rewritten as follows;
+
+```vue
+<template
+    alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]="toolbar-item(weight: 200, showIf: 'pageName === `asset-page`')">
+  <q-btn flat dense to="/another/asset-link-page" icon="mdi-alarm-bell"></q-btn>
+</template>
+```
+
+Where the expression string provided to the `showIf` argument is a valid [JMESPath expression](https://jmespath.org/).
+
 #### Consuming Slots
 
 ```vue
