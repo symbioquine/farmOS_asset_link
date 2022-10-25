@@ -223,7 +223,7 @@ can be rewritten as follows;
 
 ```vue
 <template
-    alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]="toolbar-item(weight: 200, showIf: 'pageName === `asset-page`')">
+    alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]="toolbar-item(weight: 200, showIf: 'pageName == `asset-page`')">
   <q-btn flat dense to="/another/asset-link-page" icon="mdi-alarm-bell"></q-btn>
 </template>
 ```
@@ -238,6 +238,85 @@ Where the expression string provided to the `showIf` argument is a valid [JMESPa
     :key="slotDef.id"
     :is="slotDef.component"
     v-bind="slotDef.props"></component>
+```
+
+#### Slot Multiplexing
+
+Sometimes a single slot should render multiple times based on a given context. In this scenario a context multiplexing function may be supplied
+which maps from the context to N contexts which are used to render the slot multiple times.
+
+```vue
+<script setup>
+const props = defineProps({
+  symbol: {
+    type: String,
+    required: true,
+  },
+});
+</script>
+
+<template>
+  <q-btn flat dense to="/another/asset-link-page" :label="props.symbol"></q-btn>
+</template>
+
+<script>
+export default {
+  onLoad(handle, assetLink) {
+
+    handle.defineSlot('com.example.farmos_asset_link.slots.v0.my_slot', slot => {
+      slot.type('toolbar-item');
+
+      slot.multiplexContext(context => ['\u{1F648}', '\u{1F649}', '\u{1F64A}'].map(wiseMonkey => ({ symbol: wiseMonkey })));
+
+      slot.component(handle.thisPlugin);
+    });
+
+  }
+}
+</script>
+```
+
+#### Slot Multiplexing Shorthand
+
+```vue
+<script setup>
+const props = defineProps({
+  symbol: {
+    type: String,
+    required: true,
+  },
+});
+</script>
+
+<template alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]=
+          'toolbar-item(multiplexContext: "[`\\uD83D\\uDE48`, `\\uD83D\\uDE49`, `\\uD83D\\uDE4A`][*].{ symbol: @ }")'>
+  <q-btn flat dense to="/another/asset-link-page" :label="props.symbol"></q-btn>
+</template>
+```
+
+> ![](./wise_monkeys_toolbar_items.png)
+
+The above example is only slightly complicated by the detail that we're using an array literal of unicode characters that must be represented
+with two escape characters. See http://www.russellcottrell.com/greek/utilities/SurrogatePairCalculator.htm For most practical purposes one would
+actually be using JMESPath to transform the original context, not hard-code unicode characters, but it is still a fun example - thus included here.
+
+More practically, here is another example showing the image relationships on an asset being multiplexed into multiple contexts - each of which
+is rendered as text in a div;
+
+```vue
+<script setup>
+const props = defineProps({
+  imgRef: {
+    type: Object,
+    required: true,
+  },
+});
+</script>
+
+<template alink-slot[com.example.farmos_asset_link.slots.v0.image_ids]=
+    'page-slot(showIf: "pageName == `asset-page`", multiplexContext: "asset.relationships.image.data[*].{ imgRef: @ }")'>
+  <div>Image: {{ props.imgRef.type }} - {{ props.imgRef.id }}</div>
+</template>
 ```
 
 ### Widget Decorators

@@ -13,8 +13,6 @@ test('jmespath learning tests', () => {
 
 test('route shorthand', () => {
   const rawPluginSource = `
-    <script setup>
-    </script>
     <template alink-route[com.example.farmos_asset_link.routes.v0.my_page]="/my-page/:arg">
       <span>Hello from Vue!</span>
     </template>
@@ -37,8 +35,6 @@ test('route shorthand', () => {
 
 test('slot shorthand', () => {
   const rawPluginSource = `
-    <script setup>
-    </script>
     <template alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]="toolbar-item">
       <span>Hello from Vue!</span>
     </template>
@@ -61,8 +57,6 @@ test('slot shorthand', () => {
 
 test('slot shorthand with weight', () => {
   const rawPluginSource = `
-    <script setup>
-    </script>
     <template alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]="toolbar-item(weight: 10)">
       <span>Hello from Vue!</span>
     </template>
@@ -87,8 +81,6 @@ test('slot shorthand with weight', () => {
 
 test('slot shorthand with showIf predicate', () => {
   const rawPluginSource = `
-    <script setup>
-    </script>
     <template alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]='\t\t\n\rtoolbar-item ( showIf  : \t"asset.\\"attributes\\".status"\n )   '>
       <span>Hello from Vue!</span>
     </template>
@@ -118,6 +110,34 @@ test('slot shorthand with showIf predicate', () => {
   expect(predicate({})).toBeFalsy();
 });
 
+test('slot shorthand with multiplexed context', () => {
+  const rawPluginSource = `
+    <template alink-slot[com.example.farmos_asset_link.slots.v0.my_multi_slot]='\t\t\n\rtoolbar-item ( multiplexContext  : \t"asset.relationships.image.data[*].{ imgRef: @ }"\n )   '>
+      <span>Hello from Vue!</span>
+    </template>
+  `;
+
+  const { handle } = decorateAndCallOnload(rawPluginSource);
+
+  expect(handle.defineSlot.mock.calls[0][0]).toBe("com.example.farmos_asset_link.slots.v0.my_multi_slot");
+
+  const slotHandle = {
+      type: jest.fn(),
+      multiplexContext: jest.fn(),
+      component: jest.fn(),
+  };
+
+  handle.defineSlot.mock.calls[0][1](slotHandle);
+
+  expect(slotHandle.type.mock.calls[0][0]).toBe("toolbar-item");
+  expect(slotHandle.component.mock.calls[0][0]).toBe(handle.thisPlugin);
+
+  const multiplexer = slotHandle.multiplexContext.mock.calls[0][0];
+
+  expect(multiplexer({ asset: { relationships: { image: { data: [ { key0: 'a' }, { key0: 'b' } ] } } } }))
+    .toStrictEqual([ { imgRef: { key0: 'a' } }, { imgRef: { key0: 'b' } } ]);
+});
+
 test('slot shorthand with broken showIf predicate - missing colon', () => {
   const rawPluginSource = `
     <script setup>
@@ -132,8 +152,6 @@ test('slot shorthand with broken showIf predicate - missing colon', () => {
 
 test('slot shorthand with broken showIf predicate - missing end quote', () => {
   const rawPluginSource = `
-    <script setup>
-    </script>
     <template alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]="toolbar-item(showIf: 'asset.attributes.status)">
       <span>Hello from Vue!</span>
     </template>

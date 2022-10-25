@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for slot showIf predicates using jmespath
 - Add support for widget decorator vue template shorthand
+- Add support for slot shorthand context multiplexer
 
 ### Changed
 

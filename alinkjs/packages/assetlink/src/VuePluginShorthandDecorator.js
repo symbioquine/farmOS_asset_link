@@ -64,6 +64,9 @@ export default class VuePluginShorthandDecorator {
             if (slotParams.showIf !== undefined) {
               slot.showIf(slotParams.showIf);
             }
+            if (slotParams.multiplexContext !== undefined) {
+              slot.multiplexContext(slotParams.multiplexContext);
+            }
             slot.component(handle.thisPlugin);
           });
         }
@@ -260,6 +263,17 @@ function parseShorthandSlot(key, value) {
         throw new Error(`Got multiple showIf predicates for shorthand slot: '${slotName}'`);
       }
       slotParams.showIf = (context) => !!jmespath.search(context, argValue);
+      return;
+    }
+
+    if (argName === 'multiplexContext') {
+      if (typeof argValue !== 'string') {
+        throw new Error(`Got invalid (non-string) multiplexContext function for shorthand slot: '${slotName}'`);
+      }
+      if (slotParams.multiplexContext !== undefined) {
+        throw new Error(`Got multiple multiplexContext function for shorthand slot: '${slotName}'`);
+      }
+      slotParams.multiplexContext = (context) => jmespath.search(context, argValue);
       return;
     }
 
