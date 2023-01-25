@@ -1,5 +1,5 @@
-import fetch from 'cross-fetch';
-import { createDrupalUrl, uuidv4 } from "assetlink-plugin-api";
+import fetch, { Response } from 'cross-fetch';
+import { createDrupalUrl, getDrupalBasePath, uuidv4 } from "assetlink-plugin-api";
 
 const DEFAULT_FETCHER_DELEGATE = { fetch };
 
@@ -38,9 +38,11 @@ export default class SubrequestsGroupingRequestFetcher {
 
     if (!options.method) options.method = 'GET';
 
-    const requestUrl = new URL(url, window.location.origin + window.assetLinkDrupalBasePath);
+    const farmOSBasePath = getDrupalBasePath();
 
-    const isFarmOSRequest = requestUrl.host === window.location.host && requestUrl.pathname.startsWith(window.assetLinkDrupalBasePath);
+    const requestUrl = createDrupalUrl(url);
+
+    const isFarmOSRequest = requestUrl.host === window.location.host && requestUrl.pathname.startsWith(farmOSBasePath);
 
     // For now just handle farmOS GET requests via subrequests
     if (!isFarmOSRequest || options.method !== 'GET') {

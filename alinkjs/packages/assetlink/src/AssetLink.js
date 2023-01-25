@@ -18,6 +18,7 @@ import localforage from 'localforage';
 import fetch from 'cross-fetch';
 
 import AssetLinkUI from '@/AssetLinkUI';
+import HttpEntityModelLoader from '@/HttpEntityModelLoader';
 import FarmOSConnectionStatusDetector from '@/FarmOSConnectionStatusDetector';
 import SubrequestsGroupingRequestFetcher from '@/SubrequestsGroupingRequestFetcher';
 import PeekableAsyncIterator from '@/PeekableAsyncIterator';
@@ -37,9 +38,12 @@ import { createDrupalUrl, currentEpochSecond, EventBus, uuidv4 } from "assetlink
  */
 export default class AssetLink {
 
-  constructor(rootComponent, devToolsApi) {
+  constructor(rootComponent, devToolsApi, options) {
     this._rootComponent = rootComponent;
     this._devToolsApi = devToolsApi;
+
+    const opts = options || {};
+
     this._vm = reactive({
       booted: false,
       bootProgress: 0,
@@ -51,7 +55,12 @@ export default class AssetLink {
       messages: [],
     });
 
-    this._connectionStatus = new FarmOSConnectionStatusDetector();
+    const connectionStatusOptions = {};
+    if (options.fetch) {
+      connectionStatusOptions.fetcherDelegate = { fetch: options.fetch };
+    }
+
+    this._connectionStatus = new FarmOSConnectionStatusDetector(connectionStatusOptions);
 
     this._fetcherDelegate = new SubrequestsGroupingRequestFetcher(this._connectionStatus);
 
@@ -64,9 +73,18 @@ export default class AssetLink {
       });
     });
 
-    this._store = localforage.createInstance({
+    this._store = opts.store || localforage.createInstance({
       name: 'asset-link',
       storeName: 'data',
+    });
+
+    this._entityModelLoader = new HttpEntityModelLoader({
+      fetch: this.fetch,
+      store: this.store,
+      reportProgressFn: (bootText, bootProgress) => {
+        this.vm.bootText = bootText;
+        this.vm.bootProgress = bootProgress;
+      },
     });
 
     this._cores = {};
@@ -243,7 +261,7 @@ export default class AssetLink {
     }
 
     this.vm.bootText = "Loading models...";
-    this._models = await this._loadModels();
+    this._models = await this._entityModelLoader.loadModels();
 
     const orbitCoordinatorActivationBarrier = new Barrier(true);
 
@@ -846,88 +864,6 @@ export default class AssetLink {
       }
       throw error;
     }
-  }
-
-  async _loadModels() {
-    const cacheKey = `asset-link-cached-entity-models`;
-
-    const cacheItem = await this._store.getItem(cacheKey);
-
-    if (cacheItem) {
-      // TODO: If cache item is stale, schedule background refresh
-      return cacheItem.value;
-    }
-
-    const models = await this._loadModelsFromServer();
-
-    const timestamp = currentEpochSecond();
-
-    await this._store.setItem(cacheKey, {key: cacheKey, timestamp, value: models});
-
-    return models;
-  }
-
-  async _loadModelsFromServer() {
-    this.vm.bootText = "Loading server schema";
-    const fetchJson = (url, args) => this.fetch(url, args).then(response => response.json());
-
-    const serverSchema = await fetchJson(createDrupalUrl('/api/schema'));
-
-    const serverRelatedSchemas = serverSchema.allOf.flatMap(schemaRef => schemaRef.links || []);
-
-    const models = {};
-
-    await Promise.all(serverRelatedSchemas.map(async (serverRelatedSchema) => {
-      const schemaUrl = typeof serverRelatedSchema.targetSchema === 'object' ? serverRelatedSchema.targetSchema.$ref : serverRelatedSchema.targetSchema;
-
-      const relatedSchema = await fetchJson(schemaUrl);
-
-      const relatedItemSchema = await fetchJson(relatedSchema.definitions.data.items.$ref);
-
-      const typeName = relatedItemSchema.definitions.type['const'];
-
-      models[typeName] = {
-        attributes: Object.fromEntries(
-            Object.entries(relatedItemSchema.definitions.attributes.properties)
-              .map(([attrName, attr]) => {
-                // Orbit.js seems to only support 'number', not 'integer' but handles the former well enough
-                if (attr.type === 'integer') {
-                  attr.type = 'number';
-                }
-
-                // https://www.drupal.org/project/jsonapi_schema/issues/3058850
-                if (attrName === 'third_party_settings') {
-                  attr.type = 'object';
-                }
-
-                return [attrName, attr];
-              })
-        ),
-        relationships: Object.fromEntries(
-            Object.entries(relatedItemSchema.definitions?.relationships?.properties || {})
-              .map(([attrName, propSchema]) => {
-
-                // https://github.com/bradjones1/orbit-schema-from-openapi/blob/cde8d885152b3d88b9352669c97099ca1c13a2ff/index.js#L160-L172
-                if (propSchema.properties?.data?.type === 'array') {
-                  return [attrName, {
-                    kind: 'hasMany',
-                    type: propSchema.properties?.data?.items?.properties?.type?.enum,
-                  }];
-                } else {
-                  return [attrName, {
-                    kind: 'hasOne',
-                    type: propSchema.properties?.data?.properties?.type?.enum,
-                  }];
-                }
-
-              })
-        ),
-      };
-
-      this.vm.bootProgress = (Object.keys(models).length / serverRelatedSchemas.length) * 100;
-    }));
-
-    return models;
   }
 
 }

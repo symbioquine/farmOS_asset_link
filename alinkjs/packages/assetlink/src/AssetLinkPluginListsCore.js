@@ -8,8 +8,9 @@ import HttpAccessDeniedException from '@/HttpAccessDeniedException';
 export default class AssetLinkPluginListsCore {
 
   constructor(assetLink) {
-    this._store = assetLink._store;
-    this._connectionStatus = assetLink._connectionStatus;
+    this._store = assetLink.store;
+    this._fetch = assetLink.fetch;
+    this._connectionStatus = assetLink.connectionStatus;
 
     this._vm = reactive({
       lists: [],
@@ -28,6 +29,7 @@ export default class AssetLinkPluginListsCore {
         this._pluginReferenceTracker,
         true,
         () => this._connectionStatus.isOnline.value,
+        { fetch: this._fetch },
     );
     this._localPluginList = new LocalPluginList(
         assetLink._store,
@@ -65,6 +67,7 @@ export default class AssetLinkPluginListsCore {
           this._pluginReferenceTracker,
           false,
           () => this._connectionStatus.hasNetworkConnection.value,
+          { fetch: this._fetch },
         ));
 
     for (let pluginList of [
@@ -128,6 +131,7 @@ export default class AssetLinkPluginListsCore {
         this._pluginReferenceTracker,
         false,
         () => this._connectionStatus.hasNetworkConnection.value,
+        { fetch: this._fetch },
     );
 
     this._extraPluginLists.push(pluginList);
@@ -355,7 +359,7 @@ class PluginReferenceTracker {
 }
 
 class HttpPluginList {
-  constructor(store, url, pluginReferenceTracker, isDefault, isOnlineGetter) {
+  constructor(store, url, pluginReferenceTracker, isDefault, isOnlineGetter, { fetch }) {
     this._store = store;
     this._storeKey = `asset-link-cached-plugin-list:${url}`;
     this._url = url;
@@ -364,6 +368,8 @@ class HttpPluginList {
     this._isLocal = false;
 
     this._isOnlineGetter = isOnlineGetter;
+
+    this._fetch = fetch;
 
     this._latestPluginListView = undefined;
   }
@@ -460,9 +466,7 @@ class HttpPluginList {
       headers['X-Skip-Cache'] = "1";
     }
 
-    const pluginListRes = await fetch(this._url, { headers });
-
-    console.log(pluginListRes);
+    const pluginListRes = await this._fetch(this._url, { headers });
 
     if (!pluginListRes.ok) {
       if (cachedPluginList) {

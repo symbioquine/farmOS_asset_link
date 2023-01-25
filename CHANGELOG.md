@@ -12,14 +12,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add support for slot showIf predicates using jmespath
 - Add support for widget decorator vue template shorthand
 - Add support for slot shorthand context multiplexer
+- Add some basic smoke testing of AssetLink initialization and entity resolution
 
 ### Changed
 
 - Automatically group requests via subrequests #1
+- Refactor entity model loading into a separate class and add tests
 
 ### Fixed
 
 - Fix bug where changed events wouldn't be honored by the EntityResolver component
+- Fix handling of farmOS installations that are at subpaths rather than '/'
 
 ## [0.7.6] - 2022-10-21
 

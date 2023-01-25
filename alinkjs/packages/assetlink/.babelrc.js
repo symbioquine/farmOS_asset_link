@@ -1,22 +1,35 @@
 module.exports = api => {
   const isTest = api.env('test');
 
-  const testPlugins = isTest ? ["@babel/plugin-transform-modules-commonjs"] : [];
+  const plugins = isTest ? [
+    "@babel/plugin-transform-modules-commonjs",
+  ] : [
+    ["@babel/plugin-proposal-decorators", { "decoratorsBeforeExport": true, "version": "2021-12" }],
+  ];
 
-  return {
+  const alias = {
+      "@": "assetlink",
+  };
+
+  const cfg = {
     presets: [],
     plugins: [
-      ...testPlugins,
-      ["@babel/plugin-syntax-decorators", { "decoratorsBeforeExport": true }],
+      ...plugins,
       [
         require.resolve('babel-plugin-module-resolver'),
         {
-          alias: {
-            "@": "assetlink",
-          },
+          alias,
           loglevel: 'silent',
         }
       ]
     ]
   };
+
+  if (isTest) {
+    cfg.presets.push("@vue/babel-preset-app");
+
+    alias["@"] = "./src";
+  }
+
+  return cfg;
 };

@@ -5,6 +5,7 @@ import { defineAsyncComponent } from "vue";
  */
 export { default as createDrupalUrl } from "./createDrupalUrl";
 export { default as currentEpochSecond } from "./currentEpochSecond";
+export { default as getDrupalBasePath } from "./getDrupalBasePath";
 export { default as summarizeAssetNames } from "./summarizeAssetNames";
 export { default as RacingLocalRemoteAsyncIterator } from "./RacingLocalRemoteAsyncIterator";
 export { default as EventBus } from "./EventBus";

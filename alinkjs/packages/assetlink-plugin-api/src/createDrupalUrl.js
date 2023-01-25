@@ -12,11 +12,16 @@
  * @param {String} pathSuffix The path suffix of the URL to be created
  * @return {external:URL} the fully qualified URL instance.
  */
+import getDrupalBasePath from "./getDrupalBasePath";
+
 export default function createDrupalUrl(pathSuffix) {
-  return new URL(
-    pathSuffix,
-    window.location.origin + window.assetLinkDrupalBasePath
-  );
+  let relativePath = pathSuffix;
+  if (typeof relativePath === "string" && relativePath.startsWith("/")) {
+    relativePath = relativePath.substring(1);
+  }
+
+  const basePath = getDrupalBasePath();
+  return new URL(relativePath, window.location.origin + basePath);
 }
 
 /**
