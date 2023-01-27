@@ -240,12 +240,20 @@ export default class AssetLink {
     return true;
   }
 
+  async halt() {
+    this._connectionStatus.stop();
+    await this.cores.farmData.halt();
+    await this.cores.localPluginStorage.halt();
+    await this.cores.pluginLoader.halt();
+    await this.cores.pluginLists.halt();
+  }
+
   /**
    * Clear all local data/caches/etc. Asset Link will become non-functional after this until the page is reloaded.
    */
   async permanentlyDeleteLocalData() {
+    await this.halt();
     await this._store.dropInstance();
-    this._connectionStatus.stop();
     await this.cores.farmData.permanentlyDeleteLocalData();
   }
 

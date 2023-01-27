@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add support for widget decorator vue template shorthand
 - Add support for slot shorthand context multiplexer
 - Add some basic smoke testing of AssetLink initialization and entity resolution
+- Add a AssetLink::halt method and test to show that resolving a cached asset involves no http requests
 
 ### Changed
 

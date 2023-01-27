@@ -18,6 +18,10 @@ export default class AssetLinkLocalPluginStorageCore {
     // TODO: ?
   }
 
+  async halt() {
+    // TODO: ?
+  }
+
   async readLocalPlugin(url, opts) {
     const options = opts || {};
 

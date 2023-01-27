@@ -46,6 +46,10 @@ export default class AssetLinkPluginLoaderCore {
     // TODO: ?
   }
 
+  async halt() {
+    // TODO: ?
+  }
+
   async loadPlugin(pluginUrl, opts) {
     const options = opts || {};
 

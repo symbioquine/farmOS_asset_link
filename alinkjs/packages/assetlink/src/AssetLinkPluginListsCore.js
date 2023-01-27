@@ -88,6 +88,10 @@ export default class AssetLinkPluginListsCore {
     }
   }
 
+  async halt() {
+    // TODO: ?
+  }
+
   async addPluginToLocalBlacklist(pluginUrl) {
     this.vm.blacklist = await this._localBlacklist.addPlugin(pluginUrl);
   }

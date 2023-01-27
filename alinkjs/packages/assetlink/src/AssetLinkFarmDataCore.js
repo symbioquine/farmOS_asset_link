@@ -71,6 +71,13 @@ export default class AssetLinkFarmDataCore {
   }
 
   /**
+  * Stops this core.
+  */
+  async halt() {
+    await this._coordinator.deactivate();
+  }
+
+  /**
   * Clear all local data/caches/etc. Asset Link will become non-functional after this until the page is reloaded.
   */
   async permanentlyDeleteLocalData() {
