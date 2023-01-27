@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Automatically group requests via subrequests #1
 - Refactor entity model loading into a separate class and add tests
+- Refactor farm data access out into a new Asset Link core
 
 ### Fixed
 
