@@ -1,10 +1,20 @@
+import fs from 'fs';
+
 import { createTestFarm } from './createTestFarm';
 import AssetLink from '@/AssetLink';
-import { createDrupalUrl } from "assetlink-plugin-api";
+import { createDrupalUrl, uuidv4 } from "assetlink-plugin-api";
 
 import { Response } from 'cross-fetch';
 
 const delay = time => new Promise(res => setTimeout(res, time));
+
+// Copied from https://stackoverflow.com/a/64183951/1864479
+export async function toArray(asyncIterator) {
+  const arr = [];
+  for await (const i of asyncIterator)
+      arr.push(i);
+  return arr;
+}
 
 describe('Basic Smoke Testing', () => {
     let farm = undefined;
@@ -95,19 +105,13 @@ describe('Basic Smoke Testing', () => {
           startTimelineEventGroup: jest.fn(() => ({ end: jest.fn() })),
         };
 
-        const store = {
-            ready: jest.fn(() => Promise.resolve(true)),
-            getItem: jest.fn(() => Promise.resolve(undefined)),
-            setItem: jest.fn(),
-        };
-
         Object.defineProperty(window.navigator, 'onLine', {
           get: function() {
             return true;
           },
         });
 
-        const assetLink = new AssetLink(rootComponent, devToolsApi, { store, fetch });
+        const assetLink = new AssetLink(rootComponent, devToolsApi, { fetch });
 
         await assetLink.boot();
 
@@ -120,6 +124,20 @@ describe('Basic Smoke Testing', () => {
 
         expect(animalByNumericId).toBeDefined();
         expect(animalByNumericId.id).toBe('e9fa0fcb-b334-4350-8294-f2d2c51a9a25');
+
+        const NamedBasedEntitySearcher = fs.readFileSync('../assetlink-default-plugins/plugins/NamedBasedEntitySearcher.alink.js', 'utf8');
+
+        await assetLink.cores.localPluginStorage.writeLocalPlugin(new URL('indexeddb://asset-link/data/NamedBasedEntitySearcher.alink.js'), NamedBasedEntitySearcher);
+
+        const searchResults = await toArray(assetLink.searchEntities({
+          entityType: 'asset',
+          id: uuidv4(),
+          type: 'text-search',
+          term: 'Tommy',
+        }, 'remote'));
+
+        expect(searchResults[0]).toBeDefined();
+        expect(searchResults[0].entity.id).toBe('e9fa0fcb-b334-4350-8294-f2d2c51a9a25');
     }, /* timeout: */ 60 * 1000);
 
 });

@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix bug where changed events wouldn't be honored by the EntityResolver component
 - Fix handling of farmOS installations that are at subpaths rather than '/'
+- Fix handling of internal plugin data representation so it can be loaded in tests
 
 ## [0.7.6] - 2022-10-21
 

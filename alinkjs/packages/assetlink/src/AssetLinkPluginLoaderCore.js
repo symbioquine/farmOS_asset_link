@@ -3,10 +3,14 @@ import { markRaw, reactive } from 'vue';
 import { loadModule } from 'vue3-sfc-loader/dist/vue3-sfc-loader.esm.js';
 import { parseComponent } from 'vue-template-compiler';
 
+import fetch from 'cross-fetch';
+
 import VuePluginShorthandDecorator from '@/VuePluginShorthandDecorator';
 import { default as pluginModuleLibrary, pluginModuleLibraryNames } from '@/pluginModuleLibrary';
 
 import { createDrupalUrl, currentEpochSecond, EventBus, uuidv4 } from "assetlink-plugin-api";
+
+const PLUGIN_DATA_URL_PREFIX = "data:application/javascript;base64,";
 
 export default class AssetLinkPluginLoaderCore {
 
@@ -63,9 +67,13 @@ export default class AssetLinkPluginLoaderCore {
     let rawPluginSource = undefined;
 
     try {
-      const pluginDataUrl = await this._fetchPlugin(pluginUrl, options);
+      const pluginData = await this._fetchPlugin(pluginUrl, options);
 
-      rawPluginSource = await fetch(pluginDataUrl).then(r => r.text());
+      if (!pluginData.startsWith(PLUGIN_DATA_URL_PREFIX)) {
+        throw new Error(`Fetched plugin data must start with: '${PLUGIN_DATA_URL_PREFIX}'`);
+      }
+
+      rawPluginSource = atob(pluginData.substring(PLUGIN_DATA_URL_PREFIX.length));
 
       let pluginDecorator = p => p;
 
@@ -281,7 +289,7 @@ export default class AssetLinkPluginLoaderCore {
 
     const pluginSrc = await pluginSrcRes.text();
 
-    const pluginDataUrl = "data:application/javascript;base64," + btoa(pluginSrc);
+    const pluginDataUrl = PLUGIN_DATA_URL_PREFIX + btoa(pluginSrc);
 
     await this._store.setItem(cacheKey, {key: cacheKey, timestamp, value: pluginDataUrl});
 
