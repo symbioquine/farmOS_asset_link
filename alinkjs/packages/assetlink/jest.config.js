@@ -1,4 +1,4 @@
-const esModules = ['assetlink-plugin-api', 'uuid', 'vue3-sfc-loader'].join('|');
+const esModules = ['assetlink-plugin-api', 'uuid', 'vue3-sfc-loader', 'quasar'].join('|');
 
 /** @returns {Promise<import('jest').Config>} */
 module.exports = async () => {
@@ -13,6 +13,7 @@ module.exports = async () => {
     verbose: true,
     setupFiles: [
       "fake-indexeddb/auto",
+      "./test/customTestEnv",
     ],
   };
 };

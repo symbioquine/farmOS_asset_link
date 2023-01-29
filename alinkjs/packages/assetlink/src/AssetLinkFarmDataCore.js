@@ -560,7 +560,7 @@ export default class AssetLinkFarmDataCore {
   
           const fileBuffer = await fetch(fileDataUrl).then(r => r.arrayBuffer());
   
-          const uploadResult = await this._csrfAwareFetch(uploadUrl, {
+          const uploadResult = await this._fetch(uploadUrl, {
             method: 'POST',
             headers: {
               'Accept': 'application/vnd.api+json',
