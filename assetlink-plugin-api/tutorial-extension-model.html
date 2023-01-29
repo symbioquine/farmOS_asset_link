@@ -228,6 +228,15 @@ routes/pages > slots > widgets
 
   }
 </code></pre>
+<h4>Shorthand</h4>
+<p>Asset Link provides a shorthand for defining simple routes. The above route can be written like this;</p>
+<pre class="prettyprint source lang-vue"><code>&lt;template alink-route[com.example.farmos_asset_link.routes.v0.my_page]=&quot;/my-page/:arg&quot;>
+  &lt;q-page padding class=&quot;text-left&quot;>
+    &lt;h4>My Custom page&lt;/h4>
+    ...
+  &lt;/q-page>
+&lt;/template>
+</code></pre>
 <h3>Slots</h3>
 <pre class="prettyprint source lang-javascript"><code>  static onLoad(handle) {
 
@@ -268,12 +277,112 @@ export default {
   &lt;q-btn flat dense to=&quot;/another/asset-link-page&quot; icon=&quot;mdi-alarm-bell&quot;>&lt;/q-btn>
 &lt;/template>
 </code></pre>
+<h4>Shorthand with <code>weight</code> and <code>appliesIf</code> Predicate Arguments</h4>
+<p>The shorthand syntax also supports providing some kinds of arguments. For example, the following;</p>
+<pre class="prettyprint source lang-vue"><code>&lt;template>
+  &lt;q-btn flat dense to=&quot;/another/asset-link-page&quot; icon=&quot;mdi-alarm-bell&quot;>&lt;/q-btn>
+&lt;/template>
+
+&lt;script>
+export default {
+  onLoad(handle, assetLink) {
+
+    handle.defineSlot('com.example.farmos_asset_link.slots.v0.my_slot', slot => {
+      slot.type('toolbar-item');
+
+      slot.weight(200);
+
+      slot.showIf(context => context.pageName === 'asset-page');
+
+      slot.component(handle.thisPlugin);
+    });
+
+  }
+}
+&lt;/script>
+</code></pre>
+<p>can be rewritten as follows;</p>
+<pre class="prettyprint source lang-vue"><code>&lt;template
+    alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]=&quot;toolbar-item(weight: 200, showIf: 'pageName == `asset-page`')&quot;>
+  &lt;q-btn flat dense to=&quot;/another/asset-link-page&quot; icon=&quot;mdi-alarm-bell&quot;>&lt;/q-btn>
+&lt;/template>
+</code></pre>
+<p>Where the expression string provided to the <code>showIf</code> argument is a valid <a href="https://jmespath.org/">JMESPath expression</a>.</p>
 <h4>Consuming Slots</h4>
 <pre class="prettyprint source lang-vue"><code>&lt;component
     v-for=&quot;slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, pageName: 'asset-page', asset })&quot;
     :key=&quot;slotDef.id&quot;
     :is=&quot;slotDef.component&quot;
     v-bind=&quot;slotDef.props&quot;>&lt;/component>
+</code></pre>
+<h4>Slot Multiplexing</h4>
+<p>Sometimes a single slot should render multiple times based on a given context. In this scenario a context multiplexing function may be supplied
+which maps from the context to N contexts which are used to render the slot multiple times.</p>
+<pre class="prettyprint source lang-vue"><code>&lt;script setup>
+const props = defineProps({
+  symbol: {
+    type: String,
+    required: true,
+  },
+});
+&lt;/script>
+
+&lt;template>
+  &lt;q-btn flat dense to=&quot;/another/asset-link-page&quot; :label=&quot;props.symbol&quot;>&lt;/q-btn>
+&lt;/template>
+
+&lt;script>
+export default {
+  onLoad(handle, assetLink) {
+
+    handle.defineSlot('com.example.farmos_asset_link.slots.v0.my_slot', slot => {
+      slot.type('toolbar-item');
+
+      slot.multiplexContext(context => ['\u{1F648}', '\u{1F649}', '\u{1F64A}'].map(wiseMonkey => ({ symbol: wiseMonkey })));
+
+      slot.component(handle.thisPlugin);
+    });
+
+  }
+}
+&lt;/script>
+</code></pre>
+<h4>Slot Multiplexing Shorthand</h4>
+<pre class="prettyprint source lang-vue"><code>&lt;script setup>
+const props = defineProps({
+  symbol: {
+    type: String,
+    required: true,
+  },
+});
+&lt;/script>
+
+&lt;template alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]=
+          'toolbar-item(multiplexContext: &quot;[`\\uD83D\\uDE48`, `\\uD83D\\uDE49`, `\\uD83D\\uDE4A`][*].{ symbol: @ }&quot;)'>
+  &lt;q-btn flat dense to=&quot;/another/asset-link-page&quot; :label=&quot;props.symbol&quot;>&lt;/q-btn>
+&lt;/template>
+</code></pre>
+<blockquote>
+<p><img src="./wise_monkeys_toolbar_items.png" alt=""></p>
+</blockquote>
+<p>The above example is only slightly complicated by the detail that we're using an array literal of unicode characters that must be represented
+with two escape characters. See http://www.russellcottrell.com/greek/utilities/SurrogatePairCalculator.htm For most practical purposes one would
+actually be using JMESPath to transform the original context, not hard-code unicode characters, but it is still a fun example - thus included here.</p>
+<p>More practically, here is another example showing the image relationships on an asset being multiplexed into multiple contexts - each of which
+is rendered as text in a div;</p>
+<pre class="prettyprint source lang-vue"><code>&lt;script setup>
+const props = defineProps({
+  imgRef: {
+    type: Object,
+    required: true,
+  },
+});
+&lt;/script>
+
+&lt;template alink-slot[com.example.farmos_asset_link.slots.v0.image_ids]=
+    'page-slot(showIf: &quot;pageName == `asset-page`&quot;, multiplexContext: &quot;asset.relationships.image.data[*].{ imgRef: @ }&quot;)'>
+  &lt;div>Image: {{ props.imgRef.type }} - {{ props.imgRef.id }}&lt;/div>
+&lt;/template>
 </code></pre>
 <h3>Widget Decorators</h3>
 <pre class="prettyprint source lang-javascript"><code>&lt;template>
@@ -289,6 +398,8 @@ export default {
 
       widgetDecorator.appliesIf(context => context.asset.attributes.status !== 'archived');
 
+      widgetDecorator.weight(150);
+
       widgetDecorator.component(handle.thisPlugin);
     });
 
@@ -298,6 +409,14 @@ export default {
 </code></pre>
 <p><em><strong>Note:</strong> The above example uses a Vue.js slot to render the content it is decorating. The slot concept
 seen here is different from Asset Link slots.</em></p>
+<h4>Shorthand</h4>
+<p>Asset Link provides a shorthand for defining simple widget decorators. The above widget decorator can be written like this;</p>
+<pre class="prettyprint source lang-vue"><code>&lt;template
+    alink-widget-decorator[com.example.farmos_asset_link.widget_decorator.v0.asset_name_with_peace_sign]
+      =&quot;asset-name(weight: 150, appliesIf: 'asset.attributes.status != `archived`')&quot;>
+  &lt;span>&lt;slot>&lt;/slot> &#9774;&lt;/span>
+&lt;/template>
+</code></pre>
 <h4>Consuming Widget Decorators</h4>
 <pre class="prettyprint source lang-vue"><code>&lt;h2>Asset: &lt;render-widget
       name=&quot;asset-name&quot;
