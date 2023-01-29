@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const https = require("https");
 const { defineConfig } = require("@vue/cli-service");
 const { ModuleFederationPlugin } = require("webpack").container;
@@ -97,6 +98,11 @@ module.exports = defineConfig({
   transpileDependencies: ["quasar"],
 
   configureWebpack(config) {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'quasar': path.resolve('./node_modules/quasar'),
+    };
+
     config.plugins.push(
       new ModuleFederationPlugin({
         name: "assetlink_sidecar",

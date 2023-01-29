@@ -18,6 +18,6 @@
   "minimum-stability": "dev",
   "require": {
     "drupal/default_content": "^2.0@alpha",
-    "drupal/devel": "^4.1"
+    "drupal/devel": "^5"
   }
 }

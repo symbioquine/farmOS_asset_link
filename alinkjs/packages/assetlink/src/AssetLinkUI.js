@@ -1,6 +1,4 @@
-import {
-  Dialog,
-} from 'quasar';
+import Dialog from 'quasar/src/plugins/Dialog';
 
 export default class AssetLinkUI {
 

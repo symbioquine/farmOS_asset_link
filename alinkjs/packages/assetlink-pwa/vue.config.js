@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const https = require("https");
 const { defineConfig } = require("@vue/cli-service");
 const { ModuleFederationPlugin } = require("webpack").container;
@@ -133,6 +134,11 @@ module.exports = defineConfig({
   },
 
   configureWebpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'quasar': path.resolve('./node_modules/quasar'),
+    };
+
     config.resolve.fallback = {
       ...config.resolve.fallback,
       path: require.resolve("path-browserify"),

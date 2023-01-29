@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix bug with Webpack resolution of Quasar Dialog plugin - breaking all dialogs
+
 ## [0.8.1] - 2023-01-29
 
 ### Fixed
