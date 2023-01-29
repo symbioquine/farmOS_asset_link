@@ -93,14 +93,20 @@ export default class SubrequestsGroupingRequestFetcher {
       };
     });
 
-    const subrequestsRes = await this.fetcherDelegate.fetch(createDrupalUrl('/subrequests?_format=json'), {
-      method: 'POST',
-      body: JSON.stringify(subrequestBlueprint),
-      headers: {
-        'Content-Type': 'application/vnd.api+json',
-        Accept: 'application/vnd.api+json',
-      },
-    });
+    let subrequestsRes = undefined;
+    try {
+      subrequestsRes = await this.fetcherDelegate.fetch(createDrupalUrl('/subrequests?_format=json'), {
+        method: 'POST',
+        body: JSON.stringify(subrequestBlueprint),
+        headers: {
+          'Content-Type': 'application/vnd.api+json',
+          Accept: 'application/vnd.api+json',
+        },
+      });
+    } catch (err) {
+      requests.forEach(r => r.reject(err));
+      return;
+    }
 
     const subrequestsData = await subrequestsRes.json();
 

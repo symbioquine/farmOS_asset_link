@@ -329,7 +329,7 @@ export default class OrbitPriorityTaskQueue {
     await settleInSeries(this, 'complete');
   }
 
-  async _fail(task) {
+  async _fail(task, e) {
     if (this._reject) {
       this._reject(e);
     }

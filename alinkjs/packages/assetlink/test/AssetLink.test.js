@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import { createTestFarm } from './createTestFarm';
 import AssetLink from '@/AssetLink';
-import { createDrupalUrl, uuidv4 } from "assetlink-plugin-api";
+import { createDrupalUrl, formatRFC3339, uuidv4 } from "assetlink-plugin-api";
 
 import { Response } from 'cross-fetch';
 
@@ -18,7 +18,7 @@ export async function toArray(asyncIterator) {
 
 describe('Basic Smoke Testing', () => {
     let farm = undefined;
-    let fetch = undefined;
+    let fetchDelegate = undefined;
     let createdAnimal = undefined;
 
     const rootComponent = {};
@@ -28,6 +28,10 @@ describe('Basic Smoke Testing', () => {
     };
 
     beforeAll(async () => {
+        Object.defineProperty(window.navigator, 'onLine', {
+          get: jest.fn(() => true),
+        });
+
         farm = await createTestFarm();
 
         const createdAnimalType = await farm.fetch(`${farm.url}/api/taxonomy_term/animal_type`, {
@@ -79,7 +83,7 @@ describe('Basic Smoke Testing', () => {
 
       window.assetLinkDrupalBasePath = farm.init_data.path;
 
-      fetch = jest.fn(async (url, opts) => {
+      fetchDelegate = async (url, opts) => {
         const u = new URL(url);
 
         if (u.pathname.endsWith('/alink/backend/default-plugins.repo.json')) {
@@ -95,22 +99,14 @@ describe('Basic Smoke Testing', () => {
         }
 
         return await farm.fetch(url, opts);
-      });
-    }, /* timeout: */ 10 * 1000);
-
-    afterAll(async () => {
-        await farm.cleanup()
+      };
     }, /* timeout: */ 10 * 1000);
 
     test('Resolve an Asset', async () => {
+        const fetch = jest.fn(fetchDelegate);
+
         expect(window.location.toString()).toBe(farm.url.toString());
         expect(createDrupalUrl('api').toString()).toBe(farm.url.toString() + '/api');
-
-        Object.defineProperty(window.navigator, 'onLine', {
-          get: function() {
-            return true;
-          },
-        });
 
         let assetLink = new AssetLink(rootComponent, devToolsApi, { fetch });
 
@@ -157,5 +153,117 @@ describe('Basic Smoke Testing', () => {
 
         await assetLink.halt();
     }, /* timeout: */ 60 * 1000);
+
+    test('Backs up only Orbit.js JSON:API sync queue, not request queue', async () => {
+        const fetch = jest.fn(fetchDelegate);
+
+        expect(window.location.toString()).toBe(farm.url.toString());
+        expect(createDrupalUrl('api').toString()).toBe(farm.url.toString() + '/api');
+
+        let assetLink = new AssetLink(rootComponent, devToolsApi, { fetch });
+
+        await assetLink.boot();
+
+        const animal = await assetLink.resolveEntity('asset', 'e9fa0fcb-b334-4350-8294-f2d2c51a9a25');
+
+        expect(animal).toBeDefined();
+        expect(animal.attributes.name).toBe('Tommy');
+
+        fetch.mockImplementation(async (url, opts) => {
+          const u = new URL(url);
+
+          if (u.pathname.endsWith('/api/asset/animal') || u.pathname.endsWith('/api/log/observation')) {
+            // TODO: Consider also including these other failure modes in the test
+            // throw new Error("Request failed!");
+            // return new Promise(() => {});
+            return new Response('', {
+              status: 500,
+              statusText: 'ERR',
+            });
+          }
+
+          return await farm.fetch(url, opts);
+        });
+
+        const NamedBasedEntitySearcher = fs.readFileSync('../assetlink-default-plugins/plugins/NamedBasedEntitySearcher.alink.js', 'utf8');
+
+        await assetLink.cores.localPluginStorage.writeLocalPlugin(new URL('indexeddb://asset-link/data/NamedBasedEntitySearcher.alink.js'), NamedBasedEntitySearcher);
+
+        await delay(100);
+
+        try {
+          await toArray(assetLink.searchEntities({
+            entityType: 'asset',
+            entityBundles: ['animal'],
+            id: uuidv4(),
+            type: 'text-search',
+            term: 'Victor',
+          }, 'remote'));
+        } catch (err) {
+          // console.log("Error while searching entities:", err);
+        }
+
+        const logToCreate = {
+          type: 'log--observation',
+          id: uuidv4(),
+          attributes: {
+            name: 'Something happened!',
+            timestamp: formatRFC3339(new Date()),
+            status: "done",
+          },
+        };
+
+        try {
+          await assetLink.entitySource.update(
+              (t) => t.addRecord(logToCreate),
+              {label: logToCreate.attributes.name});
+        } catch (err) {
+          // console.log("Error while adding log record:", err);
+        }
+
+        await assetLink.halt();
+
+        fetch.mockClear();
+
+        const observationEndpointCalled = new Promise(resolve => {
+          fetch.mockImplementation(async (url, opts) => {
+            try {
+              return await farm.fetch(url, opts);
+            } finally {
+              if (new URL(url).pathname.endsWith('/api/log/observation')) {
+                resolve(true);
+              }
+            }
+          });
+        });
+
+        assetLink = new AssetLink(rootComponent, devToolsApi, { fetch });
+
+        await assetLink.boot();
+
+        await Promise.race([observationEndpointCalled, delay(1000)]);
+
+        // TODO: Figure out how to wait on the transform (creating the log) being fully settled
+        await delay(1000);
+
+        const fetchCalls = fetch.mock.calls.map(c => ({method: c[1].method || 'GET', url: new URL(c[0]).toString()}));
+
+        expect(fetchCalls.filter(call => call.url.includes('/subrequests'))).toEqual([]);
+        expect(fetchCalls.filter(call => call.url.includes('/api/asset/animal'))).toEqual([]);
+
+        expect(fetchCalls.filter(call => call.url.includes('/api/log/observation')))
+          .toEqual([
+            {
+              method: 'POST',
+              url: farm.url.toString() + '/api/log/observation',
+            }
+          ]);
+
+        await assetLink.halt();
+    }, /* timeout: */ 60 * 1000);
+
+    afterAll(async () => {
+        await farm.cleanup()
+    }, /* timeout: */ 30 * 1000);
 
 });

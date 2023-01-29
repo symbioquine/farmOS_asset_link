@@ -20,12 +20,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatically group requests via subrequests #1
 - Refactor entity model loading into a separate class and add tests
 - Refactor farm data access out into a new Asset Link core
+- Change Orbit.js JSON:API request timeout from 10s to 5s
+- Propagate transforms from memory to remote source synchronously
 
 ### Fixed
 
 - Fix bug where changed events wouldn't be honored by the EntityResolver component
 - Fix handling of farmOS installations that are at subpaths rather than '/'
 - Fix handling of internal plugin data representation so it can be loaded in tests
+- Fix handling of Orbit.js query failures to avoid gumming up internal request queues
+- Cleaned up some unnecessary logging
+- Fixed task failure propagation in OrbitPriorityTaskQueue
+- Fixed handling of `fetch` requests that throw exceptions in SubrequestsGroupingRequestFetcher
 
 ## [0.7.6] - 2022-10-21
 

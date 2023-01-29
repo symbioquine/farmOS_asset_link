@@ -372,18 +372,15 @@ export default class AssetLink {
       if (addCsrfHeader) {
         const tokenResponse = await this._fetcherDelegate.fetch(createDrupalUrl('/session/token'));
 
-        console.log("tokenResponse:", tokenResponse);
-
         const token = await tokenResponse.text();
 
         // TODO: Cache the token
         if (!options.headers) options.headers = {};
         options.headers['X-CSRF-Token'] = token;
       }
-  
+
       return await this._fetcherDelegate.fetch(url, options);
     } catch (error) {
-      console.log("Error in _csrfAwareFetch", typeof error, error);
       if (error.message === 'Network request failed') {
         return new Response(null, {
           status: 503,

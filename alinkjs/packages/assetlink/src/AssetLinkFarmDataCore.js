@@ -321,7 +321,7 @@ export default class AssetLinkFarmDataCore {
       name: 'remote',
       host: createDrupalUrl('/api'),
       defaultFetchSettings: {
-        timeout: 10000,
+        timeout: 5000,
       },
       bucket: this._bucket,
       requestQueueSettings: {
@@ -361,7 +361,15 @@ export default class AssetLinkFarmDataCore {
       target: 'remote',
       action: 'query',
 
-      blocking: true
+      blocking: true,
+
+      // Discard failed queries
+      catch (e, query) {
+        // console.log('Error performing remote.query()', query, e);
+        this.source.requestQueue.skip(e);
+        this.target.requestQueue.skip(e);
+        throw e;
+      },
     });
 
     // Only use the remote query strategy when online
@@ -378,10 +386,18 @@ export default class AssetLinkFarmDataCore {
         target: 'remote',
         action: 'update',
 
-        blocking: false,
+        blocking: true,
 
         filter(query) {
           return !query.options?.localOnly;
+        },
+
+        catch (e, transform) {
+          // console.log('Error performing remote.update()', transform, e);
+          // TODO: Keep track of retries and move failed updates to a DLQ after a certain number
+          // this.source.requestQueue.skip(e);
+          // this.target.requestQueue.skip(e);
+          throw e;
         },
       })
     );
@@ -499,7 +515,6 @@ export default class AssetLinkFarmDataCore {
       });
   
       this._memory.on('update', update => {
-        console.log('_memory::update', update);
   
         let operations = update?.operations || [];
         if (!Array.isArray(operations)) {
@@ -507,8 +522,7 @@ export default class AssetLinkFarmDataCore {
         }
   
         operations.forEach(operation => {
-          console.log(operation);
-  
+
           if (['updateRecord', 'replaceAttribute', 'addToRelatedRecords', 'removeFromRelatedRecords', 'replaceRelatedRecords', 'replaceRelatedRecord']
               .includes(operation.op) && operation.record.type.startsWith('asset--')) {
             this.eventBus.$emit('changed:asset', { assetType: operation.record.type, assetId: operation.record.id});
@@ -565,7 +579,7 @@ export default class AssetLinkFarmDataCore {
   
       watchEffect(async () => {
         const isOnline = this._connectionStatus.isOnline.value;
-  
+
         this._remote.requestQueue.autoProcess = isOnline;
         if (isOnline && !this._remote.requestQueue.empty) {
           this._remote.requestQueue.process();

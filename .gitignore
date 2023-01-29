@@ -7,6 +7,9 @@ lerna-debug.log
 /docker/db
 /docker/www
 **/node_modules
+.vscode
+launch.json
+.pydevproject
 .project
 website/assetlink-plugin-api
 
