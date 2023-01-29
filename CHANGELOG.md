@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2023-01-29
+
 ### Added
 
 - Add support for slot showIf predicates using jmespath
@@ -363,7 +365,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.6...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.8.0...HEAD
+[0.8.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.6...unbuilt-v0.8.0
 [0.7.6]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.5...unbuilt-v0.7.6
 [0.7.5]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.4...unbuilt-v0.7.5
 [0.7.4]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.3...unbuilt-v0.7.4
