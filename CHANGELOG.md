@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.2] - 2023-01-29
+
 ### Fixed
 
 - Fix bug with Webpack resolution of Quasar Dialog plugin - breaking all dialogs
@@ -375,7 +377,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.8.1...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.8.2...HEAD
+[0.8.2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.8.1...unbuilt-v0.8.2
 [0.8.1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.8.0...unbuilt-v0.8.1
 [0.8.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.6...unbuilt-v0.8.0
 [0.7.6]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.5...unbuilt-v0.7.6
