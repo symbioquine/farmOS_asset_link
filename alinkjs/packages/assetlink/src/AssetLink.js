@@ -40,8 +40,8 @@ export default class AssetLink {
     });
 
     const connectionStatusOptions = {};
-    if (options.fetch) {
-      connectionStatusOptions.fetcherDelegate = { fetch: options.fetch };
+    if (opts.fetch) {
+      connectionStatusOptions.fetcherDelegate = { fetch: opts.fetch };
     }
 
     this._connectionStatus = new FarmOSConnectionStatusDetector(connectionStatusOptions);

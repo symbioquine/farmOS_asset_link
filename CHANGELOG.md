@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix bug with options handling injecting `fetch` into the AssetLink class
+
 ## [0.8.0] - 2023-01-29
 
 ### Added
