@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2023-01-29
+
+### Added
+
+- Add support for slot showIf predicates using jmespath
+- Add support for widget decorator vue template shorthand
+- Add support for slot shorthand context multiplexer
+- Add some basic smoke testing of AssetLink initialization and entity resolution
+- Add a AssetLink::halt method and test to show that resolving a cached asset involves no http requests
+
+### Changed
+
+- Automatically group requests via subrequests #1
+- Refactor entity model loading into a separate class and add tests
+- Refactor farm data access out into a new Asset Link core
+- Change Orbit.js JSON:API request timeout from 10s to 5s
+- Propagate transforms from memory to remote source synchronously
+
+### Fixed
+
+- Fix bug where changed events wouldn't be honored by the EntityResolver component
+- Fix handling of farmOS installations that are at subpaths rather than '/'
+- Fix handling of internal plugin data representation so it can be loaded in tests
+- Fix handling of Orbit.js query failures to avoid gumming up internal request queues
+- Cleaned up some unnecessary logging
+- Fixed task failure propagation in OrbitPriorityTaskQueue
+- Fixed handling of `fetch` requests that throw exceptions in SubrequestsGroupingRequestFetcher
+
 ## [0.7.6] - 2022-10-21
 
 ### Added
@@ -337,7 +365,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.6...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.8.0...HEAD
+[0.8.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.6...unbuilt-v0.8.0
 [0.7.6]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.5...unbuilt-v0.7.6
 [0.7.5]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.4...unbuilt-v0.7.5
 [0.7.4]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.7.3...unbuilt-v0.7.4
