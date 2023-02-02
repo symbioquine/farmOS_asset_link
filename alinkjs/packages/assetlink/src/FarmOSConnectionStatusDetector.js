@@ -23,7 +23,6 @@ export default class FarmOSConnectionStatusDetector {
 
     this.$_running = false;
     this.$_barrier = new Barrier(true);
-
     this.hasNetworkConnection = ref(window.navigator.onLine);
     this.canReachFarmOS = ref(null);
     this.userRef = ref(null);

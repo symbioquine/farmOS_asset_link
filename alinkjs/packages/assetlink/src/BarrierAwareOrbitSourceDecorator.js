@@ -1,5 +1,3 @@
-import { Queryable, Updatable } from '@orbit/data';
-
 /**
  * Decorator for a Orbit.js Source which blocks queries/updates while a barrier is active.
  */
@@ -11,6 +9,14 @@ export default class BarrierAwareOrbitSourceDecorator {
 
   get cache() {
     return this._delegate.cache;
+  }
+
+  get queryBuilder() {
+    return this._delegate.queryBuilder;
+  }
+
+  get transformBuilder() {
+    return this._delegate.transformBuilder;
   }
 
   async query(queryOrExpressions, options, id) {

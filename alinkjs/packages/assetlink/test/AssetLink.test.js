@@ -6,6 +6,12 @@ import { createDrupalUrl, formatRFC3339, uuidv4 } from "assetlink-plugin-api";
 
 import { Response } from 'cross-fetch';
 
+import FDBFactory from 'fake-indexeddb/lib/FDBFactory';
+
+beforeEach(() => {
+  window.indexedDB = new FDBFactory();
+});
+
 const delay = time => new Promise(res => setTimeout(res, time));
 
 // Copied from https://stackoverflow.com/a/64183951/1864479
@@ -17,9 +23,12 @@ export async function toArray(asyncIterator) {
 }
 
 describe('Basic Smoke Testing', () => {
+    const isOnline = jest.fn(() => true);
     let farm = undefined;
     let fetchDelegate = undefined;
     let createdAnimal = undefined;
+    let createdRabbitCage = undefined;
+    let createdRabbitry = undefined;
 
     const rootComponent = {};
 
@@ -29,7 +38,7 @@ describe('Basic Smoke Testing', () => {
 
     beforeAll(async () => {
         Object.defineProperty(window.navigator, 'onLine', {
-          get: jest.fn(() => true),
+          get: isOnline,
         });
 
         farm = await createTestFarm();
@@ -77,6 +86,50 @@ describe('Basic Smoke Testing', () => {
                 }
               }
           }),
+      }).then((response) => response.json());
+
+      createdRabbitCage = await farm.fetch(`${farm.url}/api/asset/land`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/vnd.api+json',
+          Accept: 'application/vnd.api+json',
+        },
+        body: JSON.stringify({
+            "data": {
+              "type": "asset--land",
+              "id": "8966a8f7-861f-4a8e-ae53-70bdc28896df",
+              "attributes": {
+                "name": "Rabbit Cage #1",
+                "status": "active",
+                "is_location": true,
+                "is_fixed": true,
+                "land_type": "paddock",
+                "intrinsic_geometry": 'POLYGON((0 0,-10 0,-10 10,0 10,0 0))',
+              },
+            }
+        }),
+      }).then((response) => response.json());
+
+      createdRabbitry = await farm.fetch(`${farm.url}/api/asset/land`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/vnd.api+json',
+          Accept: 'application/vnd.api+json',
+        },
+        body: JSON.stringify({
+            "data": {
+              "type": "asset--land",
+              "id": "4c9fe5c1-a349-4b75-8310-f60e956f44de",
+              "attributes": {
+                "name": "Rabbitry",
+                "status": "active",
+                "is_location": true,
+                "is_fixed": true,
+                "land_type": "paddock",
+                "intrinsic_geometry": 'POLYGON((0 0,10 0,10 10,0 10,0 0))',
+              },
+            }
+        }),
       }).then((response) => response.json());
 
       jsdom.reconfigure({ url: farm.url.toString() });
@@ -163,6 +216,8 @@ describe('Basic Smoke Testing', () => {
         let assetLink = new AssetLink(rootComponent, devToolsApi, { fetch });
 
         await assetLink.boot();
+
+        await delay(100);
 
         const animal = await assetLink.resolveEntity('asset', 'e9fa0fcb-b334-4350-8294-f2d2c51a9a25');
 
@@ -260,6 +315,84 @@ describe('Basic Smoke Testing', () => {
           ]);
 
         await assetLink.halt();
+    }, /* timeout: */ 60 * 1000);
+
+    test('Move asset while offline and confirm location and geometry are updated', async () => {
+      const fetch = jest.fn(fetchDelegate);
+
+      expect(window.location.toString()).toBe(farm.url.toString());
+      expect(createDrupalUrl('api').toString()).toBe(farm.url.toString() + '/api');
+
+      const assetLink = new AssetLink(rootComponent, devToolsApi, { fetch });
+
+      await assetLink.boot();
+  
+      await delay(500);
+
+      try {
+        const animal = await assetLink.resolveEntity('asset', 'e9fa0fcb-b334-4350-8294-f2d2c51a9a25');
+
+        const animalCage = await assetLink.resolveEntity('asset', createdRabbitCage.data.id);
+
+        // Make sure these are cached
+        await assetLink.getLogTypes();
+
+        expect(animal).toBeDefined();
+        expect(animal.relationships.location.data).toEqual([]);
+        expect(animal.attributes.geometry?.value).not.toBeDefined();
+
+        expect(animalCage).toBeDefined();
+  
+        isOnline.mockImplementation(() => false);
+        window.dispatchEvent(new window.Event('offline'));
+
+        const movementLog = {
+          type: 'log--activity',
+          id: 'ef49c952-6af7-4769-9700-6f30c2614471',
+          attributes: {
+            name: `Move ${createdAnimal.data.attributes.name} to ${createdRabbitCage.data.attributes.name}`,
+            timestamp: formatRFC3339(new Date()),
+            status: "done",
+            is_movement: true,
+          },
+          relationships: {
+            asset: {
+              data: [
+                {
+                  type: createdAnimal.data.type,
+                  id: createdAnimal.data.id,
+                }
+              ]
+            },
+            location: {
+              data: [
+                {
+                  type: createdRabbitCage.data.type,
+                  id: createdRabbitCage.data.id,
+                },
+                {
+                  type: createdRabbitry.data.type,
+                  id: createdRabbitry.data.id,
+                }
+              ],
+            },
+          },
+        };
+  
+        await assetLink.entitySource.update(
+            (t) => t.addRecord(movementLog),
+            {label: movementLog.attributes.name});
+  
+        // await delay(1000);
+  
+        const updatedAnimal = await assetLink.resolveEntity('asset', 'e9fa0fcb-b334-4350-8294-f2d2c51a9a25');
+
+        expect(updatedAnimal).toBeDefined();
+        expect(updatedAnimal.relationships.location.data).toEqual([{ 'type': animalCage.type, 'id': animalCage.id }]);
+        expect(updatedAnimal.attributes.geometry?.value).toBe(animalCage.attributes.geometry.value);
+      } finally {
+        await assetLink.halt();
+      }
     }, /* timeout: */ 60 * 1000);
 
     afterAll(async () => {

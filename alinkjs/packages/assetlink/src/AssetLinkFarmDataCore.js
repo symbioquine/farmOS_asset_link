@@ -10,6 +10,8 @@ import { MemorySource } from '@orbit/memory';
 import Barrier from '@/Barrier';
 import BarrierAwareOrbitSourceDecorator from '@/BarrierAwareOrbitSourceDecorator';
 
+import FarmDataModelOrbitMemorySourceDecorator from '@/FarmDataModelOrbitMemorySourceDecorator';
+
 import HttpEntityModelLoader from '@/HttpEntityModelLoader';
 
 import PeekableAsyncIterator from '@/PeekableAsyncIterator';
@@ -111,19 +113,9 @@ export default class AssetLinkFarmDataCore {
   async getAssetTypes() {
     await this._booted;
 
-    const listAssetTypes = async (source) => {
-      return await source.query((q) => q
-          .findRecords(`asset_type--asset_type`)
-          .sort('drupal_internal__id'));
-    };
-
-    const assetTypes = await listAssetTypes(this.entitySource.cache);
-
-    if (assetTypes.length) {
-      return assetTypes;
-    }
-
-    return await listAssetTypes(this.entitySource);
+    return await this.entitySource.query((q) => q
+        .findRecords(`asset_type--asset_type`)
+        .sort('drupal_internal__id'));
   }
 
   /**
@@ -132,19 +124,9 @@ export default class AssetLinkFarmDataCore {
   async getLogTypes() {
     await this._booted;
 
-    const listLogTypes = async (source) => {
-      return await source.query((q) => q
-          .findRecords(`log_type--log_type`)
-          .sort('drupal_internal__id'));
-    };
-
-    const logTypes = await listLogTypes(this.entitySource.cache);
-
-    if (logTypes.length) {
-      return logTypes;
-    }
-
-    return await listLogTypes(this.entitySource);
+    return await this.entitySource.query((q) => q
+        .findRecords(`log_type--log_type`)
+        .sort('drupal_internal__id'));
   }
 
   /**
@@ -153,19 +135,9 @@ export default class AssetLinkFarmDataCore {
   async getTaxonomyVocabularies() {
     await this._booted;
 
-    const listTaxonomyVocabularies = async (source) => {
-      return await source.query((q) => q
+    await this.entitySource.query((q) => q
           .findRecords(`taxonomy_vocabulary--taxonomy_vocabulary`)
           .sort('drupal_internal__vid'));
-    };
-
-    const taxonomyVocabularies = await listTaxonomyVocabularies(this.entitySource.cache);
-
-    if (taxonomyVocabularies.length) {
-      return taxonomyVocabularies;
-    }
-
-    return await listTaxonomyVocabularies(this.entitySource);
   }
 
   /**
@@ -189,52 +161,43 @@ export default class AssetLinkFarmDataCore {
     }
 
     if (!entityBundles || !entityBundles.length) {
+      console.log(`No entity bundles for '${entityType}'. Returning...`);
       return;
     }
 
     const isRefNumeric = /^-?\d+$/.test(entityRef);
 
-    const findEntity = async entitySource => {
-      const results = await entitySource.query(q => entityBundles.flatMap(entityBundle => {
-        const typeName = `${entityType}--${entityBundle}`;
+    const results = await this.entitySource.query(q => entityBundles.flatMap(entityBundle => {
+      const typeName = `${entityType}--${entityBundle}`;
 
-        const model = this.getEntityModelSync(typeName);
+      const model = this.getEntityModelSync(typeName);
 
-        const numericIdKey = Object.keys(model.attributes).find(k => /^drupal_internal__.?id$/.test(k));
+      const numericIdKey = Object.keys(model.attributes).find(k => /^drupal_internal__.?id$/.test(k));
 
-        if (!numericIdKey && isRefNumeric) {
-          return [];
-        }
+      if (!numericIdKey && isRefNumeric) {
+        return [];
+      }
 
-        let idFilter = { attribute: 'id', value: entityRef };
-        if (isRefNumeric) {
-          idFilter = { attribute: numericIdKey, value: parseInt(entityRef) };
-        }
+      let idFilter = { attribute: 'id', value: entityRef };
+      if (isRefNumeric) {
+        idFilter = { attribute: numericIdKey, value: parseInt(entityRef) };
+      }
 
-        let baseQuery = q
-          .findRecords(typeName)
-          .filter(idFilter);
+      let baseQuery = q
+        .findRecords(typeName)
+        .filter(idFilter);
 
-        const include = Object.keys(model.relationships);
+      const include = Object.keys(model.relationships);
 
-        return (additionalFilters || [])
-          .reduce((query, f) => query.filter(f), baseQuery)
-          .sort(numericIdKey || 'id')
-          .options({ include });
-      }));
+      return (additionalFilters || [])
+        .reduce((query, f) => query.filter(f), baseQuery)
+        .sort(numericIdKey || 'id')
+        .options({ include });
+    }));
 
-      const entities = results.flatMap(l => l);
+    const entities = results.flatMap(l => l);
 
-      return entities.find(e => e);
-    };
-
-    const entity = await findEntity(this.entitySource.cache);
-
-    if (entity) {
-      return entity;
-    }
-
-    return await findEntity(this.entitySource);
+    return entities.find(e => e);
   }
 
   /**
@@ -314,7 +277,13 @@ export default class AssetLinkFarmDataCore {
       },
     });
 
-    this._entitySource = new BarrierAwareOrbitSourceDecorator(this._memory, orbitCoordinatorActivationBarrier);
+    this._entitySource = new FarmDataModelOrbitMemorySourceDecorator(
+      new BarrierAwareOrbitSourceDecorator(this._memory, orbitCoordinatorActivationBarrier, { schema: this._schema }),
+      {
+        schema: this._schema,
+        logTypesGetter: async () => this.getLogTypes(),
+      }
+    );
 
     this._remote = new DrupalJSONAPISource({
       schema: this._schema,
@@ -329,7 +298,7 @@ export default class AssetLinkFarmDataCore {
       },
     });
 
-    this._remoteEntitySource = new BarrierAwareOrbitSourceDecorator(this._remote, orbitCoordinatorActivationBarrier);
+    this._remoteEntitySource = new BarrierAwareOrbitSourceDecorator(this._remote, orbitCoordinatorActivationBarrier, { schema: this._schema });
 
     const updateViewModelPendingUpdates = () => {
       this._vm.pendingUpdates = this._remote.requestQueue.entries.filter(r => r.type === 'update');
@@ -352,7 +321,7 @@ export default class AssetLinkFarmDataCore {
     });
 
     // Query the remote server when the memory source is queried (and online)
-    this._remoteQueryStrategy = new RequestStrategy({
+    this._coordinator.addStrategy(new RequestStrategy({
       name: 'remoteRequestStrategy',
 
       source: 'memory',
@@ -363,6 +332,52 @@ export default class AssetLinkFarmDataCore {
 
       blocking: true,
 
+      filter: (query) => {
+        if (!this._connectionStatus.isOnline.value) {
+          return false;
+        }
+
+        if (query.options?.forceRemote) {
+          return true;
+        }
+
+        // TODO: Figure out whether we need to do this filtering on a expression-by-expression basis,
+        // rather than for the query as a whole.
+        let multiQuery = true;
+        let expressions = query?.expressions || [];
+        if (!Array.isArray(expressions)) {
+          multiQuery = false;
+          expressions = [expressions];
+        }
+
+        const dataInCache = this._memory.cache.query(query);
+
+        const flattenResults = (r, e) => {
+          if (r === undefined) {
+            return [];
+          }
+          if (e.op === 'findRecord' || e.op === 'findRelatedRecord') {
+            return [r];
+          }
+          return r;
+        }
+
+        const zip = (...rows) => [...rows[0]].map((_,c) => rows.map(row => row[c]))
+
+        let cacheResultEntities = [];
+        if (multiQuery) {
+          cacheResultEntities = zip(dataInCache, expressions).flatMap(([r, e]) => flattenResults(r, e));
+        } else {
+          cacheResultEntities = flattenResults(dataInCache, expressions[0]);
+        }
+
+        if (cacheResultEntities.length) {
+          return false;
+        }
+
+        return true;
+      },
+
       // Discard failed queries
       catch (e, query) {
         // console.log('Error performing remote.query()', query, e);
@@ -370,12 +385,7 @@ export default class AssetLinkFarmDataCore {
         this.target.requestQueue.skip(e);
         throw e;
       },
-    });
-
-    // Only use the remote query strategy when online
-    if (this._connectionStatus.isOnline.value) {
-      this._coordinator.addStrategy(this._remoteQueryStrategy);
-    }
+    }));
 
     // Update the remote server whenever the memory source is updated
     this._coordinator.addStrategy(
@@ -511,9 +521,10 @@ export default class AssetLinkFarmDataCore {
                 { localOnly: true });
   
         }));
-  
+
       });
   
+      // Emit events indicating that assets/logs have changed when the memory source gets updated
       this._memory.on('update', update => {
   
         let operations = update?.operations || [];
@@ -577,6 +588,12 @@ export default class AssetLinkFarmDataCore {
   
       });
   
+      // Enable and disable the remote request queue when offline
+      // In practice this means that `update` requests are queued up
+      // until the connection to the server becomes available again.
+      // On the other hand `query` requests shouldn't be reaching the
+      // remote request queue - being fullfilled locally with the
+      // information already available.
       watchEffect(async () => {
         const isOnline = this._connectionStatus.isOnline.value;
 
@@ -584,22 +601,6 @@ export default class AssetLinkFarmDataCore {
         if (isOnline && !this._remote.requestQueue.empty) {
           this._remote.requestQueue.process();
         }
-  
-        orbitCoordinatorActivationBarrier.raise();
-  
-        await this._coordinator.deactivate();
-        if (isOnline) {
-          if (!this._coordinator.strategies.includes(this._remoteQueryStrategy)) {
-            this._coordinator.addStrategy(this._remoteQueryStrategy);
-          }
-        } else {
-          if (this._coordinator.strategies.includes(this._remoteQueryStrategy)) {
-            this._coordinator.removeStrategy(this._remoteQueryStrategy.name);
-          }
-        }
-        await this._coordinator.activate();
-  
-        orbitCoordinatorActivationBarrier.lower();
       });
   }
 

@@ -53,6 +53,7 @@
     "uuid": "^8.3.2",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0",
-    "vue3-sfc-loader": "^0.8.4"
+    "vue3-sfc-loader": "^0.8.4",
+    "wellknown": "^0.5.0"
   }
 }

@@ -7,9 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Move logic for farmOS data model locations and group membership into the core of Asset Link
+- Simplify location and group membership asset title plugins to use relationships from above refactoring
+
 ### Fixed
 
 - Fix bug with file uploads caused by refactoring
+- Fix bug where group membership calculation breaks when group module is not enabled
+- Fix bug where inventory calculation breaks when inventory module is not enabled
 
 ## [0.8.2] - 2023-01-29
 
