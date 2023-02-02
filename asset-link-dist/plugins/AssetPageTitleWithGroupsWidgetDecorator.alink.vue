@@ -12,50 +12,10 @@ const props = defineProps({
 
 const assetLink = inject('assetLink');
 
-const loadingGroups = ref(false);
 const currentGroups = ref(null);
 
-const resolveCurrentGroups = async () => {
-  loadingGroups.value = true;
-
-  const logTypes = (await assetLink.getLogTypes()).map(t => t.attributes.drupal_internal__id);
-
-  const populateGroupsFromLatestGroupMembershipLogs = async (entitySource, entitySourceCache) => {
-
-    const results = await entitySource.query(q => logTypes.map(logType => {
-      return q.findRecords(`log--${logType}`)
-        .filter({ attribute: 'is_group_assignment', op: 'equal', value: true })
-        .filter({ attribute: 'status', op: 'equal', value: 'done' })
-        .filter({ attribute: 'timestamp', op: '<=', value: currentEpochSecond() })
-        .filter({
-          relation: 'asset.id',
-          op: 'some',
-          records: [{ type: props.asset.type, id: props.asset.id }]
-        })
-        .sort('-timestamp')
-        .page({ offset: 0, limit: 1 });
-    }), {
-      sources: {
-        remote: {
-          include: ['group']
-        }
-      }
-    });
-
-    const logs = results.flatMap(l => l);
-
-    const latestLog = logs.length ? logs.reduce((logA, logB) => parseJSONDate(logA.attributes.timestamp) > parseJSONDate(logB.attributes.timestamp) ? logA : logB) : null;
-
-    if (latestLog) {
-      currentGroups.value = await entitySourceCache.query(q => q.findRelatedRecords(latestLog, 'group'))
-    }
-  }
-
-  await populateGroupsFromLatestGroupMembershipLogs(assetLink.entitySource.cache, assetLink.entitySource.cache);
-
-  await populateGroupsFromLatestGroupMembershipLogs(assetLink.entitySource, assetLink.entitySource.cache);
-
-  loadingGroups.value = false;
+const resolveCurrentGroups = () => {
+  currentGroups.value = assetLink.entitySource.cache.query(q => q.findRelatedRecords({ type: props.asset.type, id: props.asset.id }, 'group'))
 };
 
 const onAssetLogsChanged = ({ assetType, assetId }) => {

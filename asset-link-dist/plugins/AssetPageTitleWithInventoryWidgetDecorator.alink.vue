@@ -25,6 +25,13 @@ const inventoryLineItemNodes = computed(() => {
 });
 
 const resolveInventoryLineItems = async () => {
+  const quantityModel = await assetLink.getEntityModel('quantity--standard');
+
+  // Don't try and resolve inventory line items if the inventory module is not installed in farmOS
+  if (!quantityModel.relationships.inventory_asset) {
+    return;
+  }
+
   const logTypes = (await assetLink.getLogTypes()).map(t => t.attributes.drupal_internal__id);
 
   // Paginate through all the pages of logs for each log type by keeping a mapping of log types to page offsets
