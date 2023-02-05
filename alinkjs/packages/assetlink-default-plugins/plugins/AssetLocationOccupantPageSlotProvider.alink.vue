@@ -111,7 +111,10 @@ const resolveCurrentLocationOccupants = async () => {
       .sort((a, b) => (b.latestLogDate - a.latestLogDate) || parseJSONDate(b.occupant.attributes.created) - parseJSONDate(a.occupant.attributes.created))
       .map(m => m.occupant);
 
-    locationOccupants.value = currentOccupants;
+    const uniqueCurrentOccupants = {}
+    currentOccupants.forEach(o => uniqueCurrentOccupants[o.id] = o);
+
+    locationOccupants.value = Object.values(uniqueCurrentOccupants);
   }
 
   await populateLocationOccupantsFromLatestMovementLogs(assetLink.entitySource.cache, assetLink.entitySource.cache);
