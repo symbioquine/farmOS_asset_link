@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix bug with useServiceWorkerUX.js when not running the service worker (i.e. in dev mode)
+- Fix AssetPageTitleWithGroupsWidgetDecorator plugin to not break when group assets/relationships are disabled
 
 ## [0.9.0] - 2023-02-02
 

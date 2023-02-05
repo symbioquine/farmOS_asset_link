@@ -1,8 +1,6 @@
 <script setup>
 import { inject, ref, onMounted, onUnmounted } from 'vue';
 
-import { currentEpochSecond, parseJSONDate } from "assetlink-plugin-api";
-
 const props = defineProps({
   asset: {
     type: Object,
@@ -14,7 +12,14 @@ const assetLink = inject('assetLink');
 
 const currentGroups = ref(null);
 
-const resolveCurrentGroups = () => {
+const resolveCurrentGroups = async () => {
+  const assetModel = await assetLink.getEntityModel(props.asset.type);
+
+  // Bail if groups are not enabled
+  if (!assetModel.relationships.group) {
+    return;
+  }
+
   currentGroups.value = assetLink.entitySource.cache.query(q => q.findRelatedRecords({ type: props.asset.type, id: props.asset.id }, 'group'))
 };
 
