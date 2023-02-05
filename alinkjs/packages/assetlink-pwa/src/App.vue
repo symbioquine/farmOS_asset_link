@@ -1,10 +1,10 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh Lpr lFf">
     <q-header elevated>
       <q-toolbar class="bg-green text-white">
-        <q-toolbar-title> Asset Link</q-toolbar-title>
-
         <farmos-sync-icon @click.stop="$refs.syncTray.toggle()" />
+
+        <q-toolbar-title> Asset Link</q-toolbar-title>
 
         <component
           :is="slotDef.component"

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Change the entity resolver component to use q-inner-loading so core Asset Link UI remains usable
+- Move the top toolbar sync icon to the far left and make the sync tray appear under the toolbar
 
 ### Fixed
 
