@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added a updates DLQ and improved UX of sync icon/tray to show queries and allow retrying/deleting failed updates
+
 ### Changed
 
 - Change the entity resolver component to use q-inner-loading so core Asset Link UI remains usable

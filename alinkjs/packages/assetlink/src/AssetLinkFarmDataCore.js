@@ -1,7 +1,7 @@
 import { watchEffect } from 'vue';
 
 import { Coordinator, RequestStrategy, SyncStrategy } from '@orbit/coordinator';
-import { Orbit } from '@orbit/core';
+import { Orbit, TaskQueue } from '@orbit/core';
 import { IndexedDBBucket } from '@orbit/indexeddb-bucket';
 import { IndexedDBSource } from '@orbit/indexeddb';
 import { RecordSchema } from '@orbit/records';
@@ -48,6 +48,8 @@ export default class AssetLinkFarmDataCore {
     this._memory = undefined;
     this._remote = undefined;
 
+    this._updateDlq = undefined;
+
     this._entitySource = undefined;
     this._remoteEntitySource = undefined;
   }
@@ -70,6 +72,16 @@ export default class AssetLinkFarmDataCore {
    */
   get remoteEntitySource() {
     return this._remoteEntitySource;
+  }
+
+  /**
+   * The Orbit.js {TaskQueue} which is used to hold failed updates once they have exceeded
+   * their max retries.
+   *
+   * Will be {undefined} until Asset Link has booted.
+   */
+  get updateDlq() {
+    return this._updateDlq;
   }
 
   /**
@@ -270,6 +282,13 @@ export default class AssetLinkFarmDataCore {
 
     this._bucket = new IndexedDBBucket({ namespace: 'asset-link-orbitjs-bucket' });
 
+    const updateDlq = new TaskQueue(null, {
+      name: 'dlq-update-requests',
+      bucket: this._bucket,
+      autoActivate: false,
+    });
+    this._updateDlq = updateDlq;
+
     this._memory = new MemorySource({
       schema: this._schema,
       cacheSettings: {
@@ -300,12 +319,22 @@ export default class AssetLinkFarmDataCore {
 
     this._remoteEntitySource = new BarrierAwareOrbitSourceDecorator(this._remote, orbitCoordinatorActivationBarrier, { schema: this._schema });
 
-    const updateViewModelPendingUpdates = () => {
-      this._vm.pendingUpdates = this._remote.requestQueue.entries.filter(r => r.type === 'update');
+    const onQueueChanged = (queue, fn) => {
+      queue.reified.then(fn);
+      queue.on('change', fn);
     };
 
-    this._remote.requestQueue.reified.then(updateViewModelPendingUpdates);
-    this._remote.requestQueue.on('change', updateViewModelPendingUpdates);
+    onQueueChanged(this._memory.requestQueue, () => {
+      this._vm.pendingQueries = this._memory.requestQueue.entries.filter(r => r.type === 'query');
+    });
+
+    onQueueChanged(this._remote.requestQueue, () => {
+      this._vm.pendingUpdates = this._remote.requestQueue.entries.filter(r => r.type === 'update');
+    });
+
+    onQueueChanged(this._updateDlq, () => {
+      this._vm.failedUpdates = this._updateDlq.entries;
+    });
 
     this._backup = new IndexedDBSource({
       schema: this._schema,
@@ -398,16 +427,55 @@ export default class AssetLinkFarmDataCore {
 
         blocking: true,
 
+        passHints: true,
+
         filter(query) {
           return !query.options?.localOnly;
         },
+      })
+    );
 
-        catch (e, transform) {
-          // console.log('Error performing remote.update()', transform, e);
-          // TODO: Keep track of retries and move failed updates to a DLQ after a certain number
-          // this.source.requestQueue.skip(e);
-          // this.target.requestQueue.skip(e);
-          throw e;
+    // Retry and DLQ for remote source
+    this._coordinator.addStrategy(
+      new RequestStrategy({
+        source: 'remote',
+        on: 'updateFail',
+
+        blocking: true,
+
+        action(transform, e) {
+          const remote = this.source;
+          const store = this.coordinator.getSource('memory');
+
+          if (e.response?.status === 422 && e.data?.errors?.length > 0) {
+            e.message = e.data.errors.map(error => `${error.title}: ${error.detail}`).join("|");
+          }
+
+          // transform.options.currentRetry = (transform.options.currentRetry || 0) + 1;
+          transform.options.failedRetryErrors = transform.options.failedRetryErrors || [];
+          transform.options.failedRetryErrors.push(e);
+
+          if (transform.options.failedRetryErrors.length >= 3) {
+            updateDlq.push({
+              type: 'update',
+              data: transform,
+            });
+
+            // Roll back store to position before transform
+            if (store.transformLog.contains(transform.id)) {
+              console.log('Rolling back - transform:', transform.id); // eslint-disable-line
+              store.rollback(transform.id, -1);
+            }
+
+            store.requestQueue.skip(e);
+            remote.requestQueue.skip(e);
+            return;
+          }
+
+          // TODO: Consider some sort of exponential back-off and maybe not blocking other requests in the interim
+          setTimeout(() => {
+            remote.requestQueue.retry();
+          }, 1000);
         },
       })
     );

@@ -1,12 +1,24 @@
 <template>
   <q-btn
-    v-if="assetLink.vm.pendingUpdates.length > 0"
+    v-if="
+      assetLink.vm.pendingUpdates.length > 0 ||
+      assetLink.vm.failedUpdates.length > 0
+    "
     flat
     dense
     :icon="statusIcon"
-    class="q-mr-sm"
+    class="q-mx-sm"
   >
-    <q-badge color="red" floating>
+    <q-badge
+      v-if="assetLink.vm.failedUpdates.length > 0"
+      color="orange"
+      floating
+    >
+      {{ assetLink.vm.pendingUpdates.length }}
+      <q-icon name="mdi-alert" color="white" size="1em" />
+      {{ assetLink.vm.failedUpdates.length }}
+    </q-badge>
+    <q-badge v-else color="red" floating>
       {{ assetLink.vm.pendingUpdates.length }}
     </q-badge>
   </q-btn>

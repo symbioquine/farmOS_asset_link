@@ -34,7 +34,9 @@ export default class AssetLink {
       bootText: "Starting",
       bootFailed: false,
 
+      pendingQueries: [],
       pendingUpdates: [],
+      failedUpdates: [],
 
       messages: [],
     });
@@ -132,6 +134,16 @@ export default class AssetLink {
    */
   get remoteEntitySource() {
     return this.cores.farmData.remoteEntitySource;
+  }
+
+  /**
+   * The Orbit.js {TaskQueue} which is used to hold failed updates once they have exceeded
+   * their max retries.
+   *
+   * Will be {undefined} until Asset Link has booted.
+   */
+  get updateDlq() {
+    return this.cores.farmData.updateDlq;
   }
 
   /**
