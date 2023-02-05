@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Change the entity resolver component to use q-inner-loading so core Asset Link UI remains usable
+
 ### Fixed
 
 - Fix bug with useServiceWorkerUX.js when not running the service worker (i.e. in dev mode)

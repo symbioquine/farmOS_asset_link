@@ -20,14 +20,18 @@ export default {};
 
 <template>
   <span>
-    <i v-if="!resolvedEntity">Unknown {{ entityType }} '{{ entityRef }}'...</i>
-    <slot v-else :entity="resolvedEntity" />
+    <template v-if="!initialLoading">
+      <i v-if="!resolvedEntity"
+        >Unknown {{ entityType }} '{{ entityRef }}'...</i
+      >
+      <slot v-else :entity="resolvedEntity" />
+    </template>
+    <q-inner-loading :showing="loadingEntity"></q-inner-loading>
   </span>
 </template>
 
 <script setup>
 import { inject, ref, onMounted, onUnmounted } from "vue";
-import { useQuasar } from "quasar";
 
 const props = defineProps({
   entityType: {
@@ -44,12 +48,13 @@ const emit = defineEmits(["entity-resolved"]);
 
 const assetLink = inject("assetLink");
 
-const $q = useQuasar();
+const initialLoading = ref(true);
+const loadingEntity = ref(false);
 
 const resolvedEntity = ref(null);
 
 const resolveEntity = async () => {
-  $q.loading.show();
+  loadingEntity.value = true;
   try {
     const entity = await assetLink.resolveEntity(
       props.entityType,
@@ -64,7 +69,8 @@ const resolveEntity = async () => {
     });
     console.log(e);
   } finally {
-    $q.loading.hide();
+    loadingEntity.value = false;
+    initialLoading.value = false;
   }
 };
 
