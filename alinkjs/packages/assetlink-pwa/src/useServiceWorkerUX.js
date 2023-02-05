@@ -26,6 +26,9 @@ export function useServiceWorkerUX() {
 
   // Listen for our custom event from the SW registration
   onMounted(() => {
+    if (!navigator.serviceWorker?.addEventListener) {
+      return;
+    }
     document.addEventListener("swUpdated", updateAvailable, { once: true });
     navigator.serviceWorker.addEventListener(
       "controllerchange",
@@ -33,6 +36,9 @@ export function useServiceWorkerUX() {
     );
   });
   onUnmounted(() => {
+    if (!navigator.serviceWorker?.addEventListener) {
+      return;
+    }
     window.removeEventListener("swUpdated", updateAvailable);
     navigator.serviceWorker.removeEventListener(
       "controllerchange",

@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.9.2] - 2023-02-02
+### Fixed
+
+- Fix bug with useServiceWorkerUX.js when not running the service worker (i.e. in dev mode)
+
+## [0.9.0] - 2023-02-02
 
 ### Changed
 
