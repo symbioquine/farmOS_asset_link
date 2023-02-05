@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix AssetPageTitleWithGroupsWidgetDecorator plugin to not break when group assets/relationships are disabled
 - Fix MoveAssetActionProvider plugin to filter the current asset out of possible move destinations
 - Fix whitespace in test geometry comparison
+- Fix how retry errors are stored so they don't break the tests due to fake-indexeddb serialization differences
 
 ## [0.9.0] - 2023-02-02
 

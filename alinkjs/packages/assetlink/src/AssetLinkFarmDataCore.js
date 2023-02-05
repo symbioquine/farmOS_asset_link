@@ -447,13 +447,16 @@ export default class AssetLinkFarmDataCore {
           const remote = this.source;
           const store = this.coordinator.getSource('memory');
 
+          const storableError = {
+            message: e.message,
+          };
+
           if (e.response?.status === 422 && e.data?.errors?.length > 0) {
-            e.message = e.data.errors.map(error => `${error.title}: ${error.detail}`).join("|");
+            storableError.message = e.data.errors.map(error => `${error.title}: ${error.detail}`).join("|");
           }
 
-          // transform.options.currentRetry = (transform.options.currentRetry || 0) + 1;
           transform.options.failedRetryErrors = transform.options.failedRetryErrors || [];
-          transform.options.failedRetryErrors.push(e);
+          transform.options.failedRetryErrors.push(storableError);
 
           if (transform.options.failedRetryErrors.length >= 3) {
             updateDlq.push({
