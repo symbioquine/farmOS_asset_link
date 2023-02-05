@@ -6,6 +6,13 @@ defineEmits([
   ...useDialogPluginComponent.emits
 ]);
 
+const props = defineProps({
+  asset: {
+    type: Object,
+    required: true,
+  },
+});
+
 const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 
 const onSubmit = (selectedAssets) => {
@@ -18,6 +25,13 @@ const onSubmit = (selectedAssets) => {
 
   onDialogOK(selectedAssets);
 };
+
+const additionalFilters = [
+  // Only allow moving to locations
+  { attribute: 'is_location', op: 'equal', value: true },
+  // Do not allow moving to self
+  { attribute: 'drupal_internal__id', op: '<>', value: props.asset.attributes.drupal_internal__id },
+];
 
 const searchMethod = ref('text-search');
 </script>
@@ -33,7 +47,7 @@ const searchMethod = ref('text-search');
         :key="searchMethod"
         @changed:search-method="newSearchMethod => searchMethod = newSearchMethod"
         @submit="onSubmit"
-        :additional-filters="[{ attribute: 'is_location', op: 'equal', value: true }]"
+        :additional-filters="additionalFilters"
       ></entity-search>
     </q-card>
   </q-dialog>
@@ -54,7 +68,7 @@ export default {
       moveAction.showIf(({ asset }) => asset.attributes.status !== 'archived');
 
       const doActionWorkflow = async (asset) => {
-        const destinations = await assetLink.ui.dialog.custom(handle.thisPlugin, []);
+        const destinations = await assetLink.ui.dialog.custom(handle.thisPlugin, { asset });
 
         console.log(destinations);
 
