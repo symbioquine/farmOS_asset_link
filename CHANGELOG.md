@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix MoveAssetActionProvider plugin to filter the current asset out of possible move destinations
 - Fix whitespace in test geometry comparison
 - Fix how retry errors are stored so they don't break the tests due to fake-indexeddb serialization differences
+- Fix retry logic so retries do not happen after AssetLink instance is halted
 
 ## [0.9.0] - 2023-02-02
 

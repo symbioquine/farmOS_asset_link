@@ -476,7 +476,17 @@ export default class AssetLinkFarmDataCore {
           }
 
           // TODO: Consider some sort of exponential back-off and maybe not blocking other requests in the interim
-          setTimeout(() => {
+          setTimeout(async () => {
+            const passedBarrier = await orbitCoordinatorActivationBarrier.arrive(500);
+            if (!passedBarrier) {
+              throw new Error("Could not retry update - barrier was closed for >500ms");
+            }
+            try {
+              await remote.activated;
+            } catch(err) {
+              // This should mean our Orbit.js coordinator is deactivated and Asset Link was halted 
+              return;
+            }
             remote.requestQueue.retry();
           }, 1000);
         },
