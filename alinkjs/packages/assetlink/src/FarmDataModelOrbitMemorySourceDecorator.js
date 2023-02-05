@@ -2,7 +2,7 @@ import { buildQuery, buildTransform } from '@orbit/data';
 
 import combineWkt from './combineWkt';
 
-import { currentEpochSecond, parseJSONDate, uuidv4 } from "assetlink-plugin-api";
+import { currentEpochSecond, parseJSONDate, uuidv4, formatRFC3339 } from "assetlink-plugin-api";
 
 /**
  * Implements the core farmOS data model computed field logic for locations, geometry, quantities, and group membership
@@ -32,16 +32,18 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
   async query(queryOrExpressions, options, id) {
     const opts = options || {};
 
+    opts.timestamp = formatRFC3339(new Date());
+
     const query = buildQuery(
       queryOrExpressions,
-      options,
+      opts,
       id,
       this._delegate.queryBuilder
     );
 
     // TODO: Consider convenience mechanism to allow querying `asset--*`
 
-    const results = await this._delegate.query(query, options, id);
+    const results = await this._delegate.query(query, opts, id);
 
     let multiQuery = true;
     let expressions = query?.expressions || [];
@@ -83,6 +85,10 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
   }
 
   async update(transformOrOperations, options, id) {
+    const opts = options || {};
+
+    opts.timestamp = formatRFC3339(new Date());
+
     const transform = buildTransform(
       transformOrOperations,
       options,
@@ -119,7 +125,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       return;
     }
 
-    const results = await this._delegate.query(q => logTypesWithGroupAssignmentField.map(logType => {
+    const results = await this.query(q => logTypesWithGroupAssignmentField.map(logType => {
       return q.findRecords(logType)
         .filter({ attribute: 'is_group_assignment', op: 'equal', value: true })
         .filter({ attribute: 'status', op: 'equal', value: 'done' })
@@ -182,7 +188,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
   async _getLatestMovementLog(asset) {
     const logTypes = (await this._logTypeGetter()).map(t => t.attributes.drupal_internal__id);
 
-    const results = await this._delegate.query(q => logTypes.map(logType => {
+    const results = await this.query(q => logTypes.map(logType => {
       return q.findRecords(`log--${logType}`)
         .filter({ attribute: 'is_movement', op: 'equal', value: true })
         .filter({ attribute: 'status', op: 'equal', value: 'done' })
