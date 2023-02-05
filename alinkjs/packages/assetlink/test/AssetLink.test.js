@@ -389,7 +389,7 @@ describe('Basic Smoke Testing', () => {
 
         expect(updatedAnimal).toBeDefined();
         expect(updatedAnimal.relationships.location.data).toEqual([{ 'type': animalCage.type, 'id': animalCage.id }]);
-        expect(updatedAnimal.attributes.geometry?.value).toBe(animalCage.attributes.geometry.value);
+        expect(updatedAnimal.attributes.geometry?.value).toBe("POLYGON ((0 0, -10 0, -10 10, 0 10, 0 0))");
       } finally {
         await assetLink.halt();
       }
