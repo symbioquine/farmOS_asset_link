@@ -14,8 +14,8 @@ const assetLink = inject('assetLink');
 
 const currentLocations = ref(null);
 
-const resolveCurrentLocation = () => {
-  currentLocations.value = assetLink.entitySource.cache.query(q => q.findRelatedRecords({ type: props.asset.type, id: props.asset.id }, 'location'))
+const resolveCurrentLocation = async () => {
+  currentLocations.value = await assetLink.entitySource.query(q => q.findRelatedRecords({ type: props.asset.type, id: props.asset.id }, 'location'))
 };
 
 const onAssetLogsChanged = ({ assetType, assetId }) => {

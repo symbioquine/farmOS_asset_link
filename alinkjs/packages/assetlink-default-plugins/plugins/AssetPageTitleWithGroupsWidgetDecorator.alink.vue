@@ -20,7 +20,7 @@ const resolveCurrentGroups = async () => {
     return;
   }
 
-  currentGroups.value = assetLink.entitySource.cache.query(q => q.findRelatedRecords({ type: props.asset.type, id: props.asset.id }, 'group'))
+  currentGroups.value = await assetLink.entitySource.query(q => q.findRelatedRecords({ type: props.asset.type, id: props.asset.id }, 'group'))
 };
 
 const onAssetLogsChanged = ({ assetType, assetId }) => {

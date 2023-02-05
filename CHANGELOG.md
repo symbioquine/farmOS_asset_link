@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change the entity resolver component to use q-inner-loading so core Asset Link UI remains usable
 - Move the top toolbar sync icon to the far left and make the sync tray appear under the toolbar
 - Set the current timestamp in the query/update options so we can tell when queries were originally created
+- Make location and groups asset title decorators query those relationships from the entity source, not its cache
 
 ### Fixed
 
