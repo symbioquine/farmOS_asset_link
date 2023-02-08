@@ -41,9 +41,9 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       this._delegate.queryBuilder
     );
 
-    // TODO: Consider convenience mechanism to allow querying `asset--*`
+    // TODO: Consider convenience mechanism to allow querying `asset--*` and `log--*`
 
-    const results = await this._delegate.query(query, opts, id);
+    const results = await this._partiallyDelegateQuery(query, opts, id);
 
     let multiQuery = true;
     let expressions = query?.expressions || [];
@@ -109,20 +109,97 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
     return await this._delegate.update(transform, options, id);
   }
 
+  async _partiallyDelegateQuery(query, opts, id) {
+    let expressions = query?.expressions || [];
+    if (!Array.isArray(expressions)) {
+      expressions = [expressions];
+    }
+
+    const localExpressions = [];
+    const delegateExpressions = [];
+    const mergeSelectors = [];
+
+    expressions.forEach(expr => {
+      // Handle "computed" group/location relations locally
+      if (['findRelatedRecords'].includes(expr.op) &&
+          expr.record.type.startsWith('asset--') &&
+          ['group', 'location'].includes(expr.relationship)
+      ) {
+        localExpressions.push(expr);
+        mergeSelectors.push((localResults, delegateResults) => localResults.shift());
+        return;
+      }
+
+      delegateExpressions.push(expr);
+      mergeSelectors.push((localResults, delegateResults) => delegateResults.shift());
+    });
+
+    const localQuery = { ...query, expressions: localExpressions };
+    const delegateQuery = { ...query, expressions: delegateExpressions };
+
+    const [localResults, delegateResults] = await Promise.all([
+      this._localQuery(localQuery, opts, id),
+      this._delegateQuery(delegateQuery, opts, id)
+    ]);
+
+    const mergedResults = mergeSelectors.map(ms => ms(localResults, delegateResults));
+
+    if (!Array.isArray(query?.expressions)) {
+      return mergedResults[0];
+    }
+    return mergedResults;
+  }
+
+  async _localQuery(query, opts, id) {
+    return await Promise.all(query.expressions.map(async (expr) => {
+      if (expr.relationship === 'group') {
+        return await this._computeCurrentRelatedGroups(expr.record);
+      }
+      else if (expr.relationship === 'location') {
+        return await this._computeCurrentRelatedLocations(expr.record);
+      }
+    }));
+  }
+
+  async _delegateQuery(query, opts, id) {
+    if (!query.expressions.length) {
+      return [];
+    }
+    return await this._delegate.query(query, opts, id);
+  }
+
+  async _computeCurrentRelatedLocations(recordIdentity) {
+    const latestMovementLog = await this._getLatestMovementLog(recordIdentity);
+
+    if (!latestMovementLog) {
+      return [];
+    }
+
+    return await this.query(q => q.findRelatedRecords({ type: latestMovementLog.type, id: latestMovementLog.id }, 'location')) || [];
+  }
+
   async _computeCurrentAssetGroups(entity) {
     if (!entity.type.startsWith('asset--')) {
       return;
     }
 
-    const asset = entity;
+    const groups = await this._computeCurrentRelatedGroups({ type: entity.type, id: entity.id });
 
+    if (groups === undefined) {
+      return;
+    }
+
+    entity.relationships.group.data = groups.map(g => ({ type: g.type, id: g.id }));
+  }
+
+  async _computeCurrentRelatedGroups(recordIdentity) {
     const logTypes = (await this._logTypeGetter()).map(t => t.attributes.drupal_internal__id).map(logType => `log--${logType}`);
 
     const logTypesWithGroupAssignmentField = logTypes.filter(logType => this._schema.getModel(logType).attributes.is_group_assignment);
 
     // Only proceed if at least one log type has the `is_group_assignment` field
     if (!logTypesWithGroupAssignmentField.length) {
-      return;
+      return undefined;
     }
 
     const results = await this.query(q => logTypesWithGroupAssignmentField.map(logType => {
@@ -133,7 +210,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
         .filter({
           relation: 'asset.id',
           op: 'some',
-          records: [{ type: asset.type, id: asset.id }]
+          records: [{ type: recordIdentity.type, id: recordIdentity.id }]
         })
         .sort('-timestamp')
         .page({ offset: 0, limit: 1 });
@@ -147,14 +224,13 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
   
     const logs = results.flatMap(l => l);
   
-    const latestLog = logs.length ? logs.reduce((logA, logB) => parseJSONDate(logA.attributes.timestamp) > parseJSONDate(logB.attributes.timestamp) ? logA : logB) : null;
+    const latestGroupMembershipLog = logs.length ? logs.reduce((logA, logB) => parseJSONDate(logA.attributes.timestamp) > parseJSONDate(logB.attributes.timestamp) ? logA : logB) : null;
   
-    if (latestLog) {
-      const groups = this.cache.query(q => q.findRelatedRecords(latestLog, 'group'));
-
-      asset.relationships.group.data = groups.map(g => ({ type: g.type, id: g.id }));
+    if (!latestGroupMembershipLog) {
+      return [];
     }
 
+    return this.query(q => q.findRelatedRecords({ type: latestGroupMembershipLog.type, id: latestGroupMembershipLog.id }, 'group')) || [];
   }
 
   // Roughly implements: https://github.com/farmOS/farmOS/blob/637843aabf86a4ccfe108d31a8435f80dd64fcf3/modules/core/location/src/AssetLocation.php
@@ -165,8 +241,8 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
 
     const asset = entity;
 
-    const latestMovementLog = await this._getLatestMovementLog(asset);
-  
+    const latestMovementLog = await this._getLatestMovementLog({ type: asset.type, id: asset.id });
+
     if (latestMovementLog) {
       const locations = await this.query(q => q.findRelatedRecords({ type: latestMovementLog.type, id: latestMovementLog.id }, 'location')) || [];
 
@@ -185,7 +261,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
     asset.attributes.geometry = latestMovementLog.attributes.geometry;
   }
 
-  async _getLatestMovementLog(asset) {
+  async _getLatestMovementLog(recordIdentity) {
     const logTypes = (await this._logTypeGetter()).map(t => t.attributes.drupal_internal__id);
 
     const results = await this.query(q => logTypes.map(logType => {
@@ -196,7 +272,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
         .filter({
           relation: 'asset.id',
           op: 'some',
-          records: [{ type: asset.type, id: asset.id }]
+          records: [{ type: recordIdentity.type, id: recordIdentity.id }]
         })
         .sort('-timestamp')
         .page({ offset: 0, limit: 1 });
