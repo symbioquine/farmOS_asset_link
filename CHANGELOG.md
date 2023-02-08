@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Expose jmespath for import by plugins
+
 ### Changed
 
 - Make updates non-blocking with the remote when offline
