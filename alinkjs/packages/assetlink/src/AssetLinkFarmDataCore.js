@@ -425,7 +425,7 @@ export default class AssetLinkFarmDataCore {
         target: 'remote',
         action: 'update',
 
-        blocking: true,
+        blocking: () => this._connectionStatus.isOnline.value,
 
         passHints: true,
 
