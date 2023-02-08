@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Make updates non-blocking with the remote when offline
 
+### Fixed
+
+- Fire "changed:" events after updates have been fully settled with the memory source
+
 ## [0.10.0] - 2023-02-05
 
 ### Added

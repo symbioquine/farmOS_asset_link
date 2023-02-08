@@ -617,12 +617,16 @@ export default class AssetLinkFarmDataCore {
 
           if (['updateRecord', 'replaceAttribute', 'addToRelatedRecords', 'removeFromRelatedRecords', 'replaceRelatedRecords', 'replaceRelatedRecord']
               .includes(operation.op) && operation.record.type.startsWith('asset--')) {
-            this._eventBus.$emit('changed:asset', { assetType: operation.record.type, assetId: operation.record.id});
+            this._memory.requestQueue.currentProcessor.settle().then(() => {
+              this._eventBus.$emit('changed:asset', { assetType: operation.record.type, assetId: operation.record.id});
+            });
           }
   
           if (['addRecord', 'updateRecord'].includes(operation.op) && operation.record.type.startsWith('log--')) {
             operation.record.relationships.asset.data.forEach(assetRel => {
-              this._eventBus.$emit('changed:assetLogs', { assetType: assetRel.type, assetId: assetRel.id});
+              this._memory.requestQueue.currentProcessor.settle().then(() => {
+                this._eventBus.$emit('changed:assetLogs', { assetType: assetRel.type, assetId: assetRel.id});
+              });
             });
           }
   
@@ -630,7 +634,9 @@ export default class AssetLinkFarmDataCore {
             const assetRel = operation.record.relationships?.inventory_asset?.data;
   
             if (assetRel) {
-              this._eventBus.$emit('changed:assetLogs', { assetType: assetRel.type, assetId: assetRel.id});
+              this._memory.requestQueue.currentProcessor.settle().then(() => {
+                this._eventBus.$emit('changed:assetLogs', { assetType: assetRel.type, assetId: assetRel.id});
+              });
             }
           }
   
