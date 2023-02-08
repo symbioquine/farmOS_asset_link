@@ -333,6 +333,7 @@ describe('Basic Smoke Testing', () => {
         const animal = await assetLink.resolveEntity('asset', 'e9fa0fcb-b334-4350-8294-f2d2c51a9a25');
 
         const animalCage = await assetLink.resolveEntity('asset', createdRabbitCage.data.id);
+        const rabbitry = await assetLink.resolveEntity('asset', createdRabbitry.data.id);
 
         // Make sure these are cached
         await assetLink.getLogTypes();
@@ -345,6 +346,8 @@ describe('Basic Smoke Testing', () => {
   
         isOnline.mockImplementation(() => false);
         window.dispatchEvent(new window.Event('offline'));
+
+        fetch.mockClear();
 
         const movementLog = {
           type: 'log--activity',
@@ -378,18 +381,57 @@ describe('Basic Smoke Testing', () => {
             },
           },
         };
+
+        // Listen for the `changed:assetLogs` event and confirm that querying the related locations
+        // immediately upon recieiving that event yields the correct locations - assertions farther below
+        const changedLocationsPromise = new Promise(resolve => {
+          assetLink.eventBus.$once("changed:assetLogs", async ({ assetType, assetId }) => {
+            if (
+              'asset--animal' === assetType &&
+              'e9fa0fcb-b334-4350-8294-f2d2c51a9a25' === assetId
+            ) {
+              resolve(await assetLink.entitySource.query(q =>
+                q.findRelatedRecords({ type: 'asset--animal', id: 'e9fa0fcb-b334-4350-8294-f2d2c51a9a25' }, 'location'), { trace: true }));
+            }
+          });
+        });
   
+        // Add our movement log
         await assetLink.entitySource.update(
             (t) => t.addRecord(movementLog),
             {label: movementLog.attributes.name});
-  
-        // await delay(1000);
-  
+
+        // Query the related locations
+        const locations = await assetLink.entitySource.query(q =>
+            q.findRelatedRecords({ type: 'asset--animal', id: 'e9fa0fcb-b334-4350-8294-f2d2c51a9a25' }, 'location'));
+
+        // Check that those match where we just moved the animal
+        expect(locations).toHaveLength(2);
+        expect(locations[0].type).toBe(animalCage.type);
+        expect(locations[0].id).toBe(animalCage.id);
+        expect(locations[1].type).toBe(rabbitry.type);
+        expect(locations[1].id).toBe(rabbitry.id);
+
+        // Check that the locations we got immediately after the `changed:assetLogs` event also match
+        const changedLocations = await changedLocationsPromise;
+        expect(changedLocations).toHaveLength(2);
+        expect(changedLocations[0].type).toBe(animalCage.type);
+        expect(changedLocations[0].id).toBe(animalCage.id);
+        expect(changedLocations[1].type).toBe(rabbitry.type);
+        expect(changedLocations[1].id).toBe(rabbitry.id);
+
+        // Query the animal asset itself
         const updatedAnimal = await assetLink.resolveEntity('asset', 'e9fa0fcb-b334-4350-8294-f2d2c51a9a25');
 
+        // Check that the animal asset's fields were updated
         expect(updatedAnimal).toBeDefined();
-        expect(updatedAnimal.relationships.location.data).toEqual([{ 'type': animalCage.type, 'id': animalCage.id }]);
-        expect(updatedAnimal.attributes.geometry?.value).toBe("POLYGON ((0 0, -10 0, -10 10, 0 10, 0 0))");
+        expect(updatedAnimal.relationships.location.data).toEqual([
+          { 'type': animalCage.type, 'id': animalCage.id },
+          { 'type': rabbitry.type, 'id': rabbitry.id },
+        ]);
+        expect(updatedAnimal.attributes.geometry?.value).toBe("GEOMETRYCOLLECTION (POLYGON ((0 0, -10 0, -10 10, 0 10, 0 0)),POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0)))");
+
+        expect(fetch).not.toHaveBeenCalled();
       } finally {
         await assetLink.halt();
       }
