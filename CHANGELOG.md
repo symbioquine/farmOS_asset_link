@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Make updates non-blocking with the remote when offline
+- Make the toolbar title decoratable
 
 ### Fixed
 

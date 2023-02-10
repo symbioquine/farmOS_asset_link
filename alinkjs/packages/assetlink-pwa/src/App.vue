@@ -4,7 +4,11 @@
       <q-toolbar class="bg-green text-white">
         <farmos-sync-icon @click.stop="$refs.syncTray.toggle()" />
 
-        <q-toolbar-title> Asset Link</q-toolbar-title>
+        <q-toolbar-title>
+          <render-widget name="asset-link-title" :context="{}"
+            >Asset Link</render-widget
+          ></q-toolbar-title
+        >
 
         <component
           :is="slotDef.component"
