@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Expose jmespath for import by plugins
 - Implement "computed" group/location relationships
+- Add a "persistent UX tray" area after the Asset Link toolbar title
 
 ### Changed
 

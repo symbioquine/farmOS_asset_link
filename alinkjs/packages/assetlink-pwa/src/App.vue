@@ -4,11 +4,22 @@
       <q-toolbar class="bg-green text-white">
         <farmos-sync-icon @click.stop="$refs.syncTray.toggle()" />
 
-        <q-toolbar-title>
+        <q-toolbar-title shrink>
           <render-widget name="asset-link-title" :context="{}"
             >Asset Link</render-widget
           ></q-toolbar-title
         >
+
+        <q-btn-group outline v-if="persistentUxTrayItemDefs.length">
+          <component
+            :is="slotDef.component"
+            v-for="slotDef in persistentUxTrayItemDefs"
+            :key="slotDef.id"
+            v-bind="slotDef.props"
+          />
+        </q-btn-group>
+
+        <q-space />
 
         <component
           :is="slotDef.component"
@@ -136,7 +147,14 @@
 </template>
 
 <script>
-import { defineComponent, inject, getCurrentInstance, watch, ref } from "vue";
+import {
+  computed,
+  defineComponent,
+  inject,
+  getCurrentInstance,
+  watch,
+  ref,
+} from "vue";
 import { useRouter, useRoute } from "vue-router";
 
 import { useServiceWorkerUX } from "@/useServiceWorkerUX";
@@ -165,6 +183,10 @@ export default defineComponent({
     app.provide("assetLink", assetLink);
 
     const metaActionDefs = ref([]);
+
+    const persistentUxTrayItemDefs = computed(() => {
+      return assetLink.getSlots({ type: "persistent-ux-tray-item" });
+    });
 
     const farmOSLoginUrl = ref(null);
     watch(
@@ -221,6 +243,7 @@ export default defineComponent({
       assetLink,
       farmOSLoginUrl,
       metaActionDefs,
+      persistentUxTrayItemDefs,
       updateExists,
       refreshApp,
       onRouteTitleExposed,
