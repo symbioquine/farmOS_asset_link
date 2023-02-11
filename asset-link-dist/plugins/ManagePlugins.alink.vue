@@ -88,51 +88,189 @@
       </q-fab>
     </q-page-sticky>
 
-    <q-dialog v-model="editPluginDialogShown" :transition="false" full-height full-width>
-      <q-card class="full-height column">
-        <q-card-section>
-          <div class="text-h6 text-grey">Edit Plugin</div>
-        </q-card-section>
-
-        <q-card-section
-          class="col"
-          style="
-            height: auto;
-            min-height: 160px;
-            max-height: 100%;
-            position: relative;
-            contain: strict;
-          ">
-          <code-editor v-model="code" :code-mimetype="codeMimetype"></code-editor>
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="primary" @click="() => editPluginDialogCallback(undefined)" v-close-popup />
-          <q-btn flat label="Save" color="primary" @click="() => editPluginDialogCallback(code)" v-close-popup />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-
   </q-page>
 </template>
 
 <script>
-import { h } from 'vue';
-import { QItem, QItemSection } from 'quasar';
+import { defineComponent, h, ref } from 'vue';
+import {
+  QBadge,
+  QBtn,
+  QCard,
+  QCardActions,
+  QCardSection,
+  QDialog,
+  QItem,
+  QItemSection,
+  QList,
+  QMenu,
+  QSpace,
+  QToolbar,
+  QToolbarTitle,
+  useDialogPluginComponent,
+} from 'quasar';
 
-import { createDrupalUrl } from "assetlink-plugin-api";
+import { createDrupalUrl, components as ApiComponents } from "assetlink-plugin-api";
+
+const PluginCodeEditor = defineComponent((props, { slots, emit, attrs }) => {
+
+  const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent();
+
+  const code = ref(props.code);
+
+  const closeEditor = (closeHint) => {
+    // TODO: Consider checking for unsaved changes and prompting about losing them
+    onDialogOK({ updatedCode: undefined, closeHint });
+  };
+
+  const saveEdits = () => {
+    onDialogOK({ updatedCode: code.value, closeHint: 'save'});
+  };
+
+  return () => h(QDialog, { ref: dialogRef, transition: false, 'full-height': true, 'full-width': true }, () => [
+    h(QCard, { 'class': 'full-height column' }, () => [
+
+      h(QToolbar, {}, () => [
+        h(QToolbarTitle, { 'class': 'text-h6 text-grey ellipsis', style: "direction: rtl; text-align: left; max-width: 60vw;" }, () =>
+          "Edit Plugin: " + props.pluginUrl.toString()),
+        h(QSpace),
+        h(QBtn, { flat: true, round: true, dense: true, icon: 'mdi-window-minimize', onClick: () => closeEditor('minimize') }),
+        h(QBtn, { flat: true, round: true, dense: true, icon: 'mdi-window-close', onClick: () => closeEditor('cancel') }),
+      ]),
+
+      h(QCardSection, { 'class': "col", 'style': "height: auto; min-height: 160px; max-height: 100%; position: relative; contain: strict;" }, () => [
+        h(ApiComponents.CodeEditor, { 'code-mimetype': props.codeMimetype, modelValue: code.value, 'onUpdate:modelValue': (value) => { code.value = value; } })
+      ]),
+
+      h(QCardActions, { align: 'right' }, () => [
+        h(QBtn, { flat: true, label: 'Save', icon: 'mdi-content-save', color: 'primary', onClick: saveEdits }),
+      ]),
+
+    ]),
+  ]);
+});
+PluginCodeEditor.props = ['pluginUrl', 'code', 'codeMimetype'];
+
+const PLUGIN_DATA_URL_PREFIX = "data:application/javascript;base64,";
+const PERSISTENT_EDITORS_IDX_KEY = `manage-plugins-persistent-edit-dialogs-index`;
+const PERSISTENT_EDITOR_KEY_PREFIX = `manage-plugins-persistent-edit-dialog:`;
+
+const getPersistentEditorsIndex = async (assetLink) => {
+  const rawIndex = await assetLink.store.getItem(PERSISTENT_EDITORS_IDX_KEY) || [];
+
+  return rawIndex.map(rawIndexEntry => ({
+    pluginUrl: new URL(rawIndexEntry.pluginUrl),
+    codeMimetype: rawIndexEntry.codeMimetype,
+    isOpen: rawIndexEntry.isOpen,
+    pluginUrlToDisableOnFirstSave: rawIndexEntry.pluginUrlToDisableOnFirstSave ? new URL(rawIndexEntry.pluginUrlToDisableOnFirstSave) : undefined,
+  }));
+};
+
+const mutatePersistentEditorsIndex = async (assetLink, mutatorFn) => {
+  const index = await getPersistentEditorsIndex(assetLink);
+
+  const shouldWrite = mutatorFn(index) !== false;
+  if (shouldWrite) {
+    const updatedRawIndex = index.map(indexEntry => ({
+      pluginUrl: indexEntry.pluginUrl.toString(),
+      codeMimetype: indexEntry.codeMimetype,
+      isOpen: indexEntry.isOpen,
+      pluginUrlToDisableOnFirstSave: indexEntry.pluginUrlToDisableOnFirstSave ? indexEntry.pluginUrlToDisableOnFirstSave.toString() : undefined,
+    }));
+    await assetLink.store.setItem(PERSISTENT_EDITORS_IDX_KEY, updatedRawIndex);
+    assetLink.eventBus.$emit(`changed:${PERSISTENT_EDITORS_IDX_KEY}`);
+  }
+  return shouldWrite;
+}
+
+const openPersistentEditor = async (assetLink, localPluginUrl, initialCodeMimetype, initialCode, pluginUrlToDisableOnFirstSave) => {
+  const editorDataKey = PERSISTENT_EDITOR_KEY_PREFIX + localPluginUrl.pathname;
+
+  let indexEntry = { pluginUrl: localPluginUrl, codeMimetype: initialCodeMimetype, isOpen: false, pluginUrlToDisableOnFirstSave };
+  const isNewEditor = await mutatePersistentEditorsIndex(assetLink, (index) => {
+    const idx = index.findIndex(indexEntry => indexEntry.pluginUrl.toString() === localPluginUrl.toString());
+    if (idx >= 0) {
+      indexEntry = index[idx];
+      return false;
+    }
+    index.push(indexEntry);
+  });
+
+  let code = initialCode;
+  if (isNewEditor) {
+    const pluginDataUrl = PLUGIN_DATA_URL_PREFIX + btoa(initialCode);
+
+    await assetLink.store.setItem(editorDataKey, { pluginDataUrl });
+  } else {
+    const storedState = await assetLink.store.getItem(editorDataKey);
+    if (storedState) {
+      const pluginDataUrl = storedState.pluginDataUrl;
+
+      if (!pluginDataUrl.startsWith(PLUGIN_DATA_URL_PREFIX)) {
+        throw new Error(`Persistent editor plugin data url must start with: '${PLUGIN_DATA_URL_PREFIX}'`);
+      }
+
+      code = atob(pluginDataUrl.substring(PLUGIN_DATA_URL_PREFIX.length));
+    }
+  }
+
+  const { updatedCode, closeHint } = await assetLink.ui.dialog.custom(PluginCodeEditor, {
+    pluginUrl: localPluginUrl,
+    code,
+    codeMimetype: indexEntry.codeMimetype,
+    persistent: true,
+  });
+
+  if (updatedCode === undefined || closeHint !== 'save') {
+    if (closeHint === 'cancel') {
+      await closePersistentEditor(assetLink, localPluginUrl)
+    }
+    return;
+  }
+
+  if (indexEntry.pluginUrlToDisableOnFirstSave) {
+    await assetLink.cores.pluginLists.addPluginToLocalBlacklist(indexEntry.pluginUrlToDisableOnFirstSave);
+
+    mutatePersistentEditorsIndex(assetLink, (index) => {
+      const idx = index.findIndex(indexEntry => indexEntry.pluginUrl.toString() === localPluginUrl.toString());
+      if (idx < 0) {
+        return false;
+      }
+      index[idx].pluginUrlToDisableOnFirstSave = undefined;
+    });
+  }
+
+  const updatedPluginDataUrl = PLUGIN_DATA_URL_PREFIX + btoa(updatedCode);
+
+  await assetLink.store.setItem(editorDataKey, { pluginDataUrl: updatedPluginDataUrl });
+
+  await assetLink.cores.localPluginStorage.writeLocalPlugin(localPluginUrl, updatedCode);
+};
+
+const closePersistentEditor = async (assetLink, localPluginUrl) => {
+  const editorDataKey = PERSISTENT_EDITOR_KEY_PREFIX + localPluginUrl.pathname;
+
+  await assetLink.store.removeItem(editorDataKey);
+
+  mutatePersistentEditorsIndex(assetLink, (index) => {
+    const idx = index.findIndex(indexEntry => indexEntry.pluginUrl.toString() === localPluginUrl.toString());
+    if (idx < 0) {
+      return false;
+    }
+    index.splice(idx, 1);
+  });
+};
 
 export default {
+  components: {
+    PluginCodeEditor,
+  },
+
   inject: ['assetLink'],
 
   data() {
     return {
       showAddPluginButtons: false,
-
-      editPluginDialogShown: false,
-      editPluginDialogCallback: () => {},
-      codeMimetype: undefined,
-      code: "<template>\n<div>Hello world!</div>\n</template>\n",
     };
   },
 
@@ -166,7 +304,7 @@ export default {
     async editPluginByUrl(pluginUrl) {
       const sourcePlugin = this.pluginsByUrl[pluginUrl.toString()];
 
-      this.code = this.pluginsByUrl[pluginUrl.toString()].rawSource;
+      const code = this.pluginsByUrl[pluginUrl.toString()].rawSource;
 
       let disableSourcePlugin = false;
 
@@ -179,30 +317,16 @@ export default {
         localPluginUrl = new URL(`indexeddb://asset-link/data/${pluginFilename}`);
       }
 
+      let codeMimetype = undefined;
       if (localPluginUrl.pathname.endsWith('alink.js')) {
-        this.codeMimetype = "text/javascript";
+        codeMimetype = "text/javascript";
       } else if (localPluginUrl.pathname.endsWith('alink.vue')) {
-        this.codeMimetype = "text/x-vue";
+        codeMimetype = "text/x-vue";
       } else if (localPluginUrl.pathname.endsWith('.json')) {
-        this.codeMimetype = "application/json";
-      } else {
-        this.codeMimetype = undefined;
+        codeMimetype = "application/json";
       }
 
-      this.editPluginDialogShown = true;
-      const updatedCode = await new Promise((resolve) => {
-        this.editPluginDialogCallback = resolve;
-      });
-
-      if (updatedCode === undefined) {
-        return;
-      }
-
-      if (disableSourcePlugin) {
-        await this.assetLink.cores.pluginLists.addPluginToLocalBlacklist(pluginUrl);
-      }
-
-      await this.assetLink.cores.localPluginStorage.writeLocalPlugin(localPluginUrl, updatedCode);
+      openPersistentEditor(this.assetLink, localPluginUrl, codeMimetype, code, disableSourcePlugin ? pluginUrl : undefined );
     },
     async createNewLocalPlugin() {
       const newPluginName = await this.assetLink.ui.dialog.promptText(`Give your new plugin a name... it must be in the format "{name}.alink.{extension}"`);
@@ -221,28 +345,18 @@ export default {
       const pluginBaseName = newPluginName.split('.alink.')[0];
 
       let pluginTemplate = "";
+      let codeMimetype = undefined;
       if (pluginUrl.pathname.endsWith('alink.js')) {
-        this.codeMimetype = "text/javascript";
+        codeMimetype = "text/javascript";
         pluginTemplate = `export default class ${pluginBaseName} {\n  static onLoad(handle, assetLink) {\n\n  }\n\n}\n`;
       } else if (pluginUrl.pathname.endsWith('alink.vue')) {
-        this.codeMimetype = "text/x-vue";
+        codeMimetype = "text/x-vue";
         pluginTemplate = `<${'script'} setup>\n</${'script'}>\n\n<${'template'}>\n<div>Hello world!</div>\n</${'template'}>\n`;
       } else if (pluginUrl.pathname.endsWith('.json')) {
-        this.codeMimetype = "application/json";
+        codeMimetype = "application/json";
       }
 
-      this.code = pluginTemplate;
-
-      this.editPluginDialogShown = true;
-      const updatedCode = await new Promise((resolve) => {
-        this.editPluginDialogCallback = resolve;
-      });
-
-      if (updatedCode === undefined) {
-        return;
-      }
-
-      await this.assetLink.cores.localPluginStorage.writeLocalPlugin(pluginUrl, updatedCode);
+      openPersistentEditor(this.assetLink, pluginUrl, codeMimetype, pluginTemplate);
     },
     async disablePluginByUrl(pluginUrl) {
       await this.assetLink.cores.pluginLists.addPluginToLocalBlacklist(pluginUrl);
@@ -348,6 +462,13 @@ export default {
   },
 
   onLoad(handle, assetLink) {
+    const currentPersistentEditors = ref([]);
+
+    const loadPersistentEditors = async () => {
+      currentPersistentEditors.value = await getPersistentEditorsIndex(assetLink);
+    };
+    loadPersistentEditors();
+    assetLink.eventBus.$on(`changed:${PERSISTENT_EDITORS_IDX_KEY}`, () => loadPersistentEditors());
 
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.manage_plugins', slot => {
       slot.type('config-action');
@@ -361,6 +482,34 @@ export default {
       );
     });
 
+    handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.manage_plugins_persistent_edit_dialogs_menu', slot => {
+      slot.type('persistent-ux-tray-item');
+
+      slot.showIf(() => currentPersistentEditors.value.length);
+
+      slot.component(() =>
+        h(QBtn, { dense: true, flat: true, icon: "mdi-puzzle-edit" }, () => [
+
+          h(QMenu, { 'auto-close': true }, () =>
+            h(QList, { 'style': "min-width: 100px" }, () => currentPersistentEditors.value.map(currentEditor =>
+              h(QItem, { 'clickable': true, onClick: () => openPersistentEditor(assetLink, currentEditor.pluginUrl) }, () =>
+                h(QItemSection, {}, () => currentEditor.pluginUrl.pathname)
+              )
+            ))
+          ),
+
+          h(QBadge, { color: 'blue-8', floating: true }, () => '' + currentPersistentEditors.value.length),
+
+        ])
+      );
+    });
+
   }
 }
 </script>
+
+<style>
+  .manage-plugins .q-tree .q-tree__node--child:nth-of-type(odd) {
+    background-color: rgb(223, 223, 223) !important;
+  }
+</style>
