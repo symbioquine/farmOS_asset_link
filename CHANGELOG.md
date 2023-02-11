@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Make updates non-blocking with the remote when offline
 - Make the toolbar title decoratable
+- Pin editor dialogs from manage plugins plugin in new persistent UX tray
 
 ### Fixed
 
