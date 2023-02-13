@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Switch to connecting to the farm-faux-cloud on port 1880
+- Conditionally compute location/geometry/group values
 
 ## [0.11.0] - 2023-02-11
 

@@ -18,7 +18,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
     this._delegate = delegate;
     this._schema = settings.schema;
     this._logTypeGetter = settings.logTypesGetter;
-
+    this._remoteRequestQueue = settings.remoteRequestQueue;
   }
 
   get cache() {
@@ -183,6 +183,11 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       return;
     }
 
+    // Don't replace the computed groups field if we don't have any relevant pending log updates
+    if (!this._hasPendingRemoteLogUpdatesForAssetWhere({ type: entity.type, id: entity.id }, { is_group_assignment: true, status: 'done' })) {
+      return;
+    }
+
     const groups = await this._computeCurrentRelatedGroups({ type: entity.type, id: entity.id });
 
     if (groups === undefined) {
@@ -241,6 +246,11 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
 
     const asset = entity;
 
+    // Don't replace the computed location/geometry fields if we don't have any relevant pending log updates
+    if (!this._hasPendingRemoteLogUpdatesForAssetWhere({ type: asset.type, id: asset.id }, { is_movement: true, status: 'done' })) {
+      return;
+    }
+
     const latestMovementLog = await this._getLatestMovementLog({ type: asset.type, id: asset.id });
 
     if (latestMovementLog) {
@@ -259,6 +269,52 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
     }
 
     asset.attributes.geometry = latestMovementLog.attributes.geometry;
+  }
+
+  _hasPendingRemoteLogUpdatesForAssetWhere(recordIdentity, attrsToMatch) {
+    const remoteUpdateOperations = this._remoteRequestQueue.entries
+      .filter(r => r.type === 'update')
+      .flatMap(queueItem => {
+        const update = queueItem.data;
+        let operations = update?.operations || [];
+        if (!Array.isArray(operations)) {
+          operations = [operations];
+        }
+        return operations;
+      });
+
+    // Find if there are any update operations which concern the asset relationship matching `recordIdentity`
+    // and the attrsToMatch
+    return !!remoteUpdateOperations.find(operation => {
+      if (!operation.record.type.startsWith('log--')) {
+        return false;
+      }
+
+      const updatedLogRecord = this._delegate.cache.query((q) => q.findRecord(operation.record));
+
+      if (!updatedLogRecord) {
+        // TODO: Handle deleted logs that were relevant
+        return false;
+      }
+
+      const hasCurrentRelevantAssetRelationship = updatedLogRecord.relationships.asset.data
+        .find(assetRel => assetRel.type === recordIdentity.type && assetRel.id === recordIdentity.id);
+
+      const removesRelevantAssetRelationship = operation.op === 'removeFromRelatedRecords' && operation.relationship === 'asset' &&
+        operation.relatedRecord.type === recordIdentity.type && operation.relatedRecord.id === recordIdentity.id;
+
+      // TODO: Handle `replaceRelatedRecords` operation
+
+      if (!hasCurrentRelevantAssetRelationship && !removesRelevantAssetRelationship) {
+          return false;
+      }
+
+      return Object.keys(attrsToMatch).every(attrKey => {
+        const expectedAttrValue = attrsToMatch[attrKey];
+
+        return updatedLogRecord.attributes[attrKey] === expectedAttrValue;
+      });
+    });
   }
 
   async _getLatestMovementLog(recordIdentity) {

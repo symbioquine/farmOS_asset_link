@@ -289,21 +289,6 @@ export default class AssetLinkFarmDataCore {
     });
     this._updateDlq = updateDlq;
 
-    this._memory = new MemorySource({
-      schema: this._schema,
-      cacheSettings: {
-        queryOperators: DrupalSyncQueryOperators,
-      },
-    });
-
-    this._entitySource = new FarmDataModelOrbitMemorySourceDecorator(
-      new BarrierAwareOrbitSourceDecorator(this._memory, orbitCoordinatorActivationBarrier, { schema: this._schema }),
-      {
-        schema: this._schema,
-        logTypesGetter: async () => this.getLogTypes(),
-      }
-    );
-
     this._remote = new DrupalJSONAPISource({
       schema: this._schema,
       name: 'remote',
@@ -318,6 +303,22 @@ export default class AssetLinkFarmDataCore {
     });
 
     this._remoteEntitySource = new BarrierAwareOrbitSourceDecorator(this._remote, orbitCoordinatorActivationBarrier, { schema: this._schema });
+
+    this._memory = new MemorySource({
+      schema: this._schema,
+      cacheSettings: {
+        queryOperators: DrupalSyncQueryOperators,
+      },
+    });
+
+    this._entitySource = new FarmDataModelOrbitMemorySourceDecorator(
+      new BarrierAwareOrbitSourceDecorator(this._memory, orbitCoordinatorActivationBarrier, { schema: this._schema }),
+      {
+        schema: this._schema,
+        logTypesGetter: async () => this.getLogTypes(),
+        remoteRequestQueue: this._remote.requestQueue,
+      }
+    );
 
     const onQueueChanged = (queue, fn) => {
       queue.reified.then(fn);
@@ -622,6 +623,7 @@ export default class AssetLinkFarmDataCore {
             });
           }
   
+          // TODO: Handle 'addToRelatedRecords', 'removeFromRelatedRecords', 'replaceRelatedRecords', 'replaceRelatedRecord', 'removeRecord'
           if (['addRecord', 'updateRecord'].includes(operation.op) && operation.record.type.startsWith('log--')) {
             operation.record.relationships.asset.data.forEach(assetRel => {
               this._memory.requestQueue.currentProcessor.settle().then(() => {
@@ -630,6 +632,7 @@ export default class AssetLinkFarmDataCore {
             });
           }
   
+          // TODO: Handle 'replaceRelatedRecord'
           if (['addRecord', 'updateRecord'].includes(operation.op) && operation.record.type.startsWith('quantity--')) {
             const assetRel = operation.record.relationships?.inventory_asset?.data;
   
