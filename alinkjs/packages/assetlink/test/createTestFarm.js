@@ -2,12 +2,14 @@ import fetch from 'cross-fetch';
 
 const delay = time => new Promise(res => setTimeout(res, time));
 
-// Uses https://github.com/symbioquine/farm-faux-cloud to create fresh test farmOS instances
+const FAUX_FARM_CLOUD_BASE_URL = 'http://localhost:1880';
+
+// Uses https://github.com/symbioquine/farm-faux-cloud hosted on port 1880 to create fresh test farmOS instances
 export const createTestFarm = async function () {
-    const init_data = await fetch('http://localhost/meta/farm', { method: 'POST' })
+    const init_data = await fetch(FAUX_FARM_CLOUD_BASE_URL + '/meta/farm', { method: 'POST' })
         .then((response) => response.json());
 
-    const url = new URL(`http://localhost${init_data.path}`);
+    const url = new URL(`${FAUX_FARM_CLOUD_BASE_URL}${init_data.path}`);
 
     await delay(100);
 
@@ -42,7 +44,7 @@ export const createTestFarm = async function () {
             return await fetch(reqUrl, options);
         },
         cleanup: async () => {
-            await fetch(`http://localhost/meta/farm/${init_data.id}`, { method: 'DELETE' });
+            await fetch(`${FAUX_FARM_CLOUD_BASE_URL}/meta/farm/${init_data.id}`, { method: 'DELETE' });
         },
     };
 };
