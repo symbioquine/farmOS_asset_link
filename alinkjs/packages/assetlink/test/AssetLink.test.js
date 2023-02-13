@@ -347,6 +347,15 @@ describe('Basic Smoke Testing', () => {
         isOnline.mockImplementation(() => false);
         window.dispatchEvent(new window.Event('offline'));
 
+        // Wait for our connection status to be offline
+        await Promise.race([new Promise(async (resolve) => {
+          while (assetLink.connectionStatus.isOnline.value) {
+            await delay(1);
+          }
+          resolve(true);
+        }), delay(1000)]);
+        expect(assetLink.connectionStatus.isOnline.value).toBe(false);
+
         fetch.mockClear();
 
         const movementLog = {
