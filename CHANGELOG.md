@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add some functional tests in a more scalable fashion
+
 ### Changed
 
 - Switch to connecting to the farm-faux-cloud on port 1880
