@@ -100,6 +100,8 @@ import {
   QCardActions,
   QCardSection,
   QDialog,
+  QForm,
+  QInput,
   QItem,
   QItemSection,
   QList,
@@ -150,6 +152,73 @@ const PluginCodeEditor = defineComponent((props, { slots, emit, attrs }) => {
   ]);
 });
 PluginCodeEditor.props = ['pluginUrl', 'code', 'codeMimetype'];
+
+const UrlPromptDialog = defineComponent((props, { slots, emit, attrs }) => {
+  const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent();
+
+  const url = ref('');
+  const confirmText = ref('');
+
+  return () => h(QDialog, { ref: dialogRef }, () => [
+    h(QCard, { style: "width: 700px; max-width: 80vw;" }, () => [
+
+      h(QCardSection, { 'class': "text-h6" }, () => props.title),
+
+      h(QForm, { onSubmit: () => onDialogOK(url.value) }, () => [
+
+        h(QCardSection, {}, () => [
+          h(QInput, {
+            dense: true,
+            autofocus: true,
+            type: 'url',
+            label: props.promptLabel,
+            hint: props.promptHint,
+            modelValue: url.value,
+            'onUpdate:modelValue': (value) => { url.value = value; },
+            rules: [
+              (val) => (val && val.length > 0) || 'Please enter a URL',
+              (val) => {
+                try {
+                  const u = new URL(val);
+                  if (props.requiredUrlPathnamePattern && !props.requiredUrlPathnamePattern.test(u.pathname)) {
+                    return props.requiredUrlPathnameMismatchError;
+                  }
+                  return true;
+                } catch (err) {
+                  return 'Invalid URL: ' + err.message;
+                }
+              },
+            ],
+          }),
+        ]),
+
+        h(QCardSection, { 'class': "text-body2 text-orange-14" }, () => [
+          props.warningText,
+          h(QInput, {
+            dense: true,
+            type: 'text',
+            label: 'Confirm',
+            hint: 'Type "here be dragons" to confirm',
+            modelValue: confirmText.value,
+            'onUpdate:modelValue': (value) => { confirmText.value = value; },
+            rules: [
+              (val) => (val && val.length > 0 && val.trim().toLowerCase() === 'here be dragons') || 'Please enter "here be dragons"',
+            ],
+            'class': 'q-mt-md',
+          }),
+        ]),
+
+        h(QCardActions, { align: 'right' }, () => [
+          h(QBtn, { flat: true, label: 'Cancel', color: 'secondary', onClick: () => onDialogCancel(), 'v-close-popup': true }),
+          h(QBtn, { flat: true, label: 'Add', color: 'primary', type: "submit", disable: !url.value }),
+        ]),
+
+      ]),
+
+    ]),
+  ]);
+});
+UrlPromptDialog.props = ['title', 'promptLabel', 'promptHint', 'requiredUrlPathnamePattern', 'requiredUrlPathnameMismatchError', 'warningText'];
 
 const PLUGIN_DATA_URL_PREFIX = "data:application/javascript;base64,";
 const PERSISTENT_EDITORS_IDX_KEY = `manage-plugins-persistent-edit-dialogs-index`;
@@ -280,8 +349,14 @@ export default {
 
   methods: {
     async addPluginFromUrl() {
-      // TODO: Add a warning about only adding trusted code
-      const url = await this.assetLink.ui.dialog.promptText(`What is the url of the plugin to be added?`);
+      const url = await this.assetLink.ui.dialog.custom(UrlPromptDialog, {
+          title: "Add Plugin",
+          promptLabel: "Plugin URL",
+          promptHint: "What is the url of the plugin to be added?",
+          requiredUrlPathnamePattern: /[^/]+\.alink\.[^/]+$/,
+          requiredUrlPathnameMismatchError: "Plugin URL path must end with '.alink.*'",
+          warningText: "Warning: Installing plugins from untrusted sources could leak or corrupt your farmOS data!",
+      });
 
       if (!url) {
         return;
@@ -365,8 +440,14 @@ export default {
       await this.assetLink.cores.pluginLists.removePluginFromLocalBlacklist(pluginUrl);
     },
     async addPluginListFromUrl() {
-      // TODO: Add a warning about only adding trusted code
-      const url = await this.assetLink.ui.dialog.promptText(`What is the url of the plugin list to be added?`);
+      const url = await this.assetLink.ui.dialog.custom(UrlPromptDialog, {
+          title: "Add Plugin List",
+          promptLabel: "Plugin List URL",
+          promptHint: "What is the url of the plugin list to be added?",
+          requiredUrlPathnamePattern: /[^/]+\.repo\.json$/,
+          requiredUrlPathnameMismatchError: "Plugin list URL path must end with '.repo.json'",
+          warningText: "Warning: Installing untrusted plugin lists could leak or corrupt your farmOS data!",
+      });
 
       if (!url) {
         return;
