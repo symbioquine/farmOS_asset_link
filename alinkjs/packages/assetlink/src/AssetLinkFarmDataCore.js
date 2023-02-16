@@ -125,9 +125,15 @@ export default class AssetLinkFarmDataCore {
   async getAssetTypes() {
     await this._booted;
 
-    return await this.entitySource.query((q) => q
+    const assetTypes = await this.entitySource.query((q) => q
         .findRecords(`asset_type--asset_type`)
         .sort('drupal_internal__id'));
+
+    if (!assetTypes.length) {
+      throw new Error("No asset types available. Something is probably seriously wrong...");
+    }
+
+    return assetTypes;
   }
 
   /**
@@ -136,9 +142,15 @@ export default class AssetLinkFarmDataCore {
   async getLogTypes() {
     await this._booted;
 
-    return await this.entitySource.query((q) => q
+    const logTypes = await this.entitySource.query((q) => q
         .findRecords(`log_type--log_type`)
         .sort('drupal_internal__id'));
+
+    if (!logTypes.length) {
+      throw new Error("No log types available. Something is probably seriously wrong...");
+    }
+
+    return logTypes;
   }
 
   /**
@@ -147,9 +159,15 @@ export default class AssetLinkFarmDataCore {
   async getTaxonomyVocabularies() {
     await this._booted;
 
-    await this.entitySource.query((q) => q
+    const vocabs = await this.entitySource.query((q) => q
           .findRecords(`taxonomy_vocabulary--taxonomy_vocabulary`)
           .sort('drupal_internal__vid'));
+
+    if (!vocabs.length) {
+      throw new Error("No taxonomy vocabularies available. Something is probably seriously wrong...");
+    }
+
+    return vocabs;
   }
 
   /**
