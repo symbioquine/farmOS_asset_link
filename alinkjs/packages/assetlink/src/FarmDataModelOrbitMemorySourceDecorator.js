@@ -246,8 +246,15 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
 
     const asset = entity;
 
-    // Don't replace the computed location/geometry fields if we don't have any relevant pending log updates
-    if (!this._hasPendingRemoteLogUpdatesForAssetWhere({ type: asset.type, id: asset.id }, { is_movement: true, status: 'done' })) {
+    const hasRelevantPendingRemoteLogUpdates = this._hasPendingRemoteLogUpdatesForAssetWhere({ type: asset.type, id: asset.id }, { is_movement: true, status: 'done' });
+
+    const isMissingGeometryField = !asset.attributes?.geometry?.value;
+    const isMissingLocationRelationship = !asset.relationships?.location?.data;
+
+    // Don't replace the computed location/geometry fields if:
+    // - We don't have any relevant pending log updates
+    // - The computed fields are already populated
+    if (!hasRelevantPendingRemoteLogUpdates && !isMissingGeometryField && !isMissingLocationRelationship) {
       return;
     }
 
@@ -320,7 +327,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
   async _getLatestMovementLog(recordIdentity) {
     const logTypes = (await this._logTypeGetter()).map(t => t.attributes.drupal_internal__id);
 
-    const results = await this.query(q => logTypes.map(logType => {
+    const results = await this.cache.query(q => logTypes.map(logType => {
       return q.findRecords(`log--${logType}`)
         .filter({ attribute: 'is_movement', op: 'equal', value: true })
         .filter({ attribute: 'status', op: 'equal', value: 'done' })
