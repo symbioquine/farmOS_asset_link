@@ -521,6 +521,27 @@ export default class AssetLinkFarmDataCore {
       })
     );
 
+    // Update the memory cache when new data is supplied in the 'includes' field of remote server responses
+    this._coordinator.addStrategy(
+      new RequestStrategy({
+        source: 'remote',
+        on: 'query',
+
+        blocking: true,
+
+        action: (query, result) => {
+          const details = Array.isArray(result?.details) ? result?.details : [result?.details];
+          const includedRecords = details.flatMap(d => d?.document?.includes || []);
+
+          includedRecords.forEach(record => {
+            if (!this._memory.cache.getRecordSync({ type: record.type, id: record.id })) {
+              this._memory.cache.setRecordSync(record);
+            }
+          });
+        },
+      })
+    );
+
     // Sync all changes to the backup source
     this._coordinator.addStrategy(
       new SyncStrategy({
