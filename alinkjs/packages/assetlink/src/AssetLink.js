@@ -48,7 +48,7 @@ export default class AssetLink {
 
     this._connectionStatus = new FarmOSConnectionStatusDetector(connectionStatusOptions);
 
-    this._fetcherDelegate = new SubrequestsGroupingRequestFetcher(this._connectionStatus);
+    this._fetcherDelegate = opts.disableSubrequestGrouping ? this._connectionStatus : new SubrequestsGroupingRequestFetcher(this._connectionStatus);
 
     this._eventBus = new EventBus();
 

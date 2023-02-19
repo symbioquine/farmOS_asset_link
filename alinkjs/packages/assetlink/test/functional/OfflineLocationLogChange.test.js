@@ -15,7 +15,7 @@ const {
 
 let assetLink = undefined;
 beforeEach(async () => {
-  assetLink = new AssetLink(rootComponent, devToolsApi, { fetch });
+  assetLink = new AssetLink(rootComponent, devToolsApi, { fetch, disableSubrequestGrouping: true });
 });
 
 test('Offline Location Log Change', async () => {

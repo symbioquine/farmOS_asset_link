@@ -17,7 +17,7 @@ let assetLink = undefined;
 beforeEach(async () => {
   isOnline.mockImplementation(() => false);
 
-  assetLink = new AssetLink(rootComponent, devToolsApi, { fetch });
+  assetLink = new AssetLink(rootComponent, devToolsApi, { fetch, disableSubrequestGrouping: true });
 });
 
 test('Log fields computed on creation', async () => {

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add some functional tests in a more scalable fashion
 - Add security warning/confirmation about installing untrusted plugins and plugin lists
+- Add an option to disable subrequest grouping to simplify testing
 
 ### Changed
 
