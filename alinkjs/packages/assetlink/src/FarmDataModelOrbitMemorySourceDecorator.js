@@ -206,8 +206,13 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       return;
     }
 
-    // Don't replace the computed groups field if we don't have any relevant pending log updates
-    if (!this._hasPendingRemoteLogUpdatesForAssetWhere({ type: entity.type, id: entity.id }, { is_group_assignment: true, status: 'done' })) {
+    const isNewlyCreatedAsset = this._isEntityCreatedByPendingRemoteUpdate({ type: entity.type, id: entity.id });
+    const hasRelevantPendingRemoteLogUpdates = this._hasPendingRemoteLogUpdatesForAssetWhere({ type: entity.type, id: entity.id }, { is_group_assignment: true, status: 'done' });
+
+    // Only replace the computed groups field if at least one of:
+    // - The asset is newly created
+    // - We have relevant pending log updates
+    if (!isNewlyCreatedAsset && !hasRelevantPendingRemoteLogUpdates) {
       return;
     }
 
@@ -217,6 +222,8 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       return;
     }
 
+    entity.relationships = entity.relationships || {};
+    entity.relationships.group = entity.relationships.group || {};
     entity.relationships.group.data = groups.map(g => ({ type: g.type, id: g.id }));
   }
 
@@ -269,15 +276,13 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
 
     const asset = entity;
 
+    const isNewlyCreatedAsset = this._isEntityCreatedByPendingRemoteUpdate({ type: asset.type, id: asset.id });
     const hasRelevantPendingRemoteLogUpdates = this._hasPendingRemoteLogUpdatesForAssetWhere({ type: asset.type, id: asset.id }, { is_movement: true, status: 'done' });
 
-    const isMissingGeometryField = !asset.attributes?.geometry?.value;
-    const isMissingLocationRelationship = !asset.relationships?.location?.data;
-
-    // Don't replace the computed location/geometry fields if:
-    // - We don't have any relevant pending log updates
-    // - The computed fields are already populated
-    if (!hasRelevantPendingRemoteLogUpdates && !isMissingGeometryField && !isMissingLocationRelationship) {
+    // Only replace the computed location/geometry fields if at least one of:
+    // - The asset is newly created
+    // - We have relevant pending log updates
+    if (!isNewlyCreatedAsset && !hasRelevantPendingRemoteLogUpdates) {
       return;
     }
 
@@ -299,6 +304,31 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
     }
 
     asset.attributes.geometry = latestMovementLog.attributes.geometry;
+  }
+
+  _isEntityCreatedByPendingRemoteUpdate(recordIdentity) {
+    const remoteUpdateOperations = this._remoteRequestQueue.entries
+      .filter(r => r.type === 'update')
+      .flatMap(queueItem => {
+        const update = queueItem.data;
+        let operations = update?.operations || [];
+        if (!Array.isArray(operations)) {
+          operations = [operations];
+        }
+        return operations;
+      });
+
+      return !!remoteUpdateOperations.find(operation => {
+        if (operation.op !== 'addRecord') {
+          return false;
+        }
+
+        if (operation.record.type !== recordIdentity.type) {
+          return false;
+        }
+
+        return operation.record.id !== recordIdentity.id;
+      });
   }
 
   _hasPendingRemoteLogUpdatesForAssetWhere(recordIdentity, attrsToMatch) {
