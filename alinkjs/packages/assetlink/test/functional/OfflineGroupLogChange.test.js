@@ -19,6 +19,8 @@ beforeEach(async () => {
 });
 
 test('Offline Group Log Change', async () => {
+  assetLink.cores.farmData.getLogTypes = async () => ['activity'].map(lt => ({ attributes: { drupal_internal__id: lt }}));
+
   await assetLink.boot();
 
   await delay(1);
@@ -64,9 +66,6 @@ test('Offline Group Log Change', async () => {
   });
 
   try {
-    // Get these so they're cached before we go offline... TODO: Consider making Asset Link do this automatically/internally
-    const logTypes = await assetLink.getLogTypes();
-
     const animalResults = await assetLink.entitySource.query(q => q.findRecords('asset--animal'), {
       sources: {
         remote: {

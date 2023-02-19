@@ -130,7 +130,7 @@ test('Log fields computed on creation', async () => {
   
       expect(fetch).not.toHaveBeenCalled();
   
-      console.log(JSON.stringify(createdLog));
+      // console.log(JSON.stringify(createdLog));
       expect(createdLog.attributes.geometry).toBeDefined();
       expect(createdLog.attributes.geometry.value).toBe("GEOMETRYCOLLECTION (POLYGON ((0 0, -10 0, -10 10, 0 10, 0 0)),POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0)))");
       // TODO: Implement/Expect other geometry fields
