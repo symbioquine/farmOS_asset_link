@@ -1,5 +1,7 @@
 import { buildQuery, buildTransform } from '@orbit/data';
 
+import { Fraction } from 'fraction.js';
+
 import combineWkt from './combineWkt';
 
 import { currentEpochSecond, parseJSONDate, uuidv4, formatRFC3339 } from "assetlink-plugin-api";
@@ -79,7 +81,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
 
     await Promise.all(resultEntities.map(async (entity) => this._computeCurrentAssetGroups(entity)));
     await Promise.all(resultEntities.map(async (entity) => this._computeCurrentAssetLocationAndGeometry(entity)));
-    // TODO: implement inventory adjustment quantities
+    await Promise.all(resultEntities.map(async (entity) => this._computeCurrentAssetInventory(entity)));
 
     return results;
   }
@@ -305,6 +307,163 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
     asset.attributes.geometry = latestMovementLog.attributes.geometry;
   }
 
+  // Roughly implements https://github.com/farmOS/farmOS/blob/637843aabf86a4ccfe108d31a8435f80dd64fcf3/modules/core/inventory/src/AssetInventory.php#L54
+  async _computeCurrentAssetInventory(entity) {
+    if (!entity.type.startsWith('asset--')) {
+      return;
+    }
+
+    // Don't try and resolve inventory if the inventory module is not installed in farmOS
+    if (!this._schema.getModel('quantity--standard').relationships.inventory_asset) {
+      return;
+    }
+
+    const asset = entity;
+
+    const isNewlyCreatedAsset = this._isEntityCreatedByPendingRemoteUpdate({ type: asset.type, id: asset.id });
+    const hasRelevantPendingRemoteQuantityUpdates = this._hasPendingRemoteQuantityLogUpdatesForAssetWhere({ type: asset.type, id: asset.id }, { status: 'done' })
+
+    // Only replace the computed inventory field if at least one of:
+    // - The asset is newly created
+    // - We have relevant pending log updates
+    if (!isNewlyCreatedAsset && !hasRelevantPendingRemoteQuantityUpdates) {
+      return;
+    }
+
+    const logTypes = (await this._logTypeGetter()).map(t => t.attributes.drupal_internal__id).map(logType => `log--${logType}`);
+
+    // Paginate through all the pages of logs for each log type by keeping a mapping of log types to page offsets
+    // and removing log types once we've reached the end of the pages
+    let nextOffsetByLogType = logTypes.reduce((offsets, logType) => { offsets[logType] = 0; return offsets; }, {});
+
+    while (Object.keys(nextOffsetByLogType).length) {
+      // Orbit.js doesn't support this query fully https://github.com/orbitjs/orbit/issues/370
+      // So for now, we'll execute it just to prime the cache (if online), then do all our calculations
+      // from the cache.
+      const primingResult = await this.query(q => Object.entries(nextOffsetByLogType).map(([logType, nextOffset]) => {
+        return q.findRecords(logType)
+          .filter({ attribute: 'status', op: 'equal', value: 'done' })
+          .filter({ attribute: 'timestamp', op: '<=', value: currentEpochSecond() })
+          .filter({
+            attribute: 'quantity.inventory_asset.id',
+            op: 'equal',
+            value: asset.id
+          })
+          .sort('-timestamp')
+          .options({
+            page: { kind: 'offsetLimit', offset: nextOffset, limit: 50 },
+          });
+      }), {
+        fullResponse: true,
+        sources: {
+          remote: {
+            include: ['quantity', 'quantity.units'],
+          }
+        }
+      });
+
+      const remoteDetails = primingResult?.sources?.remote?.details;
+
+      if (!remoteDetails) {
+        break;
+      }
+
+      remoteDetails.forEach(detail => {
+        const selfRawUrl = detail.document?.links?.self?.href;
+        const nextRawUrl = detail.document?.links?.next?.href;
+
+        const selfUrl = new URL(selfRawUrl);
+
+        const selfPathParts = selfUrl.pathname.split('/');
+
+        const logType = selfPathParts[3];
+
+        if (!nextRawUrl) {
+          delete nextOffsetByLogType[logType];
+          return;
+        }
+
+        const nextUrl = new URL(nextRawUrl);
+
+        nextOffsetByLogType[logType] = nextUrl.searchParams.get('page[offset]');
+      });
+    }
+
+    const relatedQuantities = this.cache.query(q => {
+      return q.findRecords('quantity--standard')
+        .filter({
+          relation: 'inventory_asset.id',
+          op: 'equal',
+          record: { type: asset.type, id: asset.id }
+        })
+        .sort('-timestamp');
+    });
+
+    const relatedLogResults = this.cache.query(q => logTypes.map(logType => {
+      return q.findRecords(logType)
+        .filter({ attribute: 'status', op: 'equal', value: 'done' })
+        .filter({ attribute: 'timestamp', op: '<=', value: currentEpochSecond() })
+        .filter({
+          relation: 'quantity.id',
+          op: 'some',
+          records: relatedQuantities.map(quantity => ({ id: quantity.id, type: quantity.type })),
+        })
+        .sort('-timestamp');
+    }));
+
+    const logs = relatedLogResults.flatMap(l => l).sort((logA, logB) => parseJSONDate(logA.attributes.timestamp) - parseJSONDate(logB.attributes.timestamp));
+
+    const inventoryLineItemsByMeasureAndUnits = {};
+
+    const toFraction = (quantityValue) => {
+      if (quantityValue.numerator && quantityValue.denominator) {
+        return new Fraction(quantityValue.numerator, quantityValue.denominator);
+      }
+      return new Fraction(quantityValue.decimal);
+    }
+
+    logs.forEach(log => {
+      log.relationships.quantity.data.forEach(quantity => {
+        const quantityEntity = this.cache.query((q) => q.findRecord({ type: quantity.type, id: quantity.id }));
+
+        const invAsset = quantityEntity.relationships.inventory_asset?.data;
+
+        if (!invAsset || invAsset.type !== asset.type || invAsset.id !== asset.id) {
+          return;
+        }
+
+        const relatedUnits = quantityEntity.relationships?.units?.data || {};
+
+        const unitsEntity = relatedUnits && this.cache.query((q) => q.findRecord({ type: relatedUnits.type, id: relatedUnits.id })) || relatedUnits;
+
+        const key = `${quantityEntity.attributes.measure}|${unitsEntity.type}|${unitsEntity.id}`;
+
+        let operator = undefined;
+        if (quantityEntity.attributes.inventory_adjustment === 'increment') {
+          operator = (existing, value) => existing.add(value);
+        } else if (quantityEntity.attributes.inventory_adjustment === 'decrement') {
+          operator = (existing, value) => existing.sub(value);
+        } else if (quantityEntity.attributes.inventory_adjustment === 'reset') {
+          operator = (existing, value) => value;
+        } else {
+          throw new Error("Unsupported inventory adjustment type.");
+        }
+
+        if (!inventoryLineItemsByMeasureAndUnits[key]) {
+          inventoryLineItemsByMeasureAndUnits[key] = { key, value: new Fraction(0), measure: quantityEntity.attributes.measure, units: unitsEntity };
+        }
+
+        inventoryLineItemsByMeasureAndUnits[key].value = operator(inventoryLineItemsByMeasureAndUnits[key].value, toFraction(quantityEntity.attributes.value));
+      });
+    });
+
+    asset.attributes.inventory = Object.values(inventoryLineItemsByMeasureAndUnits).map(({ value, measure, units }) => ({
+      measure,
+      units: units.attributes?.name,
+      value: '' + value.valueOf(),
+    }));
+  }
+
   _isEntityCreatedByPendingRemoteUpdate(recordIdentity) {
     const remoteUpdateOperations = this._remoteRequestQueue.entries
       .filter(r => r.type === 'update')
@@ -356,7 +515,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
         return false;
       }
 
-      const hasCurrentRelevantAssetRelationship = updatedLogRecord.relationships.asset.data
+      const hasCurrentRelevantAssetRelationship = updatedLogRecord.relationships?.asset?.data
         .find(assetRel => assetRel.type === recordIdentity.type && assetRel.id === recordIdentity.id);
 
       const removesRelevantAssetRelationship = operation.op === 'removeFromRelatedRecords' && operation.relationship === 'asset' &&
@@ -366,6 +525,69 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
 
       if (!hasCurrentRelevantAssetRelationship && !removesRelevantAssetRelationship) {
           return false;
+      }
+
+      if (typeof attrsToMatch === 'function') {
+        return attrsToMatch(updatedLogRecord);
+      }
+
+      return Object.keys(attrsToMatch).every(attrKey => {
+        const expectedAttrValue = attrsToMatch[attrKey];
+
+        return updatedLogRecord.attributes[attrKey] === expectedAttrValue;
+      });
+    });
+  }
+
+  _hasPendingRemoteQuantityLogUpdatesForAssetWhere(recordIdentity, attrsToMatch) {
+    const remoteUpdateOperations = this._remoteRequestQueue.entries
+      .filter(r => r.type === 'update')
+      .flatMap(queueItem => {
+        const update = queueItem.data;
+        let operations = update?.operations || [];
+        if (!Array.isArray(operations)) {
+          operations = [operations];
+        }
+        return operations;
+      });
+
+    // Find if there are any relevant update operations which concern quantities with the `inventory_asset` relationship
+    return !!remoteUpdateOperations.find(operation => {
+      if (!operation.record.type.startsWith('log--')) {
+        return false;
+      }
+
+      const updatedLogRecord = this.cache.query((q) => q.findRecord(operation.record));
+
+      if (!updatedLogRecord) {
+        // TODO: Handle deleted logs that were relevant
+        return false;
+      }
+
+      const updateQuantityRecords = this.cache.query((q) => q.findRelatedRecords({ type: updatedLogRecord.type, id: updatedLogRecord.id }, 'quantity'));
+
+      const hasCurrentRelevantQuantityRelationship = updateQuantityRecords.find(qr =>
+        qr?.relationships?.inventory_asset?.data?.type === recordIdentity.type && qr?.relationships?.inventory_asset?.data?.id === recordIdentity.id);
+
+      let removesRelevantQuantityRelationship = false;
+      if (operation.op === 'removeFromRelatedRecords' && operation.relationship === 'quantity') {
+        const removedQuantityRecordIdentity = operation.relatedRecord;
+
+        const removedQuantityRecord = this.cache.query((q) => q.findRecord(removedQuantityIdentity));
+
+        removesRelevantQuantityRelationship =
+          removedQuantityRecord?.relationships?.inventory_asset?.data?.type === recordIdentity.type &&
+          removedQuantityRecord?.relationships?.inventory_asset?.data?.id === recordIdentity.id;
+      }
+
+      // TODO: Handle `replaceRelatedRecords` operation
+
+      if (!hasCurrentRelevantQuantityRelationship && !removesRelevantQuantityRelationship) {
+          return false;
+      }
+
+      if (typeof attrsToMatch === 'function') {
+        return attrsToMatch(updatedLogRecord);
       }
 
       return Object.keys(attrsToMatch).every(attrKey => {

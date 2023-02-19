@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add security warning/confirmation about installing untrusted plugins and plugin lists
 - Add an option to disable subrequest grouping to simplify testing
 - Update the memory cache when new data is supplied in the 'includes' field of remote server responses
+- Locally compute inventory values when necessary
 
 ### Changed
 

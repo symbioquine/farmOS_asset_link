@@ -343,6 +343,16 @@ describe('Basic Smoke Testing', () => {
         expect(animal.attributes.geometry?.value).not.toBeDefined();
 
         expect(animalCage).toBeDefined();
+
+        // Avoid our update below occurring as part of the resolution of the above query - which
+        // bizarrely causes it to get into the remote request queue before the previous round of
+        // request processing completes. That in turn means that even though `autoProcess` gets set
+        // on the request queue as part of going offline, the update request still gets processed -
+        // and sent to the remote server.
+        //
+        // A delay of 1 ms is enough to guarantee the two are decoupled as they would be in a non-test
+        // scenario anyway.
+        await delay(1);
   
         isOnline.mockImplementation(() => false);
         window.dispatchEvent(new window.Event('offline'));
