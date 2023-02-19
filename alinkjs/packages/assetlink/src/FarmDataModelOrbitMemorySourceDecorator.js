@@ -198,7 +198,8 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       return [];
     }
 
-    return await this.query(q => q.findRelatedRecords({ type: latestMovementLog.type, id: latestMovementLog.id }, 'location')) || [];
+    // Query the cache here because _getLatestMovementLog includes the location from the remote source (if we're online)
+    return await this.cache.query(q => q.findRelatedRecords({ type: latestMovementLog.type, id: latestMovementLog.id }, 'location'));
   }
 
   async _computeCurrentAssetGroups(entity) {
@@ -250,11 +251,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
         .sort('-timestamp')
         .page({ offset: 0, limit: 1 });
     }), {
-      sources: {
-        remote: {
-          include: ['group']
-        }
-      }
+      include: ['group']
     });
   
     const logs = results.flatMap(l => l);
@@ -265,7 +262,8 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       return [];
     }
 
-    return this.query(q => q.findRelatedRecords({ type: latestGroupMembershipLog.type, id: latestGroupMembershipLog.id }, 'group')) || [];
+    // Query the cache here because our query above already includes the group from the remote source (if we're online)
+    return this.cache.query(q => q.findRelatedRecords({ type: latestGroupMembershipLog.type, id: latestGroupMembershipLog.id }, 'group')) || [];
   }
 
   // Roughly implements: https://github.com/farmOS/farmOS/blob/637843aabf86a4ccfe108d31a8435f80dd64fcf3/modules/core/location/src/AssetLocation.php
@@ -289,7 +287,8 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
     const latestMovementLog = await this._getLatestMovementLog({ type: asset.type, id: asset.id });
 
     if (latestMovementLog) {
-      const locations = await this.query(q => q.findRelatedRecords({ type: latestMovementLog.type, id: latestMovementLog.id }, 'location')) || [];
+      // Query the cache here because _getLatestMovementLog includes the location from the remote source
+      const locations = await this.cache.query(q => q.findRelatedRecords({ type: latestMovementLog.type, id: latestMovementLog.id }, 'location')) || [];
 
       asset.relationships.location.data = locations.map(l => ({ type: l.type, id: l.id }));
     }
@@ -380,7 +379,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
   async _getLatestMovementLog(recordIdentity) {
     const logTypes = (await this._logTypeGetter()).map(t => t.attributes.drupal_internal__id);
 
-    const results = await this.cache.query(q => logTypes.map(logType => {
+    const results = await this.query(q => logTypes.map(logType => {
       return q.findRecords(`log--${logType}`)
         .filter({ attribute: 'is_movement', op: 'equal', value: true })
         .filter({ attribute: 'status', op: 'equal', value: 'done' })
@@ -393,13 +392,9 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
         .sort('-timestamp')
         .page({ offset: 0, limit: 1 });
     }), {
-      sources: {
-        remote: {
-          include: ['location']
-        }
-      }
+      include: ['location'],
     });
-  
+
     const logs = results.flatMap(l => l);
 
     if (!logs.length) {
