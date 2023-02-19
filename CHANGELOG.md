@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix a race condition related to going offline in one of the tests
 - Fix bug where the asset geometry/locations computed fields aren't initially calculated for new assets
+- Fix a bug with how query results are merged when `options.fullResponse` is set
 
 ## [0.11.0] - 2023-02-11
 

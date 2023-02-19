@@ -126,12 +126,12 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
           ['group', 'location'].includes(expr.relationship)
       ) {
         localExpressions.push(expr);
-        mergeSelectors.push((localResults, delegateResults) => localResults.shift());
+        mergeSelectors.push((localResultsItems, delegateResultsItems) => localResultsItems.shift());
         return;
       }
 
       delegateExpressions.push(expr);
-      mergeSelectors.push((localResults, delegateResults) => delegateResults.shift());
+      mergeSelectors.push((localResultsItems, delegateResultsItems) => delegateResultsItems.shift());
     });
 
     const localQuery = { ...query, expressions: localExpressions };
@@ -142,15 +142,38 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       this._delegateQuery(delegateQuery, opts, id)
     ]);
 
-    const mergedResults = mergeSelectors.map(ms => ms(localResults, delegateResults));
+    const localResultsItems = localResults;
+    let delegateResultsItems = delegateResults;
+    if (query.options?.fullResponse) {
+      delegateResultsItems = delegateResults.data || [];
+    }
+
+    let mergedResultsItems = mergeSelectors.map(ms => ms(localResultsItems, delegateResultsItems));
 
     if (!Array.isArray(query?.expressions)) {
-      return mergedResults[0];
+      mergedResultsItems = mergedResultsItems[0];
     }
-    return mergedResults;
+
+    if (!query.options?.fullResponse) {
+      return mergedResultsItems;
+    }
+
+    if (!delegateExpressions.length || !delegateResults) {
+      return {
+        data: mergedResultsItems,
+      };
+    }
+
+    return {
+      ...delegateResults,
+      data: mergedResultsItems,
+    };
   }
 
   async _localQuery(query, opts, id) {
+    if (!query.expressions.length) {
+      return [];
+    }
     return await Promise.all(query.expressions.map(async (expr) => {
       if (expr.relationship === 'group') {
         return await this._computeCurrentRelatedGroups(expr.record);
