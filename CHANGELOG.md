@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2023-02-20
+
 ### Added
 
 - Add some functional tests in a more scalable fashion
@@ -462,7 +464,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.11.0...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.12.0...HEAD
+[0.12.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.11.0...unbuilt-v0.12.0
 [0.11.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.10.0...unbuilt-v0.11.0
 [0.10.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.9.0...unbuilt-v0.10.0
 [0.9.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.8.2...unbuilt-v0.9.0
