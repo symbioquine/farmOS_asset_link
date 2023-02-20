@@ -186,7 +186,7 @@ export default {
     handle.defineSlot('net.symbioquine.farmos_asset_link.slots.v0.location_occupants', actionsSlot => {
       actionsSlot.type('page-slot');
 
-      actionsSlot.showIf(({ asset }) => asset.attributes.is_location);
+      actionsSlot.showIf(context => context.pageName === 'asset-page' && context.asset.attributes.is_location);
 
       actionsSlot.component(handle.thisPlugin);
     });

@@ -1,0 +1,9 @@
+langcode: en
+status: true
+id: LogDatePageSlotProvider
+dependencies:
+  enforced:
+    module:
+      - farmos_asset_link
+url: '{base_path}alink/plugins/LogDatePageSlotProvider.alink.vue'
+user_defined: null

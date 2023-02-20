@@ -1,0 +1,9 @@
+langcode: en
+status: true
+id: MarkLogPendingActionProvider
+dependencies:
+  enforced:
+    module:
+      - farmos_asset_link
+url: '{base_path}alink/plugins/MarkLogPendingActionProvider.alink.vue'
+user_defined: null

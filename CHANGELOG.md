@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2023-02-20
+
+### Added
+
+- Add some functional tests in a more scalable fashion
+- Add security warning/confirmation about installing untrusted plugins and plugin lists
+- Add an option to disable subrequest grouping to simplify testing
+- Update the memory cache when new data is supplied in the 'includes' field of remote server responses
+- Locally compute inventory values when necessary
+- Add a log page and basic support for viewing editing logs
+- Add a tasks page for viewing upcoming/late/recent logs
+
+### Changed
+
+- Switch to connecting to the farm-faux-cloud on port 1880
+- Conditionally compute location/geometry/group values
+- Throw exceptions when log-types/asset-types/taxonomy-vocabularies are missing
+- Clean up tests a little
+- Rename OpenInFarmOSMetaActionProvider plugin to OpenAssetInFarmOSMetaActionProvider for clarity
+
+### Fixed
+
+- Fix a race condition related to going offline in one of the tests
+- Fix bug where the asset geometry/locations computed fields aren't initially calculated for new assets
+- Fix a bug with how query results are merged when `options.fullResponse` is set
+- Fix populating missing geometry/location/group computed fields for new assets
+- Cleanup logic around how querying location/group relations works
+- Fix a bug where clearing local data fails in development without the service worker installed
+- Fix a bug creating widget decorators via the shorthand without specifying a predicate
+- Fix asset group and location members page slots to only apply to the asset page
+
 ## [0.11.0] - 2023-02-11
 
 ### Added
@@ -433,7 +464,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.11.0...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.12.0...HEAD
+[0.12.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.11.0...unbuilt-v0.12.0
 [0.11.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.10.0...unbuilt-v0.11.0
 [0.10.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.9.0...unbuilt-v0.10.0
 [0.9.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.8.2...unbuilt-v0.9.0

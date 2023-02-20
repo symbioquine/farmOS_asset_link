@@ -1,0 +1,9 @@
+langcode: en
+status: true
+id: TasksPage
+dependencies:
+  enforced:
+    module:
+      - farmos_asset_link
+url: '{base_path}alink/plugins/TasksPage.alink.vue'
+user_defined: null
