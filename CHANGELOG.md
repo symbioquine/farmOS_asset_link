@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Conditionally compute location/geometry/group values
 - Throw exceptions when log-types/asset-types/taxonomy-vocabularies are missing
 - Clean up tests a little
+- Rename OpenInFarmOSMetaActionProvider plugin to OpenAssetInFarmOSMetaActionProvider for clarity
 
 ### Fixed
 
