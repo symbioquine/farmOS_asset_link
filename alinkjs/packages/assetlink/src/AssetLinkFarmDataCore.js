@@ -662,12 +662,21 @@ export default class AssetLinkFarmDataCore {
             });
           }
   
-          // TODO: Handle 'addToRelatedRecords', 'removeFromRelatedRecords', 'replaceRelatedRecords', 'replaceRelatedRecord', 'removeRecord'
+          // TODO: Handle 'removeRecord'
           if (['addRecord', 'updateRecord'].includes(operation.op) && operation.record.type.startsWith('log--')) {
-            operation.record.relationships.asset.data.forEach(assetRel => {
-              this._memory.requestQueue.currentProcessor.settle().then(() => {
+            this._memory.requestQueue.currentProcessor.settle().then(() => {
+              (operation.record.relationships?.asset?.data || []).forEach(assetRel => {
                 this._eventBus.$emit('changed:assetLogs', { assetType: assetRel.type, assetId: assetRel.id});
               });
+              this._eventBus.$emit('changed:log', { logType: operation.record.type, logId: operation.record.id});
+            });
+          }
+
+          if (['addToRelatedRecords', 'removeFromRelatedRecords', 'replaceRelatedRecords', 'replaceRelatedRecord'].includes(operation.op) &&
+              operation.record.type.startsWith('log--')) {
+            this._memory.requestQueue.currentProcessor.settle().then(() => {
+              // TODO: 'changed:assetLogs' events here also
+              this._eventBus.$emit('changed:log', { logType: operation.record.type, logId: operation.record.id});
             });
           }
   

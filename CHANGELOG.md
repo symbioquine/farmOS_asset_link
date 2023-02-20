@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add an option to disable subrequest grouping to simplify testing
 - Update the memory cache when new data is supplied in the 'includes' field of remote server responses
 - Locally compute inventory values when necessary
+- Add a log page and basic support for viewing editing logs
 
 ### Changed
 
