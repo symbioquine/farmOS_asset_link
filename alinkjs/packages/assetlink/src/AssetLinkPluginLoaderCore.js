@@ -434,8 +434,12 @@ class AssetLinkPluginHandle {
 
     widgetDecoratorDefiner(widgetDecoratorHandle);
 
-    const missingFields = Object.entries({'targetWidgetName': 'string', 'predicateFn': 'function'})
+    const missingFields = Object.entries({'targetWidgetName': 'string'})
       .filter(([attr, expectedType]) => typeof widgetDecoratorDef[attr] !== expectedType);
+
+    if (!['undefined', 'function'].includes(typeof widgetDecoratorDef.predicateFn)) {
+      missingFields.push(['predicateFn', 'function?']);
+    }
 
     if (!['undefined', 'function', 'number'].includes(typeof widgetDecoratorDef.weightFn)) {
       missingFields.push(['weightFn', '(function|number)?']);
@@ -450,7 +454,10 @@ class AssetLinkPluginHandle {
       return;
     }
 
-    const providedPredicateFn = widgetDecoratorDef.predicateFn;
+    let providedPredicateFn = widgetDecoratorDef.predicateFn;
+    if (!providedPredicateFn) {
+      providedPredicateFn = () => true
+    }
 
     // Decorate the predicate function to make the widget decorators automatically filtered by targetWidgetName
     widgetDecoratorDef.predicateFn = (context) =>

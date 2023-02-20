@@ -160,7 +160,34 @@ test('slot shorthand with broken showIf predicate - missing end quote', () => {
   expect(() => decorateAndCallOnload(rawPluginSource)).toThrow(/^Plugin shorthand arg 'showIf' value has unclosed quotes\.$/);
 });
 
+test('widget decorator shorthand with only weight', () => {
+  const rawPluginSource = `
+    <template
+        alink-widget-decorator[com.example.farmos_asset_link.widget_decorator.v0.asset_name_with_peace_sign]
+          ="asset-name(weight: 150)">
+      <span><slot></slot> &#9774;</span>
+    </template>
+  `;
 
+  const { handle } = decorateAndCallOnload(rawPluginSource);
+
+  expect(handle.defineWidgetDecorator.mock.calls[0][0]).toBe("com.example.farmos_asset_link.widget_decorator.v0.asset_name_with_peace_sign");
+
+  const widgetDecoratorHandle = {
+      targetWidgetName: jest.fn(),
+      weight: jest.fn(),
+      appliesIf: jest.fn(),
+      component: jest.fn(),
+  };
+
+  handle.defineWidgetDecorator.mock.calls[0][1](widgetDecoratorHandle);
+
+  expect(widgetDecoratorHandle.targetWidgetName.mock.calls[0][0]).toBe("asset-name");
+  expect(widgetDecoratorHandle.weight.mock.calls[0][0]).toBe(150);
+  expect(widgetDecoratorHandle.component.mock.calls[0][0]).toBe(handle.thisPlugin);
+
+  expect(widgetDecoratorHandle.appliesIf).not.toHaveBeenCalled();
+});
 
 test('widget decorator shorthand with appliesIf predicate and weight', () => {
   const rawPluginSource = `

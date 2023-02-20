@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix populating missing geometry/location/group computed fields for new assets
 - Cleanup logic around how querying location/group relations works
 - Fix a bug where clearing local data fails in development without the service worker installed
+- Fix a bug creating widget decorators via the shorthand without specifying a predicate
 
 ## [0.11.0] - 2023-02-11
 
