@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cleanup logic around how querying location/group relations works
 - Fix a bug where clearing local data fails in development without the service worker installed
 - Fix a bug creating widget decorators via the shorthand without specifying a predicate
+- Fix asset group and location members page slots to only apply to the asset page
 
 ## [0.11.0] - 2023-02-11
 

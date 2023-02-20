@@ -183,7 +183,7 @@ export default {
     handle.defineSlot('net.symbioquine.farmos_asset_link.slots.v0.group_members', slot => {
       slot.type('page-slot');
 
-      slot.showIf(({ asset }) => asset.type === 'asset--group');
+      slot.showIf(context => context.pageName === 'asset-page' && context.asset.type === 'asset--group');
 
       slot.component(handle.thisPlugin);
     });
