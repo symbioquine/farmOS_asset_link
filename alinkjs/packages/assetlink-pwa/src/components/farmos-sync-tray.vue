@@ -55,7 +55,7 @@ const clearLocalData = async () => {
 
   await assetLink.permanentlyDeleteLocalData();
 
-  if (navigator.serviceWorker.controller) {
+  if (navigator?.serviceWorker?.controller) {
     navigator.serviceWorker.controller.postMessage({
       type: "CLEAR_ALL_CACHES",
     });
