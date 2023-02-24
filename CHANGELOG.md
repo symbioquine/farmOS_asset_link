@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Make loading of group members & location occupants actually fall through the cache when online
+
 ## [0.13.0] - 2023-02-24
 
 ### Fixed
