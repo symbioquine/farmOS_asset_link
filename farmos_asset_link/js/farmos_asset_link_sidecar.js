@@ -1,5 +1,9 @@
 /* eslint-disable-next-line no-console */
 (async function main() {
+  if (window.location.href.includes('/map-popup')) {
+    // Skip adding sidebar to map popups.
+    return;
+  }
   const matches = window.location.href.match(/https?:\/\/.*\/asset\/(\d+)/);
 
   console.log(matches);
