@@ -33,6 +33,14 @@ export default class FarmOSConnectionStatusDetector {
     this.isOnline = computed(() => {
       return this.canReachFarmOS.value && this.isLoggedIn.value;
     });
+
+    // Expose a promise that Asset Link can use during booting to
+    // wait until the main connection status checking loop has run
+    // at least once. That way booting can proceed with accurate
+    // connection status information.
+    this.mainLoopHasRunAtLeastOnce = new Promise((resolve) => {
+      this.$_resolveMainLoopHasRunAtLeastOnce = resolve;
+    });
   }
 
   start() {
@@ -87,8 +95,13 @@ export default class FarmOSConnectionStatusDetector {
 
     const checkConnectionStatus = throttle(() => this.$_checkConnectionStatus(), 1000);
 
+    let firstIteration = true;
     while (this.$_running) {
       await checkConnectionStatus();
+      if (firstIteration) {
+        this.$_resolveMainLoopHasRunAtLeastOnce();
+        firstIteration = false;
+      }
       await this.$_barrier.arrive(60 * 1000);
     }
   }

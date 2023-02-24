@@ -5,6 +5,7 @@ import FDBFactory from 'fake-indexeddb/lib/FDBFactory';
 import { uuidv4 } from "assetlink-plugin-api";
 
 import models from '../models.json';
+import taxonomyVocabs from '../taxonomyVocabs.json'
 
 export const FARM_URL = new URL("https://farm.example.com:1234/farmos");
 
@@ -46,7 +47,7 @@ export const fetchDelegate = async (url, opts) => {
       return new Response(JSON.stringify({
           data: Object.keys(models).filter(mk => mk.startsWith('asset--')).map(assetType => {
 
-            const assetTypeName = logType.split('--')[1];
+            const assetTypeName = assetType.split('--')[1];
             const assetTypeId = uuidv4();
             const capitalizedAssetTypeName = assetTypeName[0].toUpperCase() + assetTypeName.slice(1);
             return {
@@ -118,6 +119,18 @@ export const fetchDelegate = async (url, opts) => {
               }
             };
           }),
+      }), {
+        status: 200,
+        statusText: 'OK',
+        headers: {
+          'Content-type': 'application/vnd.api+json',
+        }
+      });
+    }
+
+    if (u.pathname.endsWith('/api/taxonomy_vocabulary/taxonomy_vocabulary')) {
+      return new Response(JSON.stringify({
+          data: taxonomyVocabs,
       }), {
         status: 200,
         statusText: 'OK',

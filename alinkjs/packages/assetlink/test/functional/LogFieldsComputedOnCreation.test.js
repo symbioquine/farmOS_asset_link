@@ -21,8 +21,9 @@ beforeEach(async () => {
 });
 
 test('Log fields computed on creation', async () => {
-    // Hack so the whole test can work offline
+    assetLink.cores.farmData.getAssetTypes = async () => ['animal', 'land'].map(lt => ({ attributes: { drupal_internal__id: lt }}));
     assetLink.cores.farmData.getLogTypes = async () => ['activity', 'observation'].map(lt => ({ attributes: { drupal_internal__id: lt }}));
+    assetLink.cores.farmData.getTaxonomyVocabularies = async () => [];
 
     await assetLink.boot();
 

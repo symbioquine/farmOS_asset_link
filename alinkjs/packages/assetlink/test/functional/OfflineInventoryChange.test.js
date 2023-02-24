@@ -19,6 +19,7 @@ beforeEach(async () => {
 });
 
 test('Offline Inventory Quantity Log Change', async () => {
+  assetLink.cores.farmData.getAssetTypes = async () => ['animal'].map(lt => ({ attributes: { drupal_internal__id: lt }}));
   assetLink.cores.farmData.getLogTypes = async () => ['activity'].map(lt => ({ attributes: { drupal_internal__id: lt }}));
 
   await assetLink.boot();

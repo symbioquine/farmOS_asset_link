@@ -19,6 +19,7 @@ beforeEach(async () => {
 });
 
 test('Offline Group Log Change', async () => {
+  assetLink.cores.farmData.getAssetTypes = async () => ['animal', 'group'].map(lt => ({ attributes: { drupal_internal__id: lt }}));
   assetLink.cores.farmData.getLogTypes = async () => ['activity'].map(lt => ({ attributes: { drupal_internal__id: lt }}));
 
   await assetLink.boot();

@@ -19,6 +19,7 @@ beforeEach(async () => {
 });
 
 test('Get Related Asset Locations', async () => {
+  assetLink.cores.farmData.getAssetTypes = async () => ['animal', 'land'].map(lt => ({ attributes: { drupal_internal__id: lt }}));
   assetLink.cores.farmData.getLogTypes = async () => ['activity'].map(lt => ({ attributes: { drupal_internal__id: lt }}));
 
   await assetLink.boot();

@@ -197,6 +197,12 @@ export default class AssetLink {
 
     this.connectionStatus.start();
 
+    // Avoid the race condition where stuff tries to load before
+    // we have up-to-date connection status information which
+    // can lead to data being missing and unable to load under
+    // the assumption that Asset Link is offline.
+    await this.connectionStatus.mainLoopHasRunAtLeastOnce;
+
     this.vm.bootText = "Initializing storage";
 
     await this._store.ready();

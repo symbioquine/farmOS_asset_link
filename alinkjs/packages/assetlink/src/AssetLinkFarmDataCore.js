@@ -123,8 +123,6 @@ export default class AssetLinkFarmDataCore {
    * Get a list of the asset_type entities.
    */
   async getAssetTypes() {
-    await this._booted;
-
     const assetTypes = await this.entitySource.query((q) => q
         .findRecords(`asset_type--asset_type`)
         .sort('drupal_internal__id'));
@@ -140,8 +138,6 @@ export default class AssetLinkFarmDataCore {
    * Get a list of the log_type entities.
    */
   async getLogTypes() {
-    await this._booted;
-
     const logTypes = await this.entitySource.query((q) => q
         .findRecords(`log_type--log_type`)
         .sort('drupal_internal__id'));
@@ -157,8 +153,6 @@ export default class AssetLinkFarmDataCore {
    * Get a list of the taxonomy_vocabulary entities.
    */
   async getTaxonomyVocabularies() {
-    await this._booted;
-
     const vocabs = await this.entitySource.query((q) => q
           .findRecords(`taxonomy_vocabulary--taxonomy_vocabulary`)
           .sort('drupal_internal__vid'));
@@ -174,8 +168,6 @@ export default class AssetLinkFarmDataCore {
    * Get an entity by UUID or Drupal internal (t|v)?id.
    */
   async resolveEntity(entityType, entityRef, additionalFilters, limitedEntityBundles) {
-    await this._booted;
-
     let entityBundles = limitedEntityBundles;
 
     if (!entityBundles && entityType === 'asset') {
@@ -740,6 +732,18 @@ export default class AssetLinkFarmDataCore {
           this._remote.requestQueue.process();
         }
       });
+
+      // Make sure we have some of the core data model structure
+      // data as part of booting so we don't end up offline without
+      // it since plugins will tend to assume this information is
+      // available.
+      await this._precacheKeyStructuralData();
+  }
+
+  async _precacheKeyStructuralData() {
+    await this.getAssetTypes();
+    await this.getLogTypes();
+    await this.getTaxonomyVocabularies();
   }
 
 }
