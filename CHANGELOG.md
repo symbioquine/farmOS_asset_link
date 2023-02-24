@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2023-02-24
+
+### Fixed
+
+- Skip adding sidebar to map popups
+- Fix connection status race condition and precache key structural data-model data
+
 ## [0.12.0] - 2023-02-20
 
 ### Added
@@ -26,7 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Throw exceptions when log-types/asset-types/taxonomy-vocabularies are missing
 - Clean up tests a little
 - Rename OpenInFarmOSMetaActionProvider plugin to OpenAssetInFarmOSMetaActionProvider for clarity
-- Skip adding sidebar to map popups
 
 ### Fixed
 
@@ -465,7 +471,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.12.0...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.13.0...HEAD
+[0.13.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.12.0...unbuilt-v0.13.0
 [0.12.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.11.0...unbuilt-v0.12.0
 [0.11.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.10.0...unbuilt-v0.11.0
 [0.10.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.9.0...unbuilt-v0.10.0
