@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import { defineComponent, h, ref } from 'vue';
+import { defineComponent, h, ref, onMounted, onUnmounted } from 'vue';
 import {
   QBadge,
   QBtn,
@@ -129,29 +129,54 @@ const PluginCodeEditor = defineComponent((props, { slots, emit, attrs }) => {
     onDialogOK({ updatedCode: code.value, closeHint: 'save'});
   };
 
-  return () => h(QDialog, { ref: dialogRef, transition: false, 'full-height': true, 'full-width': true }, () => [
-    h(QCard, { 'class': 'full-height column' }, () => [
+  // Based on https://stackoverflow.com/a/55323073/1864479
+  const tryHandleCtrlS = (e) => {
+    if (!(e.keyCode === 83 
+          // Allow either the ctrl or command key as the modifier
+          && (e.ctrlKey || e.metaKey))) {
+      return;
+    }
 
-      h(QToolbar, {}, () => [
-        h(QToolbarTitle, { 'class': 'text-h6 text-grey ellipsis', style: "direction: rtl; text-align: left; max-width: 60vw;" }, () =>
-          "Edit Plugin: " + props.pluginUrl.toString()),
-        h(QSpace),
-        h(QBtn, { flat: true, round: true, dense: true, icon: 'mdi-window-minimize', onClick: () => closeEditor('minimize') }),
-        h(QBtn, { flat: true, round: true, dense: true, icon: 'mdi-window-close', onClick: () => closeEditor('cancel') }),
+    e.preventDefault();
+    emit('save', { updatedCode: code.value });
+  };
+
+  onMounted(() => {
+    document.addEventListener("keydown", tryHandleCtrlS);
+  });
+  onUnmounted(() => {
+    document.removeEventListener("keydown", tryHandleCtrlS);
+  });
+
+  return () => h(QDialog, {
+      ref: dialogRef,
+      transition: false,
+      'full-height': true,
+      'full-width': true,
+    }, () => [
+      h(QCard, { 'class': 'full-height column' }, () => [
+
+        h(QToolbar, {}, () => [
+          h(QToolbarTitle, { 'class': 'text-h6 text-grey ellipsis', style: "direction: rtl; text-align: left; max-width: 60vw;" }, () =>
+            "Edit Plugin: " + props.pluginUrl.toString()),
+          h(QSpace),
+          h(QBtn, { flat: true, round: true, dense: true, icon: 'mdi-window-minimize', onClick: () => closeEditor('minimize') }),
+          h(QBtn, { flat: true, round: true, dense: true, icon: 'mdi-window-close', onClick: () => closeEditor('cancel') }),
+        ]),
+
+        h(QCardSection, { 'class': "col", 'style': "height: auto; min-height: 160px; max-height: 100%; position: relative; contain: strict;" }, () => [
+          h(ApiComponents.CodeEditor, { 'code-mimetype': props.codeMimetype, modelValue: code.value, 'onUpdate:modelValue': (value) => { code.value = value; } })
+        ]),
+
+        h(QCardActions, { align: 'right' }, () => [
+          h(QBtn, { flat: true, label: 'Save', icon: 'mdi-content-save', color: 'primary', onClick: saveEdits }),
+        ]),
+
       ]),
-
-      h(QCardSection, { 'class': "col", 'style': "height: auto; min-height: 160px; max-height: 100%; position: relative; contain: strict;" }, () => [
-        h(ApiComponents.CodeEditor, { 'code-mimetype': props.codeMimetype, modelValue: code.value, 'onUpdate:modelValue': (value) => { code.value = value; } })
-      ]),
-
-      h(QCardActions, { align: 'right' }, () => [
-        h(QBtn, { flat: true, label: 'Save', icon: 'mdi-content-save', color: 'primary', onClick: saveEdits }),
-      ]),
-
-    ]),
-  ]);
+    ]);
 });
 PluginCodeEditor.props = ['pluginUrl', 'code', 'codeMimetype'];
+PluginCodeEditor.emits = ['save'];
 
 const UrlPromptDialog = defineComponent((props, { slots, emit, attrs }) => {
   const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent();
@@ -283,11 +308,32 @@ const openPersistentEditor = async (assetLink, localPluginUrl, initialCodeMimety
     }
   }
 
+  const doSave = async (codeToSave) => {
+    if (indexEntry.pluginUrlToDisableOnFirstSave) {
+      await assetLink.cores.pluginLists.addPluginToLocalBlacklist(indexEntry.pluginUrlToDisableOnFirstSave);
+
+      mutatePersistentEditorsIndex(assetLink, (index) => {
+        const idx = index.findIndex(indexEntry => indexEntry.pluginUrl.toString() === localPluginUrl.toString());
+        if (idx < 0) {
+          return false;
+        }
+        index[idx].pluginUrlToDisableOnFirstSave = undefined;
+      });
+    }
+
+    const updatedPluginDataUrl = PLUGIN_DATA_URL_PREFIX + btoa(codeToSave);
+
+    await assetLink.store.setItem(editorDataKey, { pluginDataUrl: updatedPluginDataUrl });
+
+    await assetLink.cores.localPluginStorage.writeLocalPlugin(localPluginUrl, codeToSave);
+  };
+
   const { updatedCode, closeHint } = await assetLink.ui.dialog.custom(PluginCodeEditor, {
     pluginUrl: localPluginUrl,
     code,
     codeMimetype: indexEntry.codeMimetype,
     persistent: true,
+    onSave: ({ updatedCode }) => doSave(updatedCode),
   });
 
   if (updatedCode === undefined || closeHint !== 'save') {
@@ -297,23 +343,7 @@ const openPersistentEditor = async (assetLink, localPluginUrl, initialCodeMimety
     return;
   }
 
-  if (indexEntry.pluginUrlToDisableOnFirstSave) {
-    await assetLink.cores.pluginLists.addPluginToLocalBlacklist(indexEntry.pluginUrlToDisableOnFirstSave);
-
-    mutatePersistentEditorsIndex(assetLink, (index) => {
-      const idx = index.findIndex(indexEntry => indexEntry.pluginUrl.toString() === localPluginUrl.toString());
-      if (idx < 0) {
-        return false;
-      }
-      index[idx].pluginUrlToDisableOnFirstSave = undefined;
-    });
-  }
-
-  const updatedPluginDataUrl = PLUGIN_DATA_URL_PREFIX + btoa(updatedCode);
-
-  await assetLink.store.setItem(editorDataKey, { pluginDataUrl: updatedPluginDataUrl });
-
-  await assetLink.cores.localPluginStorage.writeLocalPlugin(localPluginUrl, updatedCode);
+  doSave(updatedCode);
 };
 
 const closePersistentEditor = async (assetLink, localPluginUrl) => {

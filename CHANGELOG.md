@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Handle Ctrl-s/Cmd-s to save from the plugin code editor
+
 ### Fixed
 
 - Make loading of group members & location occupants actually fall through the cache when online
