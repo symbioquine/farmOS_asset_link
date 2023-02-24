@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Throw exceptions when log-types/asset-types/taxonomy-vocabularies are missing
 - Clean up tests a little
 - Rename OpenInFarmOSMetaActionProvider plugin to OpenAssetInFarmOSMetaActionProvider for clarity
+- Skip adding sidebar to map popups
 
 ### Fixed
 
