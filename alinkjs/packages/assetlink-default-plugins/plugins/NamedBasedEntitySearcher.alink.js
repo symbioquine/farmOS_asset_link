@@ -32,6 +32,10 @@ export default class NamedBasedEntitySearcher {
 
       const entitySource = searchPhase === 'local' ? assetLink.entitySource.cache : assetLink.entitySource;
 
+      const searchOpts = {
+        forceRemote: searchPhase === 'remote',
+      };
+
       const results = await entitySource.query(q => entityBundles.flatMap(entityBundle => {
         const typeName = `${searchRequest.entityType}--${entityBundle}`;
 
@@ -53,7 +57,7 @@ export default class NamedBasedEntitySearcher {
         return [additionalFilters
           .reduce((query, f) => query.filter(f), baseQuery)
           .sort(sortingKey)];
-      }));
+      }), searchOpts);
 
       const entities = results.flatMap(l => l);
 
