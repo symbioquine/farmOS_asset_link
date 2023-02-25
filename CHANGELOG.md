@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add a "Reload from Server" meta action to assets and logs
+
 ### Changed
 
 - Handle Ctrl-s/Cmd-s to save from the plugin code editor
