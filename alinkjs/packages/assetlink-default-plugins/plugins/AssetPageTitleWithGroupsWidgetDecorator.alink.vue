@@ -12,7 +12,9 @@ const assetLink = inject('assetLink');
 
 const currentGroups = ref(null);
 
-const resolveCurrentGroups = async () => {
+const resolveCurrentGroups = async (options) => {
+  const opts = options || {};
+
   const assetModel = await assetLink.getEntityModel(props.asset.type);
 
   // Bail if groups are not enabled
@@ -20,7 +22,7 @@ const resolveCurrentGroups = async () => {
     return;
   }
 
-  currentGroups.value = await assetLink.entitySource.query(q => q.findRelatedRecords({ type: props.asset.type, id: props.asset.id }, 'group'))
+  currentGroups.value = await assetLink.entitySource.query(q => q.findRelatedRecords({ type: props.asset.type, id: props.asset.id }, 'group', { ...opts }))
 };
 
 const onAssetLogsChanged = ({ assetType, assetId }) => {
@@ -28,7 +30,8 @@ const onAssetLogsChanged = ({ assetType, assetId }) => {
     props.asset.type === assetType &&
     props.asset.id === assetId
   ) {
-    resolveCurrentGroups();
+    // Use chaining here instead of await to avoid blocking the event bus
+    resolveCurrentGroups().then(() => resolveCurrentGroups({ forceRemote: true }));
   }
 };
 

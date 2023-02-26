@@ -14,8 +14,9 @@ const assetLink = inject('assetLink');
 
 const currentLocations = ref(null);
 
-const resolveCurrentLocation = async () => {
-  currentLocations.value = await assetLink.entitySource.query(q => q.findRelatedRecords({ type: props.asset.type, id: props.asset.id }, 'location'))
+const resolveCurrentLocation = async (options) => {
+  const opts = options || {};
+  currentLocations.value = await assetLink.entitySource.query(q => q.findRelatedRecords({ type: props.asset.type, id: props.asset.id }, 'location'), { ...opts });
 };
 
 const onAssetLogsChanged = ({ assetType, assetId }) => {
@@ -23,7 +24,8 @@ const onAssetLogsChanged = ({ assetType, assetId }) => {
     props.asset.type === assetType &&
     props.asset.id === assetId
   ) {
-    resolveCurrentLocation();
+    // Use chaining here instead of await to avoid blocking the event bus
+    resolveCurrentLocation().then(() => resolveCurrentLocation({ forceRemote: true }));
   }
 };
 
