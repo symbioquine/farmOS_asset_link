@@ -1,10 +1,46 @@
 import { buildQuery, buildTransform } from '@orbit/data';
+import { RecordNotFoundException } from '@orbit/records';
 
 import { Fraction } from 'fraction.js';
 
 import combineWkt from './combineWkt';
 
 import { currentEpochSecond, parseJSONDate, uuidv4, formatRFC3339 } from "assetlink-plugin-api";
+
+const flattenResults = (r, e) => {
+  if (r === undefined) {
+    return [];
+  }
+  if (e.op === 'findRecord' || e.op === 'findRelatedRecord') {
+    return [r];
+  }
+  return r;
+};
+
+const zip = (...rows) => [...rows[0]].map((_,c) => rows.map(row => row[c]));
+
+const toResultsEntities = (query, results, opts) => {
+  let multiQuery = true;
+  let expressions = query?.expressions || [];
+  if (!Array.isArray(expressions)) {
+    multiQuery = false;
+    expressions = [expressions];
+  }
+
+  let rawResults = results;
+  if (opts.fullResponse) {
+    rawResults = results?.data;
+  }
+
+  let resultEntities = [];
+  if (multiQuery) {
+    resultEntities = zip(rawResults, expressions).flatMap(([r, e]) => flattenResults(r, e));
+  } else {
+    resultEntities = flattenResults(rawResults, expressions[0]);
+  }
+
+  return resultEntities;
+};
 
 /**
  * Implements the core farmOS data model computed field logic for locations, geometry, quantities, and group membership
@@ -47,41 +83,11 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
 
     const results = await this._partiallyDelegateQuery(query, opts, id);
 
-    let multiQuery = true;
-    let expressions = query?.expressions || [];
-    if (!Array.isArray(expressions)) {
-      multiQuery = false;
-      expressions = [expressions];
-    }
+    const resultEntities = toResultsEntities(query, results, opts);
 
-    const flattenResults = (r, e) => {
-      if (r === undefined) {
-        return [];
-      }
-      if (e.op === 'findRecord' || e.op === 'findRelatedRecord') {
-        return [r];
-      }
-      return r;
-    }
-
-    const zip = (...rows) => [...rows[0]].map((_,c) => rows.map(row => row[c]))
-
-    let resultEntities = [];
-
-    let rawResults = results;
-    if (opts.fullResponse) {
-      rawResults = results?.data;
-    }
-
-    if (multiQuery) {
-      resultEntities = zip(rawResults, expressions).flatMap(([r, e]) => flattenResults(r, e));
-    } else {
-      resultEntities = flattenResults(rawResults, expressions[0]);
-    }
-
-    await Promise.all(resultEntities.map(async (entity) => this._computeCurrentAssetGroups(entity)));
-    await Promise.all(resultEntities.map(async (entity) => this._computeCurrentAssetLocationAndGeometry(entity)));
-    await Promise.all(resultEntities.map(async (entity) => this._computeCurrentAssetInventory(entity)));
+    await Promise.all(resultEntities.map(async (entity) => this._computeCurrentAssetGroups(entity, opts)));
+    await Promise.all(resultEntities.map(async (entity) => this._computeCurrentAssetLocationAndGeometry(entity, opts)));
+    await Promise.all(resultEntities.map(async (entity) => this._computeCurrentAssetInventory(entity, opts)));
 
     return results;
   }
@@ -178,10 +184,10 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
     }
     return await Promise.all(query.expressions.map(async (expr) => {
       if (expr.relationship === 'group') {
-        return await this._computeCurrentRelatedGroups(expr.record);
+        return await this._computeCurrentRelatedGroups(expr.record, opts);
       }
       else if (expr.relationship === 'location') {
-        return await this._computeCurrentRelatedLocations(expr.record);
+        return await this._computeCurrentRelatedLocations(expr.record, opts);
       }
     }));
   }
@@ -190,11 +196,42 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
     if (!query.expressions.length) {
       return [];
     }
+
+    if (opts.verifyCacheIntegrity) {
+      // Execute the query against the cache without the `page` parameters
+      // to get all the local cache data
+      let cacheResults = this.cache.query({
+        ...query,
+        expressions: query.expressions.map(expr => {
+          return {
+            ...expr,
+            page: undefined,
+          };
+        }),
+      });
+
+      const cacheResultEntities = toResultsEntities(query, cacheResults, opts);
+
+      // Query each cached entity from the remote server (if online)
+      await Promise.all(cacheResultEntities.map(async (localRecord) => {
+        try {
+          await this.query(q => q.findRecord({ type: localRecord.type, id: localRecord.id }), { forceRemote: true, raiseNotFoundExceptions: true });
+        } catch (err) {
+          // Remove the log from our local memory if it is missing from the server and not pending creation by ourselves
+          if (err instanceof RecordNotFoundException && !this._isEntityCreatedByPendingRemoteUpdate({ type: localRecord.type, id: localRecord.id })) {
+            this.update(q => q.removeRecord({ type: localRecord.type, id: localRecord.id }), { localOnly: true });
+            return;
+          }
+          throw err;
+        }
+      }));
+    }
+
     return await this._delegate.query(query, opts, id);
   }
 
-  async _computeCurrentRelatedLocations(recordIdentity) {
-    const latestMovementLog = await this._getLatestMovementLog(recordIdentity);
+  async _computeCurrentRelatedLocations(recordIdentity, opts) {
+    const latestMovementLog = await this._getLatestMovementLog(recordIdentity, opts);
 
     if (!latestMovementLog) {
       return [];
@@ -204,7 +241,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
     return await this.cache.query(q => q.findRelatedRecords({ type: latestMovementLog.type, id: latestMovementLog.id }, 'location'));
   }
 
-  async _computeCurrentAssetGroups(entity) {
+  async _computeCurrentAssetGroups(entity, opts) {
     if (!entity.type.startsWith('asset--')) {
       return;
     }
@@ -219,7 +256,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       return;
     }
 
-    const groups = await this._computeCurrentRelatedGroups({ type: entity.type, id: entity.id });
+    const groups = await this._computeCurrentRelatedGroups({ type: entity.type, id: entity.id }, opts);
 
     if (groups === undefined) {
       return;
@@ -230,7 +267,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
     entity.relationships.group.data = groups.map(g => ({ type: g.type, id: g.id }));
   }
 
-  async _computeCurrentRelatedGroups(recordIdentity) {
+  async _computeCurrentRelatedGroups(recordIdentity, opts) {
     const logTypes = (await this._logTypeGetter()).map(t => t.attributes.drupal_internal__id).map(logType => `log--${logType}`);
 
     const logTypesWithGroupAssignmentField = logTypes.filter(logType => this._schema.getModel(logType).attributes.is_group_assignment);
@@ -253,7 +290,9 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
         .sort('-timestamp')
         .page({ offset: 0, limit: 1 });
     }), {
-      include: ['group']
+      include: ['group'],
+      forceRemote: !!opts.forceRemote,
+      verifyCacheIntegrity: !!opts.forceRemote,
     });
   
     const logs = results.flatMap(l => l);
@@ -269,7 +308,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
   }
 
   // Roughly implements: https://github.com/farmOS/farmOS/blob/637843aabf86a4ccfe108d31a8435f80dd64fcf3/modules/core/location/src/AssetLocation.php
-  async _computeCurrentAssetLocationAndGeometry(entity) {
+  async _computeCurrentAssetLocationAndGeometry(entity, opts) {
     if (!entity.type.startsWith('asset--')) {
       return;
     }
@@ -286,7 +325,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       return;
     }
 
-    const latestMovementLog = await this._getLatestMovementLog({ type: asset.type, id: asset.id });
+    const latestMovementLog = await this._getLatestMovementLog({ type: asset.type, id: asset.id }, opts);
 
     if (latestMovementLog) {
       // Query the cache here because _getLatestMovementLog includes the location from the remote source
@@ -308,7 +347,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
   }
 
   // Roughly implements https://github.com/farmOS/farmOS/blob/637843aabf86a4ccfe108d31a8435f80dd64fcf3/modules/core/inventory/src/AssetInventory.php#L54
-  async _computeCurrentAssetInventory(entity) {
+  async _computeCurrentAssetInventory(entity, opts) {
     if (!entity.type.startsWith('asset--')) {
       return;
     }
@@ -354,12 +393,9 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
             page: { kind: 'offsetLimit', offset: nextOffset, limit: 50 },
           });
       }), {
+        include: ['quantity', 'quantity.units'],
+        forceRemote: !!opts.forceRemote,
         fullResponse: true,
-        sources: {
-          remote: {
-            include: ['quantity', 'quantity.units'],
-          }
-        }
       });
 
       const remoteDetails = primingResult?.sources?.remote?.details;
@@ -389,7 +425,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       });
     }
 
-    const relatedQuantities = this.cache.query(q => {
+    const relatedQuantities = this.query(q => {
       return q.findRecords('quantity--standard')
         .filter({
           relation: 'inventory_asset.id',
@@ -397,9 +433,11 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
           record: { type: asset.type, id: asset.id }
         })
         .sort('-timestamp');
+    }, {
+      verifyCacheIntegrity: !!opts.forceRemote,
     });
 
-    const relatedLogResults = this.cache.query(q => logTypes.map(logType => {
+    const relatedLogResults = this.query(q => logTypes.map(logType => {
       return q.findRecords(logType)
         .filter({ attribute: 'status', op: 'equal', value: 'done' })
         .filter({ attribute: 'timestamp', op: '<=', value: currentEpochSecond() })
@@ -409,7 +447,9 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
           records: relatedQuantities.map(quantity => ({ id: quantity.id, type: quantity.type })),
         })
         .sort('-timestamp');
-    }));
+    }), {
+      verifyCacheIntegrity: !!opts.forceRemote,
+    });
 
     const logs = relatedLogResults.flatMap(l => l).sort((logA, logB) => parseJSONDate(logA.attributes.timestamp) - parseJSONDate(logB.attributes.timestamp));
 
@@ -508,7 +548,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
         return false;
       }
 
-      const updatedLogRecord = this._delegate.cache.query((q) => q.findRecord(operation.record));
+      const updatedLogRecord = this.cache.query((q) => q.findRecord(operation.record));
 
       if (!updatedLogRecord) {
         // TODO: Handle deleted logs that were relevant
@@ -598,7 +638,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
     });
   }
 
-  async _getLatestMovementLog(recordIdentity) {
+  async _getLatestMovementLog(recordIdentity, opts) {
     const logTypes = (await this._logTypeGetter()).map(t => t.attributes.drupal_internal__id);
 
     const results = await this.query(q => logTypes.map(logType => {
@@ -615,6 +655,8 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
         .page({ offset: 0, limit: 1 });
     }), {
       include: ['location'],
+      forceRemote: !!opts.forceRemote,
+      verifyCacheIntegrity: !!opts.forceRemote,
     });
 
     const logs = results.flatMap(l => l);
