@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Honor `forceRemote` and new `verifyCacheIntegrity` options in FarmDataModelOrbitMemorySourceDecorator
 - Make meta actions menu auto-close
 - Load asset page title locations/groups refresh from the server (if online) upon log changes
+- Make the find asset page load the asset again fully to ensure that all relationships are included
 
 ## [0.13.0] - 2023-02-24
 
