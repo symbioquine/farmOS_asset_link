@@ -119,7 +119,22 @@
           v-if="assetLink.vm.booted"
           @expose-meta-actions="metaActionDefs = $event"
           @expose-route-title="onRouteTitleExposed($event)"
-        />
+          v-slot="{ Component }"
+        >
+          <template v-if="Component">
+            <transition mode="out-in">
+              <suspense>
+                <component :is="Component"></component>
+                <template #fallback>
+                  <q-inner-loading :showing="true">
+                    <q-spinner-gears size="50px" color="primary" />
+                    <span class="text-italic">Loading page...</span>
+                  </q-inner-loading>
+                </template>
+              </suspense>
+            </transition>
+          </template>
+        </router-view>
 
         <q-inner-loading :showing="!assetLink.vm.booted">
           <q-circular-progress
