@@ -36,7 +36,7 @@
           icon="mdi-dots-vertical"
           @click.stop
         >
-          <q-menu>
+          <q-menu auto-close>
             <q-list style="min-width: 200px">
               <component
                 :is="slotDef.component"

@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make loading of group members & location occupants actually fall through the cache when online
 - Make the remote search phase actually fall through the cache when online
 - Honor `forceRemote` and new `verifyCacheIntegrity` options in FarmDataModelOrbitMemorySourceDecorator
+- Make meta actions menu auto-close
 
 ## [0.13.0] - 2023-02-24
 
