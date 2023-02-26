@@ -1,0 +1,22 @@
+_meta:
+  version: '1.0'
+  entity_type: taxonomy_term
+  uuid: f3d19b27-125e-4160-b2e9-f40c06d8c6dd
+  bundle: material_type
+  default_langcode: en
+default:
+  status:
+    -
+      value: true
+  name:
+    -
+      value: Hay
+  weight:
+    -
+      value: 0
+  parent:
+    -
+      target_id: 0
+  revision_translation_affected:
+    -
+      value: true

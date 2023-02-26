@@ -1,0 +1,53 @@
+_meta:
+  version: '1.0'
+  entity_type: log
+  uuid: 8c960d1c-8fc8-44d2-888d-6ea3e9fb0134
+  bundle: harvest
+  default_langcode: en
+  depends:
+    cc6f4df8-37ca-4139-b169-5ea44561febd: asset
+    2e105ad4-8919-4ccb-b9fa-4d909a54f4fa: quantity
+    a76a82cc-5523-461f-86cf-fd869615b227: quantity
+    4e9fa17a-70f5-4d3d-97b4-f1ab28064cea: asset
+default:
+  revision_user:
+    -
+      target_id: 1
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: 'Cut Hay'
+  timestamp:
+    -
+      value: 1677420900
+  status:
+    -
+      value: pending
+  created:
+    -
+      value: 1677420928
+  revision_translation_affected:
+    -
+      value: true
+  is_group_assignment:
+    -
+      value: false
+  is_movement:
+    -
+      value: false
+  asset:
+    -
+      entity: cc6f4df8-37ca-4139-b169-5ea44561febd
+  quantity:
+    -
+      entity: 2e105ad4-8919-4ccb-b9fa-4d909a54f4fa
+    -
+      entity: a76a82cc-5523-461f-86cf-fd869615b227
+  owner:
+    -
+      target_id: 1
+  equipment:
+    -
+      entity: 4e9fa17a-70f5-4d3d-97b4-f1ab28064cea

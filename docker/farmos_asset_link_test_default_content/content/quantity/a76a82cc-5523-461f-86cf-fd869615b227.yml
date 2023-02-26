@@ -1,0 +1,34 @@
+_meta:
+  version: '1.0'
+  entity_type: quantity
+  uuid: a76a82cc-5523-461f-86cf-fd869615b227
+  bundle: standard
+  depends:
+    711c25c7-3acc-48b4-939e-dceb5fd626a2: taxonomy_term
+    cc6f4df8-37ca-4139-b169-5ea44561febd: asset
+default:
+  revision_user:
+    -
+      target_id: 1
+  uid:
+    -
+      target_id: 1
+  measure:
+    -
+      value: count
+  value:
+    -
+      numerator: 10
+      denominator: 1
+  units:
+    -
+      entity: 711c25c7-3acc-48b4-939e-dceb5fd626a2
+  created:
+    -
+      value: 1677421009
+  inventory_adjustment:
+    -
+      value: increment
+  inventory_asset:
+    -
+      entity: cc6f4df8-37ca-4139-b169-5ea44561febd

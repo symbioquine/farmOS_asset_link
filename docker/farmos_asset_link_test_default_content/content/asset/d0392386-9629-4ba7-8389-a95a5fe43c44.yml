@@ -1,0 +1,31 @@
+_meta:
+  version: '1.0'
+  entity_type: asset
+  uuid: d0392386-9629-4ba7-8389-a95a5fe43c44
+  bundle: group
+  default_langcode: en
+default:
+  revision_user:
+    -
+      target_id: 1
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: 'Sheep Herd Alpha'
+  status:
+    -
+      value: active
+  created:
+    -
+      value: 1677424095
+  revision_translation_affected:
+    -
+      value: true
+  is_location:
+    -
+      value: false
+  is_fixed:
+    -
+      value: false

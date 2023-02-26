@@ -1,0 +1,45 @@
+_meta:
+  version: '1.0'
+  entity_type: asset
+  uuid: cc6f4df8-37ca-4139-b169-5ea44561febd
+  bundle: material
+  default_langcode: en
+  depends:
+    f3d19b27-125e-4160-b2e9-f40c06d8c6dd: taxonomy_term
+default:
+  revision_user:
+    -
+      target_id: 1
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: 'Stored Hay'
+  status:
+    -
+      value: active
+  created:
+    -
+      value: 1677420892
+  revision_translation_affected:
+    -
+      value: true
+  inventory:
+    -
+      measure: count
+      value: '0'
+      units: 'hay bales'
+    -
+      measure: count
+      value: '0'
+      units: 'round hay bales'
+  is_location:
+    -
+      value: false
+  is_fixed:
+    -
+      value: false
+  material_type:
+    -
+      entity: f3d19b27-125e-4160-b2e9-f40c06d8c6dd

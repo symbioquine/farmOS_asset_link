@@ -52,6 +52,11 @@ services:
             composer require symbioquine/farmos_asset_link @dev
             composer require symbioquine/farmos_asset_link_test_default_content @dev
 
+            drush --root=/opt/drupal pm-enable --yes farm_group
+            drush --root=/opt/drupal pm-enable --yes farm_material
+            drush --root=/opt/drupal pm-enable --yes farm_inventory
+            drush --root=/opt/drupal pm-enable --yes farm_seed
+
             drush --root=/opt/drupal pm-enable farmos_asset_link
             drush --root=/opt/drupal pm-enable farmos_asset_link_test_default_content
         EOF

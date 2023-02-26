@@ -1,0 +1,46 @@
+_meta:
+  version: '1.0'
+  entity_type: log
+  uuid: 18574d89-3d80-4543-8360-2df3b3080f71
+  bundle: activity
+  default_langcode: en
+  depends:
+    d0392386-9629-4ba7-8389-a95a5fe43c44: asset
+    1a7bb66a-56a6-4f1f-a5d0-f3f61d35abce: asset
+default:
+  revision_user:
+    -
+      target_id: 1
+  uid:
+    -
+      target_id: 1
+  name:
+    -
+      value: 'Group Dolly into Sheep Herd Alpha'
+  timestamp:
+    -
+      value: 1677424012
+  status:
+    -
+      value: done
+  created:
+    -
+      value: 1677424103
+  revision_translation_affected:
+    -
+      value: true
+  is_group_assignment:
+    -
+      value: true
+  group:
+    -
+      entity: d0392386-9629-4ba7-8389-a95a5fe43c44
+  is_movement:
+    -
+      value: false
+  asset:
+    -
+      entity: 1a7bb66a-56a6-4f1f-a5d0-f3f61d35abce
+  owner:
+    -
+      target_id: 1

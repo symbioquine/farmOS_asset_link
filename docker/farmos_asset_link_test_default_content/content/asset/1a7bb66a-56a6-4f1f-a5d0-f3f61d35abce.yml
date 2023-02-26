@@ -6,6 +6,7 @@ _meta:
   default_langcode: en
   depends:
     fb8ca6f1-4699-4197-a83c-5bb62abb9401: file
+    d0392386-9629-4ba7-8389-a95a5fe43c44: asset
     d09840eb-f721-42b9-92a1-7d14aa9209f2: taxonomy_term
 default:
   revision_user:
@@ -40,6 +41,9 @@ default:
     -
       value: 'Photo Credit: https://en.wikipedia.org/wiki/Dolly_(sheep)#/media/File:Dolly_face_closeup.jpg'
       format: default
+  group:
+    -
+      entity: d0392386-9629-4ba7-8389-a95a5fe43c44
   is_location:
     -
       value: false

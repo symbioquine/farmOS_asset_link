@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Handle Ctrl-s/Cmd-s to save from the plugin code editor
+- Update the test docker-compose environment to enable a few of the optional modules and add more default test data
 
 ### Fixed
 
