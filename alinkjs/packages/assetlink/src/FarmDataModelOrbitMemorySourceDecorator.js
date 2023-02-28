@@ -425,7 +425,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       });
     }
 
-    const relatedQuantities = this.query(q => {
+    const relatedQuantities = await this.query(q => {
       return q.findRecords('quantity--standard')
         .filter({
           relation: 'inventory_asset.id',
@@ -437,7 +437,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       verifyCacheIntegrity: !!opts.forceRemote,
     });
 
-    const relatedLogResults = this.query(q => logTypes.map(logType => {
+    const relatedLogResults = await this.query(q => logTypes.map(logType => {
       return q.findRecords(logType)
         .filter({ attribute: 'status', op: 'equal', value: 'done' })
         .filter({ attribute: 'timestamp', op: '<=', value: currentEpochSecond() })

@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make meta actions menu auto-close
 - Load asset page title locations/groups refresh from the server (if online) upon log changes
 - Make the find asset page load the asset again fully to ensure that all relationships are included
+- Fix bug with inventory queries
 
 ## [0.13.0] - 2023-02-24
 
