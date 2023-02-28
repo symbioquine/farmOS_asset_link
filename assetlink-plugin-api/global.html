@@ -387,7 +387,7 @@ do not support async handlers well.</p>
         <p>Creates a url relative to the base url of the Drupal site in which Asset Link is installed.</p>
 <ul>
 <li>
-<h3>Usage</h3>
+<h3 id="usage">Usage</h3>
 </li>
 </ul>
 <pre class="prettyprint source lang-js"><code>import { createDrupalUrl } from &quot;assetlink-plugin-api&quot;;
@@ -569,7 +569,7 @@ createDrupalUrl('/api') // might return `URL { href: &quot;https://myfarm.exampl
         <p>Returns the current epoch second as an integer number.</p>
 <ul>
 <li>
-<h3>Usage</h3>
+<h3 id="usage">Usage</h3>
 </li>
 </ul>
 <pre class="prettyprint source lang-js"><code>import { currentEpochSecond } from &quot;assetlink-plugin-api&quot;;
@@ -701,7 +701,7 @@ currentEpochSecond() // might return 1660580261
 Always starts and ends with a '/'.</p>
 <ul>
 <li>
-<h3>Usage</h3>
+<h3 id="usage">Usage</h3>
 </li>
 </ul>
 <pre class="prettyprint source lang-js"><code>import { getDrupalBasePath } from &quot;assetlink-plugin-api&quot;;
@@ -833,7 +833,7 @@ getDrupalBasePath() // might return &quot;/&quot; or &quot;/site-a/&quot;
 <a href="https://github.com/farmOS/farmOS/blob/04bf771d91cde8276b67090d2b97c4e4558332b9/modules/core/log/farm_log.module#L74-L88">farm_log.module#L74-L88</a></p>
 <ul>
 <li>
-<h3>Usage</h3>
+<h3 id="usage">Usage</h3>
 </li>
 </ul>
 <pre class="prettyprint source lang-js"><code>import { summarizeAssetNames } from &quot;assetlink-plugin-api&quot;;
@@ -1161,6 +1161,133 @@ summarizeAssetNames([
             
                 <div class="member">
 
+<h4 class="name" id="GetOrCreateTaxonomyTermByNameOptions">
+    <a class="href-link" href="#GetOrCreateTaxonomyTermByNameOptions">#</a>
+    
+    <span class="code-name">
+        GetOrCreateTaxonomyTermByNameOptions
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <p>Options that can be passed to IAssetLink.getOrCreateTaxonomyTermByName</p>
+<h5 id="usage">Usage</h5>
+<pre class="prettyprint source lang-js"><code>const term = await assetLink.getOrCreateTaxonomyTermByName('taxonomy_term--plant_type', 'Beans', {
+ idToCreate: 'bccd50a8-a017-4cad-b2df-712e40e4d263',
+});
+</code></pre>
+</div>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+<div class="table-container">
+    <table class="props table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>idToCreate</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Boolean</code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>The unique id of the term to create if one cannot be found
+with the specified name.</p></td>
+</tr>
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="IAssetLink.js.html" class="button">View Source</a>
+            <span>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line102">line 102</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
 
     
     <h4 class="name" id="pluginIngestorDefiner">
@@ -1464,7 +1591,7 @@ summarizeAssetNames([
 <div class="description">
     <p>A combination of a Vue component plus the information needed to render it in
 the requested context - <code>id</code> and <code>props</code>.</p>
-<h5>Usage</h5>
+<h5 id="usage">Usage</h5>
 <pre class="prettyprint source lang-js"><code>&lt;component
     :key=&quot;renderableDef.id&quot;
     :is=&quot;renderableDef.id.component&quot;
@@ -1632,7 +1759,7 @@ the requested context - <code>id</code> and <code>props</code>.</p>
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line109">line 109</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line155">line 155</a>
             </span>
         </p>
     

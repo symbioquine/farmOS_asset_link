@@ -135,6 +135,7 @@
 <p>This access is mediated by a library called <a href="https://orbitjs.com/">Orbit.js</a>. Asset Link exposes <a href="https://orbitjs.com/docs/data-sources">Orbit.js sources</a>
 via the <a href="IAssetLink.html">Asset Link API</a>. The most common use-cases will use <code>assetLink.entitySource</code> which first queries the in-memory data - followed
 by the farmOS server if the app is online at the time.</p>
+<h3 id="retrieving-data">Retrieving Data</h3>
 <pre class="prettyprint source lang-js"><code>await assetLink.entitySource.query(q => q
   .findRecords(`asset--equipment`)
   .filter({ attribute: 'name', op: 'CONTAINS', value: 'slow' }));
@@ -161,6 +162,7 @@ if (assetLink.connectionStatus.isOnline) {
 
 console.log(asset.attributes.name);
 </code></pre>
+<h3 id="modifying-data">Modifying Data</h3>
 <p>Modifying farmOS data occurs via Orbit.js as well, but is a little simpler. Asset Link takes care of synchronizing changes with the server the next time
 the app is online. Queries of farmOS data that occur before the changes are synchronized will use the local versions of the farmOS assets/logs/etc which
 include the unsynchronized changes.</p>
@@ -178,6 +180,24 @@ const updatedAsset = await assetLink.resolveEntity('asset', asset.id);
 
 // updatedAsset.attributes.name === 'Fred'
 </code></pre>
+<h3 id="directive-%24relatebyname">Directive $relateByName</h3>
+<p>Taxonomy terms can be related by name (instead of manually getting/creating them prior to creating the relationship) by specifying a '$relateByName' directive:</p>
+<pre class="prettyprint source lang-js"><code>await assetLink.entitySource.update((t) =>
+  t.replaceRelatedRecord({ type: asset.type, id: asset.id }, 'animal_type', {
+      type: &quot;taxonomy_term--animal_type&quot;,
+      // Placeholder UUID gets replaced by '$relateByName' directive below so the resulting 'taxonomy_term--animal_type'
+      // entity may have a different ID once saved locally if the term is available in memory or once the file/relationship
+      // gets saved to the server - Until https://www.drupal.org/project/drupal/issues/3021155 gets fixed anyway
+      id: uuidv4(),
+      '$relateByName': {
+        name: 'Penguin',
+      },
+  })
+, {label: `Make &quot;${asset.attributes.name}&quot; a penguin`});
+</code></pre>
+<p>Besides being convenient, this has the advantage that Asset Link will internally track the placeholder term until it is time to push the changes to the server
+at which point it will automatically create it or replace the placeholder with existing term on the server it already exists.</p>
+<h3 id="directive-%24upload">Directive $upload</h3>
 <p>Files can be uploaded as part of modifying asset/log relationships by specifying a '$upload' directive (key) along with the standard <code>type</code> and <code>id</code> properties:</p>
 <pre class="prettyprint source lang-js"><code>const fileDataUrl = 'data:image/gif;base64,R0lGODlhyAAyAKEAAAAAAP///wAAAAAAACH5BAEKAAIALAAAAADIADIAAAL+jI+py+0Po5y02ouz3rz7D4biSJbmiabqyrbuC8fyTNf2jef6zvf+DwwKh8Si8YhMKpfMpvMJjUp5gOr0mqpqO9qurgvAgscQsIecM1/Hakeb866hhVtK/FE/e3HsYV5y1xIYwxYWtDcxuKL4YhWAWJZYYdjAuGAJhwdJ42hZSInwySAa+glauTk690jWd4lYyFKnqPZWm2oKmhuByWqbm+rrKBxcMkw7bAD5J5zQFtdbyuyGi7aqvDmdpRucneedDM0cfUB+t3q+nLwY3q3u/A4/rq5NXf86LZ4Pu84u30/s1D+A0tb9uqcK4UAF+vrdInhinzZX+IoRW1jOYkLeiAyrzZPYiaMJkAIDeqSYERg3hR1ZpnQIDuYWjSNVljTVEqXNdi4LltwosGFQnIIIIkP58uDPikuBJjp5Kh1Rdj8xXRu4UmTSSRZ5yjQIFVvPDxCvfS2V0ycgmjmXeh368auhq8Y4HkwrFq9YrXubMk2oFuNWwXRHILzbMiU+wRkZ8yr2RypYkoEjHn4W9+U/rNI4P50YOazPqPTGXoiFdc+u0YFWp266U7UoUibDEEVKFvdU2qzt4k7qO/bc2ahr136LJbny5cybO38OPbr06dSrW7+OPbv27dy7GygAADs='
 

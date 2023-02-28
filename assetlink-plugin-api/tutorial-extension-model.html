@@ -131,14 +131,14 @@
                 <section>
 
 <article>
-    <h2>Plugins</h2>
+    <h2 id="plugins">Plugins</h2>
 <p>Almost everything user-facing in Asset Link is implemented via plugins. A plugin is just a file with some code or data in it that Asset Link
 knows how to load - usually via HTTP. Asset Link plugins must be named using the pattern <code>{PluginName}.alink.{ext}</code>.</p>
 <p>Support for Javascript and Vue.js plugins is built into Asset Link. Plugins ending with <code>alink.js</code> or <code>alink.vue</code> must be valid Javascript and Vue.js
 respectively. Other file types can be supported by way of plugins that interpret them.</p>
 <p>When they are loaded, JS/Vue plugins are passed an <a href="IAssetLink.html"><code>AssetLink</code> instance</a> which serves as the API entry-point for Asset Link and a
 <a href="IAssetLinkPluginHandle.html">handle object</a> which is used to define the plugin's functionality.</p>
-<h2>Plugin Lists (repositories)</h2>
+<h2 id="plugin-lists-(repositories)">Plugin Lists (repositories)</h2>
 <pre class="prettyprint source"><code>https://somewhere.example.com/folder-z/MyPluginList.repo.json
 </code></pre>
 <pre class="prettyprint source lang-json"><code>{
@@ -164,7 +164,7 @@ https://somewhere.example.com/MyPluginB.alink.vue
 https://somewhere.example.com/folder-z/MyPluginC.alink.json
 https://somewhere.example.com/MyPluginD.alink.yml
 </code></pre>
-<h3>Default/Local plugin list</h3>
+<h3 id="default%2Flocal-plugin-list">Default/Local plugin list</h3>
 <p>A default plugin list is provided with Asset Link and is pre-populated with some core plugins.</p>
 <blockquote>
 <p><code>https://my-farmos-server.example.com/alink/backend/default-plugins.repo.json</code></p>
@@ -173,8 +173,8 @@ https://somewhere.example.com/MyPluginD.alink.yml
 <blockquote>
 <p><code>indexeddb://asset-link/data/local-plugin-list.repo.json</code></p>
 </blockquote>
-<h2>Plugin Structure</h2>
-<h3>Javascript</h3>
+<h2 id="plugin-structure">Plugin Structure</h2>
+<h3 id="javascript">Javascript</h3>
 <p>When a Javascript plugin is loaded, the static <code>onLoad</code> method of the default export is invoked so it can perform any required setup.</p>
 <pre class="prettyprint source lang-javascript"><code>export default class MyPluginA {
   static onLoad(handle, assetLink) {
@@ -184,7 +184,7 @@ https://somewhere.example.com/MyPluginD.alink.yml
   // Other methods...
 }
 </code></pre>
-<h3>Vue</h3>
+<h3 id="vue">Vue</h3>
 <p>When a Vue.js plugin is loaded, the &quot;plugin instance&quot; is the uninstantiated Vue component. This means the <code>onLoad</code> method
 is static on the top-level exported object, <strong>not</strong> within <code>methods</code> - as is used in Vue to define methods on the component itself.</p>
 <pre class="prettyprint source lang-vue"><code>&lt;template>
@@ -200,13 +200,13 @@ export default {
 }
 &lt;/script>
 </code></pre>
-<h3>Handle Object</h3>
+<h3 id="handle-object">Handle Object</h3>
 <p>The handle object which is passed into plugins' <code>onLoad</code> method is an instance of <a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a>. It provides some helpers
 with validation for hooking into Asset Link's pluggable rendering system.</p>
 <p>Importantly, the component class itself must be accessed via the <code>AssetLinkPluginHandle::thisPlugin</code> property.</p>
-<h2>Pluggable Asset/Log Search</h2>
+<h2 id="pluggable-asset%2Flog-search">Pluggable Asset/Log Search</h2>
 <p>TODO</p>
-<h2>Pluggable Rendering Overview</h2>
+<h2 id="pluggable-rendering-overview">Pluggable Rendering Overview</h2>
 <pre class="prettyprint source"><code>routes/pages > widgets
 routes/pages > slots > widgets
 </code></pre>
@@ -215,7 +215,7 @@ routes/pages > slots > widgets
 <li>Plugins define &quot;slots&quot; that other plugins can request when rendering pages or other slots</li>
 <li>Plugins define &quot;widget decorators&quot; which other plugins can request as part of rendering pages or slots</li>
 </ul>
-<h3>Routes</h3>
+<h3 id="routes">Routes</h3>
 <p>Plugins can define URL Paths (routes) within Asset Link - e.g. <code>https://my-farmos-server.example.com/alink/my-page/tuesday</code>.</p>
 <pre class="prettyprint source lang-javascript"><code>  static onLoad(handle, assetLink) {
 
@@ -228,7 +228,7 @@ routes/pages > slots > widgets
 
   }
 </code></pre>
-<h4>Shorthand</h4>
+<h4 id="shorthand">Shorthand</h4>
 <p>Asset Link provides a shorthand for defining simple routes. The above route can be written like this;</p>
 <pre class="prettyprint source lang-vue"><code>&lt;template alink-route[com.example.farmos_asset_link.routes.v0.my_page]=&quot;/my-page/:arg&quot;>
   &lt;q-page padding class=&quot;text-left&quot;>
@@ -237,7 +237,7 @@ routes/pages > slots > widgets
   &lt;/q-page>
 &lt;/template>
 </code></pre>
-<h3>Slots</h3>
+<h3 id="slots">Slots</h3>
 <pre class="prettyprint source lang-javascript"><code>  static onLoad(handle) {
 
     handle.defineSlot('com.example.farmos_asset_link.slots.v0.my_slot', pageSlot => {
@@ -251,7 +251,7 @@ routes/pages > slots > widgets
 
   }
 </code></pre>
-<h4>Shorthand</h4>
+<h4 id="shorthand-1">Shorthand</h4>
 <p>Asset Link also provides a shorthand for defining simple slots. Instead of the following;</p>
 <pre class="prettyprint source lang-vue"><code>&lt;template>
   &lt;q-btn flat dense to=&quot;/another/asset-link-page&quot; icon=&quot;mdi-alarm-bell&quot;>&lt;/q-btn>
@@ -277,7 +277,7 @@ export default {
   &lt;q-btn flat dense to=&quot;/another/asset-link-page&quot; icon=&quot;mdi-alarm-bell&quot;>&lt;/q-btn>
 &lt;/template>
 </code></pre>
-<h4>Shorthand with <code>weight</code> and <code>appliesIf</code> Predicate Arguments</h4>
+<h4 id="shorthand-with-weight-and-appliesif-predicate-arguments">Shorthand with <code>weight</code> and <code>appliesIf</code> Predicate Arguments</h4>
 <p>The shorthand syntax also supports providing some kinds of arguments. For example, the following;</p>
 <pre class="prettyprint source lang-vue"><code>&lt;template>
   &lt;q-btn flat dense to=&quot;/another/asset-link-page&quot; icon=&quot;mdi-alarm-bell&quot;>&lt;/q-btn>
@@ -308,14 +308,14 @@ export default {
 &lt;/template>
 </code></pre>
 <p>Where the expression string provided to the <code>showIf</code> argument is a valid <a href="https://jmespath.org/">JMESPath expression</a>.</p>
-<h4>Consuming Slots</h4>
+<h4 id="consuming-slots">Consuming Slots</h4>
 <pre class="prettyprint source lang-vue"><code>&lt;component
     v-for=&quot;slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, pageName: 'asset-page', asset })&quot;
     :key=&quot;slotDef.id&quot;
     :is=&quot;slotDef.component&quot;
     v-bind=&quot;slotDef.props&quot;>&lt;/component>
 </code></pre>
-<h4>Slot Multiplexing</h4>
+<h4 id="slot-multiplexing">Slot Multiplexing</h4>
 <p>Sometimes a single slot should render multiple times based on a given context. In this scenario a context multiplexing function may be supplied
 which maps from the context to N contexts which are used to render the slot multiple times.</p>
 <pre class="prettyprint source lang-vue"><code>&lt;script setup>
@@ -347,7 +347,7 @@ export default {
 }
 &lt;/script>
 </code></pre>
-<h4>Slot Multiplexing Shorthand</h4>
+<h4 id="slot-multiplexing-shorthand">Slot Multiplexing Shorthand</h4>
 <pre class="prettyprint source lang-vue"><code>&lt;script setup>
 const props = defineProps({
   symbol: {
@@ -384,7 +384,7 @@ const props = defineProps({
   &lt;div>Image: {{ props.imgRef.type }} - {{ props.imgRef.id }}&lt;/div>
 &lt;/template>
 </code></pre>
-<h3>Widget Decorators</h3>
+<h3 id="widget-decorators">Widget Decorators</h3>
 <pre class="prettyprint source lang-javascript"><code>&lt;template>
   &lt;span>&lt;slot>&lt;/slot> &#9774;&lt;/span>
 &lt;/template>
@@ -409,7 +409,7 @@ export default {
 </code></pre>
 <p><em><strong>Note:</strong> The above example uses a Vue.js slot to render the content it is decorating. The slot concept
 seen here is different from Asset Link slots.</em></p>
-<h4>Shorthand</h4>
+<h4 id="shorthand-2">Shorthand</h4>
 <p>Asset Link provides a shorthand for defining simple widget decorators. The above widget decorator can be written like this;</p>
 <pre class="prettyprint source lang-vue"><code>&lt;template
     alink-widget-decorator[com.example.farmos_asset_link.widget_decorator.v0.asset_name_with_peace_sign]
@@ -417,20 +417,20 @@ seen here is different from Asset Link slots.</em></p>
   &lt;span>&lt;slot>&lt;/slot> &#9774;&lt;/span>
 &lt;/template>
 </code></pre>
-<h4>Consuming Widget Decorators</h4>
+<h4 id="consuming-widget-decorators">Consuming Widget Decorators</h4>
 <pre class="prettyprint source lang-vue"><code>&lt;h2>Asset: &lt;render-widget
       name=&quot;asset-name&quot;
       :context=&quot;{ asset }&quot;
       >{{ asset.attributes.name }}&lt;/render-widget>
 &lt;/h2>
 </code></pre>
-<h2>Plugin Dependencies</h2>
+<h2 id="plugin-dependencies">Plugin Dependencies</h2>
 <p>Asset Link Plugins can be loaded/unloaded/reloaded at any time - though normally they change infrequently. As such, dependencies
 between plugins must be flexible.</p>
 <p>To achieve that flexibility, Asset Link employs a loose dependency model. Asset Link facilitates a few types of dependencies
 explicitly - such as those related to rendering and to searching farmOS data. Beyond that, plugins can form more complex
 dependencies via plugin ingestion.</p>
-<h3>Plugin Ingestion</h3>
+<h3 id="plugin-ingestion">Plugin Ingestion</h3>
 <p>In its <code>onLoad</code> method a plugin may choose to be notified about every other plugin by defining a plugin ingestor;</p>
 <pre class="prettyprint source lang-javascript"><code>    handle.definePluginIngestor(pluginIngestor => {
       pluginIngestor.onEveryPlugin(plugin => {

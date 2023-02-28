@@ -230,6 +230,52 @@ IAssetLink.prototype.getLogTypes = async function () {};
 IAssetLink.prototype.getTaxonomyVocabularies = async function () {};
 
 /**
+ * Get a taxonomy term by type and name.
+ *
+ * @method IAssetLink#getTaxonomyTermByName
+ * @param {String} termType The type of taxonomy term to get. e.g. `taxonomy_term--animal_type`
+ * @param {String} termName The name of the taxonomy term to be retrieved.
+ */
+IAssetLink.prototype.getTaxonomyTermByName = async function (termType, termName) {};
+
+/**
+ * @typedef GetOrCreateTaxonomyTermByNameOptions
+ * @description Options that can be passed to {@link IAssetLink.getOrCreateTaxonomyTermByName}
+ *
+ * ##### Usage
+ *
+ * ```js
+ * const term = await assetLink.getOrCreateTaxonomyTermByName('taxonomy_term--plant_type', 'Beans', {
+ *  idToCreate: 'bccd50a8-a017-4cad-b2df-712e40e4d263',
+ * });
+ * ```
+ *
+ * @property {Boolean} idToCreate The unique id of the term to create if one cannot be found
+ *   with the specified name.
+ */
+
+/**
+ * Get or create a taxonomy term by type and name.
+ * 
+ * Note that it is often preferable to use the '$relateByName' directive instead of explicitly getting
+ * or creating taxonomy terms because it reduces the likelihood of duplicate terms from multiple users
+ * working simultaneously offline. See the [Farm Data Access tutorial](./tutorial-farm-data-access.html#directive-%24relatebyname) for
+ * more about that directive.
+ * 
+  * ##### Usage
+ *
+ * ```js
+ * const term = await assetLink.getOrCreateTaxonomyTermByName('taxonomy_term--plant_type', 'Beans');
+ * ```
+ *
+ * @method IAssetLink#getOrCreateTaxonomyTermByName
+ * @param {String} termType The type of taxonomy term to get or create. e.g. `taxonomy_term--animal_type`
+ * @param {String} termName The name of the taxonomy term to be retrieved or created.
+ * @param {GetOrCreateTaxonomyTermByNameOptions} options An object with options.
+ */
+IAssetLink.prototype.getOrCreateTaxonomyTermByName = async function (termType, termName, options) {};
+
+/**
  * Central entity searching entry-point. Responsible for delegating to entity searching plugins.
  *
  * *Note: It would be unusual to call this directly. Most use-cases should use the [EntitySearch](module-EntitySearch.html)

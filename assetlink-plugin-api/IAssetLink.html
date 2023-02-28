@@ -1013,6 +1013,211 @@ sleeve.</p>
 
 
     
+    <h4 class="name" id="getOrCreateTaxonomyTermByName">
+        <a class="href-link" href="#getOrCreateTaxonomyTermByName">#</a>
+        
+        <span class="code-name">
+            
+                getOrCreateTaxonomyTermByName<span class="signature">(termType, termName, options)</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <p>Get or create a taxonomy term by type and name.</p>
+<p>Note that it is often preferable to use the '$relateByName' directive instead of explicitly getting
+or creating taxonomy terms because it reduces the likelihood of duplicate terms from multiple users
+working simultaneously offline. See the <a href="./tutorial-farm-data-access.html#directive-%24relatebyname">Farm Data Access tutorial</a> for
+more about that directive.</p>
+<h5 id="usage">Usage</h5>
+<pre class="prettyprint source lang-js"><code>const term = await assetLink.getOrCreateTaxonomyTermByName('taxonomy_term--plant_type', 'Beans');
+</code></pre>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>termType</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">String</code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>The type of taxonomy term to get or create. e.g. <code>taxonomy_term--animal_type</code></p></td>
+</tr>
+
+
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>termName</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">String</code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>The name of the taxonomy term to be retrieved or created.</p></td>
+</tr>
+
+
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>options</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type"><a href="global.html#GetOrCreateTaxonomyTermByNameOptions">GetOrCreateTaxonomyTermByNameOptions</a></code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>An object with options.</p></td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="IAssetLink.js.html" class="button">View Source</a>
+            <span>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line118">line 118</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
     <h4 class="name" id="getSlots">
         <a class="href-link" href="#getSlots">#</a>
         
@@ -1028,7 +1233,7 @@ sleeve.</p>
     
     <div class="description">
         <p>Get slots that match a given context.</p>
-<h5>Usage</h5>
+<h5 id="usage">Usage</h5>
 <pre class="prettyprint source lang-js"><code>&lt;component
     v-for=&quot;slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, pageName: 'my-page', asset })&quot;
     :key=&quot;slotDef.id&quot;
@@ -1136,7 +1341,7 @@ sleeve.</p>
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line129">line 129</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line175">line 175</a>
             </span>
         </p>
     
@@ -1183,6 +1388,179 @@ sleeve.</p>
                 
         </div>
     </div>
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="getTaxonomyTermByName">
+        <a class="href-link" href="#getTaxonomyTermByName">#</a>
+        
+        <span class="code-name">
+            
+                getTaxonomyTermByName<span class="signature">(termType, termName)</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <p>Get a taxonomy term by type and name.</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>termType</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">String</code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>The type of taxonomy term to get. e.g. <code>taxonomy_term--animal_type</code></p></td>
+</tr>
+
+
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>termName</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">String</code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>The name of the taxonomy term to be retrieved.</p></td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="IAssetLink.js.html" class="button">View Source</a>
+            <span>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line93">line 93</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1413,7 +1791,7 @@ which internally calls <code>getWidgetDecorators</code> and composes the resulti
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line148">line 148</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line194">line 194</a>
             </span>
         </p>
     
@@ -1485,7 +1863,7 @@ which internally calls <code>getWidgetDecorators</code> and composes the resulti
     
     <div class="description">
         <p>Get an entity by type and UUID or Drupal internal id.</p>
-<h5>Usage</h5>
+<h5 id="usage">Usage</h5>
 <pre class="prettyprint source lang-js"><code>const log = await assetLink.resolveEntity('log', 42);
 
 console.log(log.attributes.name);
@@ -1850,7 +2228,7 @@ offline or online entity search results respectively.</p></td>
         <p class="tag-source">
             <a href="IAssetLink.js.html" class="button">View Source</a>
             <span>
-                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line93">line 93</a>
+                <a href="IAssetLink.js.html">IAssetLink.js</a>, <a href="IAssetLink.js.html#line139">line 139</a>
             </span>
         </p>
     

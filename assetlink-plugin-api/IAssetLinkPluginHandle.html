@@ -289,7 +289,7 @@
     
     <div class="description">
         <p>Define a plugin ingestor for this plugin.</p>
-<h3>Usage</h3>
+<h3 id="usage">Usage</h3>
 <pre class="prettyprint source lang-js"><code>handle.definePluginIngestor(pluginIngestor => {
   pluginIngestor.onEveryPlugin(plugin => {
     // Do something with every other plugin regardless of loading order...
@@ -445,7 +445,7 @@ and defines the plugin ingestor.</p></td>
     
     <div class="description">
         <p>Define a route provided by this plugin.</p>
-<h3>Usage</h3>
+<h3 id="usage">Usage</h3>
 <pre class="prettyprint source lang-js"><code>handle.defineRoute('com.example.farmos_asset_link.routes.v0.my_page', pageRoute => {
   // See https://router.vuejs.org/guide/essentials/dynamic-matching.html for route path format
   pageRoute.path(&quot;/my-page/:arg&quot;);
@@ -627,7 +627,7 @@ and defines the route</p></td>
     
     <div class="description">
         <p>Define a slot provided by this plugin.</p>
-<h3>Usage</h3>
+<h3 id="usage">Usage</h3>
 <pre class="prettyprint source lang-js"><code>handle.defineSlot('com.example.farmos_asset_link.slots.v0.my_slot', pageSlot => {
   pageSlot.type('page-slot');
 
@@ -810,7 +810,7 @@ and defines the slot</p></td>
     
     <div class="description">
         <p>Define a widget decorator provided by this plugin.</p>
-<h3>Usage</h3>
+<h3 id="usage">Usage</h3>
 <pre class="prettyprint source lang-js"><code>handle.defineWidgetDecorator('com.example.farmos_asset_link.widget_decorator.v0.asset_name_with_peace_sign', widgetDecorator => {
   widgetDecorator.targetWidgetName('asset-name');
 
@@ -993,7 +993,7 @@ and defines the widget decorator</p></td>
     
     <div class="description">
         <p>Define functionality on behalf of another plugin.</p>
-<h3>Usage</h3>
+<h3 id="usage">Usage</h3>
 <pre class="prettyprint source lang-js"><code>handle.onBehalfOf(plugin, attributedHandle => {
   // Asset Link will manage the lifecycle of routes/slots/etc defined via `attributedHandle`
 });
@@ -1172,7 +1172,7 @@ and defines functionality on behalf of that other plugin.</p></td>
     
     <div class="description">
         <p>Record an error from the current plugin.</p>
-<h3>Usage</h3>
+<h3 id="usage">Usage</h3>
 <pre class="prettyprint source lang-js"><code>handle.recordError(&quot;The stars are out of alignment.&quot;);
 </code></pre>
     </div>
