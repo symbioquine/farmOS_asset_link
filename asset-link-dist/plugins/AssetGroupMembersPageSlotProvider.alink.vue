@@ -34,7 +34,7 @@ const resolveCurrentGroupMembers = async () => {
 
   const logTypes = (await assetLink.getLogTypes()).map(t => t.attributes.drupal_internal__id);
 
-  const populateGroupMembersFromLatestMembershipLogs = async (entitySource, entitySourceCache) => {
+  const populateGroupMembersFromLatestMembershipLogs = async (entitySource, entitySourceCache, queryOpts) => {
 
     const results = await entitySource.query(q => logTypes.map(logType => {
       return q.findRecords(`log--${logType}`)
@@ -48,6 +48,7 @@ const resolveCurrentGroupMembers = async () => {
         })
         .sort('-timestamp');
     }), {
+      ...(queryOpts || {}),
       sources: {
         remote: {
           include: ['asset']
@@ -79,7 +80,9 @@ const resolveCurrentGroupMembers = async () => {
             records: chunkOfPossibleMembers
           })
           .sort('-timestamp');
-      })));
+        }),
+        { ...(queryOpts || {}) }
+      ));
     }
 
     const membershipLogResults = await Promise.all(membershipLogQueryPromises);
@@ -114,9 +117,9 @@ const resolveCurrentGroupMembers = async () => {
     groupMembers.value = currentMembers;
   }
 
-  await populateGroupMembersFromLatestMembershipLogs(assetLink.entitySource.cache, assetLink.entitySource.cache);
+  await populateGroupMembersFromLatestMembershipLogs(assetLink.entitySource.cache, assetLink.entitySource.cache, {});
 
-  await populateGroupMembersFromLatestMembershipLogs(assetLink.entitySource, assetLink.entitySource.cache);
+  await populateGroupMembersFromLatestMembershipLogs(assetLink.entitySource, assetLink.entitySource.cache, { forceRemote: true });
 
   loadingGroupMembers.value = false;
 };

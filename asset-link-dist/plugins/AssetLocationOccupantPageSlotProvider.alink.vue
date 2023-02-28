@@ -36,7 +36,7 @@ const resolveCurrentLocationOccupants = async () => {
 
   const logTypes = (await assetLink.getLogTypes()).map(t => t.attributes.drupal_internal__id);
 
-  const populateLocationOccupantsFromLatestMovementLogs = async (entitySource, entitySourceCache) => {
+  const populateLocationOccupantsFromLatestMovementLogs = async (entitySource, entitySourceCache, queryOpts) => {
 
     const results = await entitySource.query(q => logTypes.map(logType => {
       return q.findRecords(`log--${logType}`)
@@ -50,6 +50,7 @@ const resolveCurrentLocationOccupants = async () => {
         })
         .sort('-timestamp');
     }), {
+      ...(queryOpts || {}),
       sources: {
         remote: {
           include: ['asset']
@@ -81,7 +82,9 @@ const resolveCurrentLocationOccupants = async () => {
             records: chunkOfPossibleOccupants
           })
           .sort('-timestamp');
-      })));
+        }),
+        { ...(queryOpts || {}) }
+      ));
     }
 
     const movementLogResults = await Promise.all(movementLogQueryPromises);
@@ -119,7 +122,7 @@ const resolveCurrentLocationOccupants = async () => {
 
   await populateLocationOccupantsFromLatestMovementLogs(assetLink.entitySource.cache, assetLink.entitySource.cache);
 
-  await populateLocationOccupantsFromLatestMovementLogs(assetLink.entitySource, assetLink.entitySource.cache);
+  await populateLocationOccupantsFromLatestMovementLogs(assetLink.entitySource, assetLink.entitySource.cache, { forceRemote: true });
 
   loadingLocationOccupants.value = false;
 };

@@ -148,6 +148,10 @@ export default {
 
     const entitySource = searchPhase === 'local' ? assetLink.entitySource.cache : assetLink.entitySource;
 
+    const searchOpts = {
+      forceRemote: searchPhase === 'remote',
+    };
+
     const additionalFilters = searchRequest.additionalFilters || [];
 
     const results = await entitySource.query(q => assetTypes.map(assetType => {
@@ -158,7 +162,7 @@ export default {
       return additionalFilters
         .reduce((query, f) => query.filter(f), baseQuery)
         .sort('drupal_internal__id');
-    }));
+    }), searchOpts);
 
     const assets = results.flatMap(l => l);
 

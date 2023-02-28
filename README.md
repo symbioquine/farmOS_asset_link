@@ -3,6 +3,8 @@
 farmOS_asset_link - A.K.A "Asset Link" - is a contrib module for farmOS 2.x that supercharges links to your farmOS assets with an extensible hybrid
 PWA experience.
 
+[![Introduction to Asset Link](https://user-images.githubusercontent.com/30754460/221234358-ceb8b952-14b8-4463-b0ec-14f2daf777c7.png)](https://www.youtube.com/watch?v=VMD80XYtdQg)
+
 *Note: Some branches and tags include only the built module. See the [development branch][development branch] for the full source code.*
 
 ## Installation

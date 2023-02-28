@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha1] - 2023-02-28
+
+### Added
+
+- Add a "Reload from Server" meta action to assets and logs
+- Add support for asynchronous routes
+- Add convenience mechanisms for working with taxonomy terms
+
+### Changed
+
+- Handle Ctrl-s/Cmd-s to save from the plugin code editor
+- Update the test docker-compose environment to enable a few of the optional modules and add more default test data
+
+### Fixed
+
+- Make loading of group members & location occupants actually fall through the cache when online
+- Make the remote search phase actually fall through the cache when online
+- Honor `forceRemote` and new `verifyCacheIntegrity` options in FarmDataModelOrbitMemorySourceDecorator
+- Make meta actions menu auto-close
+- Load asset page title locations/groups refresh from the server (if online) upon log changes
+- Make the find asset page load the asset again fully to ensure that all relationships are included
+- Fix bug with inventory queries
+
 ## [0.13.0] - 2023-02-24
 
 ### Fixed
@@ -471,7 +494,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.13.0...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha1...HEAD
+[1.0.0-alpha1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.13.0...unbuilt-v1.0.0-alpha1
 [0.13.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.12.0...unbuilt-v0.13.0
 [0.12.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.11.0...unbuilt-v0.12.0
 [0.11.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.10.0...unbuilt-v0.11.0

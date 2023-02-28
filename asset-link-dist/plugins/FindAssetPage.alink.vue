@@ -1,20 +1,36 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute();
 const router = useRouter();
 
+const assetLink = inject('assetLink');
+
 const searchMethod = computed(() => route.params.searchType);
 
-const onAssetSelected = (selectedAssets) => {
+const onAssetSelected = async (selectedAssets) => {
   console.log("onAssetSelected", selectedAssets);
   if (selectedAssets === undefined) {
     router.back();
     return;
   }
   if (selectedAssets.length === 1) {
-    router.push(`/asset/${selectedAssets[0].attributes.drupal_internal__id}`);
+    const asset = selectedAssets[0];
+
+    const model = await assetLink.getEntityModel(asset.type);
+
+    const include = Object.keys(model.relationships);
+
+    // Load the asset from the server (if online) again to ensure
+    // all the relationships get loaded (since search plugins may
+    // not load all the data)
+    await assetLink.entitySource.query(q => q
+        .findRecord({ type: asset.type, id: asset.id })
+        .options({ include }),
+      { forceRemote: true });
+
+    router.push(`/asset/${asset.attributes.drupal_internal__id}`);
     return;
   }
   // TODO: Implement multi-asset page
