@@ -4,6 +4,8 @@ This access is mediated by a library called [Orbit.js](https://orbitjs.com/). As
 via the [Asset Link API](IAssetLink.html). The most common use-cases will use `assetLink.entitySource` which first queries the in-memory data - followed
 by the farmOS server if the app is online at the time.
 
+### Retrieving Data
+
 ```js
 await assetLink.entitySource.query(q => q
   .findRecords(`asset--equipment`)
@@ -38,6 +40,8 @@ const asset = await assetLink.resolveEntity('asset', 42);
 console.log(asset.attributes.name);
 ```
 
+### Modifying Data
+
 Modifying farmOS data occurs via Orbit.js as well, but is a little simpler. Asset Link takes care of synchronizing changes with the server the next time
 the app is online. Queries of farmOS data that occur before the changes are synchronized will use the local versions of the farmOS assets/logs/etc which
 include the unsynchronized changes.
@@ -57,6 +61,30 @@ const updatedAsset = await assetLink.resolveEntity('asset', asset.id);
 
 // updatedAsset.attributes.name === 'Fred'
 ```
+
+### Directive $relateByName
+
+Taxonomy terms can be related by name (instead of manually getting/creating them prior to creating the relationship) by specifying a '$relateByName' directive:
+
+```js
+await assetLink.entitySource.update((t) =>
+  t.replaceRelatedRecord({ type: asset.type, id: asset.id }, 'animal_type', {
+      type: "taxonomy_term--animal_type",
+      // Placeholder UUID gets replaced by '$relateByName' directive below so the resulting 'taxonomy_term--animal_type'
+      // entity may have a different ID once saved locally if the term is available in memory or once the file/relationship
+      // gets saved to the server - Until https://www.drupal.org/project/drupal/issues/3021155 gets fixed anyway
+      id: uuidv4(),
+      '$relateByName': {
+        name: 'Penguin',
+      },
+  })
+, {label: `Make "${asset.attributes.name}" a penguin`});
+```
+
+Besides being convenient, this has the advantage that Asset Link will internally track the placeholder term until it is time to push the changes to the server
+at which point it will automatically create it or replace the placeholder with existing term on the server it already exists.
+
+### Directive $upload
 
 Files can be uploaded as part of modifying asset/log relationships by specifying a '$upload' directive (key) along with the standard `type` and `id` properties:
 

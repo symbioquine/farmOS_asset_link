@@ -12,7 +12,8 @@ module.exports = {
     "node_modules/better-docs/category",
   ],
   "markdown": {
-    "tags": ["example"]
+    "tags": ["example"],
+    idInHeadings: true,
   },
   "babel": {
     "presets": ["@babel/env"]

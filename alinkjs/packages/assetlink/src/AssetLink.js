@@ -312,6 +312,20 @@ export default class AssetLink {
     return await this.cores.farmData.getTaxonomyVocabularies();
   }
 
+    /**
+   * Get a taxonomy term by type and name.
+   */
+  async getTaxonomyTermByName(termType, termName) {
+    return await this.cores.farmData.getTaxonomyTermByName(termType, termName);
+  }
+
+  /**
+   * Get or create a taxonomy term by type and name.
+   */
+  async getOrCreateTaxonomyTermByName(termType, termName, options) {
+    return await this.cores.farmData.getOrCreateTaxonomyTermByName(termType, termName, options);
+  }
+
   /**
    * Get an entity by UUID or Drupal internal (t|v)?id.
    */

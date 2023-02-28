@@ -19,7 +19,10 @@ import PeekableAsyncIterator from '@/PeekableAsyncIterator';
 import DrupalJSONAPISource from '@/DrupalJSONAPISource';
 import DrupalSyncQueryOperators from '@/DrupalSyncQueryOperators';
 
-import { createDrupalUrl } from "assetlink-plugin-api";
+import fileUploadDirective from './updateDirectives/fileUpload';
+import relateTaxonomyTermDirective from './updateDirectives/relateTaxonomyTerm';
+
+import { createDrupalUrl, uuidv4 } from "assetlink-plugin-api";
 
 /**
  * Initializes/exposes Orbit.js to enable access to data in farmOS.
@@ -162,6 +165,57 @@ export default class AssetLinkFarmDataCore {
     }
 
     return vocabs;
+  }
+
+  /**
+   * Get a taxonomy term by type and name.
+   */
+  async getTaxonomyTermByName(termType, termName) {
+    await this._booted;
+
+    const results = await this.entitySource.cache.query(q => q
+        .findRecords(termType)
+        .filter({ attribute: 'name', op: 'equal', value: termName })
+        // Filter out our placeholder taxonomy terms so they only ever get associated
+        // with one entity and thus can be safely deleted as part of pushing that record
+        .filter({ attribute: 'revision_log_message', op: '<>', value: "placeholder" })
+    );
+
+    console.log(termType, termName, results);
+
+    return (results || []).find(a => a);
+  }
+
+  /**
+   * Get or create a taxonomy term by type and name.
+   */
+  async getOrCreateTaxonomyTermByName(termType, termName, options) {
+    const opts = options || {};
+
+    await this._booted;
+
+    const termInternalVocabId = termType.split('--')[1];
+
+    const vocab = await this.getTaxonomyVocabularies().then(vocabs => vocabs.find(v => v.attributes.drupal_internal__vid === termInternalVocabId));
+
+    let term = await this.getTaxonomyTermByName(termType, termName);
+
+    if (!term) {
+      const termToCreate = {
+          type: termType,
+          id: opts.idToCreate || uuidv4(),
+          attributes: {
+            name: termName,
+          },
+      };
+
+      term = await this.entitySource.update(
+          (t) => t.addRecord(termToCreate),
+          {label: `Add ${vocab.attributes.name} term: '${termName}'`});
+
+    }
+
+    return term;
   }
 
   /**
@@ -551,193 +605,79 @@ export default class AssetLinkFarmDataCore {
 
     orbitCoordinatorActivationBarrier.lower();
 
-    const getRelevantFileRecordsWithUploadDirectivesFromTransform = (transform) => {
-        const relevantFileRecordsWithUploadDirectives = [];
-  
-        const appendIfRelevant = (relatedRecord, recordType, relationshipField) => {
-          if (relatedRecord?.type === 'file--file' && relatedRecord?.['$upload'] && recordType && relationshipField) {
-            relevantFileRecordsWithUploadDirectives.push({ relatedRecord, recordType, relationshipField });
-          }
-        };
-  
-        let operations = transform?.operations || [];
-        if (!Array.isArray(operations)) {
-          operations = [operations];
-        }
-  
-        operations.forEach(operation => {
-          if (['addRecord', 'updateRecord'].includes(operation.op)) {
-            const record = operation.record || {};
-  
-            const recordType = record.type;
-  
-            const relationships = record.relationships || {};
-  
-            Object.keys(relationships).forEach(relationshipField => {
-              let relatedRecords = relationships[relationshipField].data || [];
-              if (!Array.isArray(relatedRecords)) {
-                relatedRecords = [relatedRecords];
-              }
-  
-              relatedRecords.forEach(relatedRecord => appendIfRelevant(relatedRecord, recordType, relationshipField));
-            });
-          }
-  
-          if (['addToRelatedRecords', 'replaceRelatedRecord'].includes(operation.op)) {
-            const relatedRecord = operation.relatedRecord;
-            const recordType = operation.record?.type;
-            const relationshipField = operation.relationship;
-  
-            appendIfRelevant(relatedRecord, recordType, relationshipField);
-          }
-  
-          if (['replaceRelatedRecords'].includes(operation.op)) {
-            const recordType = operation.record?.type;
-            const relationshipField = operation.relationship;
-  
-            const relatedRecords = operation.relatedRecords || [];
-  
-            relatedRecords.forEach(relatedRecord => appendIfRelevant(relatedRecord, recordType, relationshipField));
-          }
-        });
-  
-        return relevantFileRecordsWithUploadDirectives;
-      };
-  
-      // Create a placeholder 'file--file' entry for pending file uploads
-      // Might be able to be simplified once https://www.drupal.org/project/drupal/issues/3021155 is fixed
-      this._memory.on('beforeUpdate', async (transform) => {
-        const relevantFileRecordsWithUploadDirectives = getRelevantFileRecordsWithUploadDirectivesFromTransform(transform);
-  
-        await Promise.all(relevantFileRecordsWithUploadDirectives.map(async ({ relatedRecord, recordType, relationshipField }) => {
-          const uploadDirective = relatedRecord['$upload'];
-  
-          const placeholderFileEntity = {
-            type: 'file--file',
-            id: relatedRecord.id,
-            attributes: {
-              filename: uploadDirective.fileName,
-              uri: {
-                url: uploadDirective.fileDataUrl,
-              }
-            },
-          };
-  
-          await this._memory.cache.update(
-                (t) => t.addRecord(placeholderFileEntity),
-                // Pass a flag so our coordinator knows not to sync these to the server
-                { localOnly: true });
-  
-          await this._backup.update(
-                (t) => t.addRecord(placeholderFileEntity),
-                // Pass a flag so our coordinator knows not to sync these to the server
-                { localOnly: true });
-  
-        }));
+    fileUploadDirective.install(this);
+    relateTaxonomyTermDirective.install(this);
 
-      });
+    // Emit events indicating that assets/logs have changed when the memory source gets updated
+    this._memory.on('update', update => {
   
-      // Emit events indicating that assets/logs have changed when the memory source gets updated
-      this._memory.on('update', update => {
+      let operations = update?.operations || [];
+      if (!Array.isArray(operations)) {
+        operations = [operations];
+      }
   
-        let operations = update?.operations || [];
-        if (!Array.isArray(operations)) {
-          operations = [operations];
-        }
-  
-        operations.forEach(operation => {
+      operations.forEach(operation => {
 
-          if (['updateRecord', 'replaceAttribute', 'addToRelatedRecords', 'removeFromRelatedRecords', 'replaceRelatedRecords', 'replaceRelatedRecord']
-              .includes(operation.op) && operation.record.type.startsWith('asset--')) {
-            this._memory.requestQueue.currentProcessor.settle().then(() => {
-              this._eventBus.$emit('changed:asset', { assetType: operation.record.type, assetId: operation.record.id});
-            });
-          }
-  
-          // TODO: Handle 'removeRecord'
-          if (['addRecord', 'updateRecord'].includes(operation.op) && operation.record.type.startsWith('log--')) {
-            this._memory.requestQueue.currentProcessor.settle().then(() => {
-              (operation.record.relationships?.asset?.data || []).forEach(assetRel => {
-                this._eventBus.$emit('changed:assetLogs', { assetType: assetRel.type, assetId: assetRel.id});
-              });
-              this._eventBus.$emit('changed:log', { logType: operation.record.type, logId: operation.record.id});
-            });
-          }
-
-          if (['addToRelatedRecords', 'removeFromRelatedRecords', 'replaceRelatedRecords', 'replaceRelatedRecord'].includes(operation.op) &&
-              operation.record.type.startsWith('log--')) {
-            this._memory.requestQueue.currentProcessor.settle().then(() => {
-              // TODO: 'changed:assetLogs' events here also
-              this._eventBus.$emit('changed:log', { logType: operation.record.type, logId: operation.record.id});
-            });
-          }
-  
-          // TODO: Handle 'replaceRelatedRecord'
-          if (['addRecord', 'updateRecord'].includes(operation.op) && operation.record.type.startsWith('quantity--')) {
-            const assetRel = operation.record.relationships?.inventory_asset?.data;
-  
-            if (assetRel) {
-              this._memory.requestQueue.currentProcessor.settle().then(() => {
-                this._eventBus.$emit('changed:assetLogs', { assetType: assetRel.type, assetId: assetRel.id});
-              });
-            }
-          }
-  
-        });
-  
-      });
-  
-      // Handle file uploads before their relationship transforms get applied to the server
-      this._remote.on('beforeUpdate', async (transform) => {
-        const relevantFileRecordsWithUploadDirectives = getRelevantFileRecordsWithUploadDirectivesFromTransform(transform);
-  
-        // Upload them all and modify the related records with the new 'file--file' entity ids
-        await Promise.all(relevantFileRecordsWithUploadDirectives.map(async ({ relatedRecord, recordType, relationshipField }) => {
-          const uploadDirective = relatedRecord['$upload'];
-  
-          const uploadUrl = createDrupalUrl(`/api/${recordType.split('--').join('/')}/${relationshipField}`);
-  
-          const { fileName, fileDataUrl } = uploadDirective;
-  
-          const fileBuffer = await fetch(fileDataUrl).then(r => r.arrayBuffer());
-  
-          const uploadResult = await this._fetch(uploadUrl, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/vnd.api+json',
-              'Content-Type': 'application/octet-stream',
-              'Content-Disposition': `file; filename="${fileName}"`,
-            },
-            body: fileBuffer,
+        if (['updateRecord', 'replaceAttribute', 'addToRelatedRecords', 'removeFromRelatedRecords', 'replaceRelatedRecords', 'replaceRelatedRecord']
+            .includes(operation.op) && operation.record.type.startsWith('asset--')) {
+          this._memory.requestQueue.currentProcessor.settle().then(() => {
+            this._eventBus.$emit('changed:asset', { assetType: operation.record.type, assetId: operation.record.id});
           });
-  
-          const uploadResultJson = await uploadResult.json();
-  
-          relatedRecord.id = uploadResultJson.data.id;
-        }));
-  
-      });
-  
-      // Enable and disable the remote request queue when offline
-      // In practice this means that `update` requests are queued up
-      // until the connection to the server becomes available again.
-      // On the other hand `query` requests shouldn't be reaching the
-      // remote request queue - being fullfilled locally with the
-      // information already available.
-      watchEffect(async () => {
-        const isOnline = this._connectionStatus.isOnline.value;
-
-        this._remote.requestQueue.autoProcess = isOnline;
-        if (isOnline && !this._remote.requestQueue.empty) {
-          this._remote.requestQueue.process();
         }
-      });
+  
+        // TODO: Handle 'removeRecord'
+        if (['addRecord', 'updateRecord'].includes(operation.op) && operation.record.type.startsWith('log--')) {
+          this._memory.requestQueue.currentProcessor.settle().then(() => {
+            (operation.record.relationships?.asset?.data || []).forEach(assetRel => {
+              this._eventBus.$emit('changed:assetLogs', { assetType: assetRel.type, assetId: assetRel.id});
+            });
+            this._eventBus.$emit('changed:log', { logType: operation.record.type, logId: operation.record.id});
+          });
+        }
 
-      // Make sure we have some of the core data model structure
-      // data as part of booting so we don't end up offline without
-      // it since plugins will tend to assume this information is
-      // available.
-      await this._precacheKeyStructuralData();
+        if (['addToRelatedRecords', 'removeFromRelatedRecords', 'replaceRelatedRecords', 'replaceRelatedRecord'].includes(operation.op) &&
+            operation.record.type.startsWith('log--')) {
+          this._memory.requestQueue.currentProcessor.settle().then(() => {
+            // TODO: 'changed:assetLogs' events here also
+            this._eventBus.$emit('changed:log', { logType: operation.record.type, logId: operation.record.id});
+          });
+        }
+  
+        // TODO: Handle 'replaceRelatedRecord'
+        if (['addRecord', 'updateRecord'].includes(operation.op) && operation.record.type.startsWith('quantity--')) {
+          const assetRel = operation.record.relationships?.inventory_asset?.data;
+  
+          if (assetRel) {
+            this._memory.requestQueue.currentProcessor.settle().then(() => {
+              this._eventBus.$emit('changed:assetLogs', { assetType: assetRel.type, assetId: assetRel.id});
+            });
+          }
+        }
+  
+      });
+  
+    });
+  
+    // Enable and disable the remote request queue when offline
+    // In practice this means that `update` requests are queued up
+    // until the connection to the server becomes available again.
+    // On the other hand `query` requests shouldn't be reaching the
+    // remote request queue - being fullfilled locally with the
+    // information already available.
+    watchEffect(async () => {
+      const isOnline = this._connectionStatus.isOnline.value;
+
+      this._remote.requestQueue.autoProcess = isOnline;
+      if (isOnline && !this._remote.requestQueue.empty) {
+        this._remote.requestQueue.process();
+      }
+    });
+
+    // Make sure we have some of the core data model structure
+    // data as part of booting so we don't end up offline without
+    // it since plugins will tend to assume this information is
+    // available.
+    await this._precacheKeyStructuralData();
   }
 
   async _precacheKeyStructuralData() {
