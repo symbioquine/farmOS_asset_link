@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha3] - 2023-03-01
+
+### Fixed
+
+- Fix handling of `options.pluginDir` in assetlink-plugin-dev-support
+
 ## [1.0.0-alpha2] - 2023-03-01
 
 ### Added
@@ -500,7 +506,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha2...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha3...HEAD
+[1.0.0-alpha3]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha2...unbuilt-v1.0.0-alpha3
 [1.0.0-alpha2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha1...unbuilt-v1.0.0-alpha2
 [1.0.0-alpha1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.13.0...unbuilt-v1.0.0-alpha1
 [0.13.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.12.0...unbuilt-v0.13.0
