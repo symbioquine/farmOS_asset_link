@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha2] - 2023-03-01
+
 ### Added
 
 - Add a dev support package to improve the plugin dev experience - see https://www.npmjs.com/package/assetlink-plugin-dev-support
@@ -498,7 +500,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha1...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha2...HEAD
+[1.0.0-alpha2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha1...unbuilt-v1.0.0-alpha2
 [1.0.0-alpha1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.13.0...unbuilt-v1.0.0-alpha1
 [0.13.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.12.0...unbuilt-v0.13.0
 [0.12.0]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.11.0...unbuilt-v0.12.0

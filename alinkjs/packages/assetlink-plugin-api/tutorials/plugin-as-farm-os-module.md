@@ -66,3 +66,8 @@ url: '{module:name_bob_alink_plugin}/NameBobAssetActionProvider.alink.js'
 Then the plugin would only be installed when the farmOS Material asset type is also available.
 
 Here is the most cogent description of this feature I have located so far: https://lightning.acquia.com/blog/optional-config-weirdness-drupal-8
+
+## Plugin Dev Support
+
+Asset link also provides some tooling that may help with building the yaml files above and serving plugins for live development. Check
+out the [assetlink-plugin-dev-support](https://www.npmjs.com/package/assetlink-plugin-dev-support) package for more information about that.
