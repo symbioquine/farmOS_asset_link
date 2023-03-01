@@ -96,6 +96,8 @@ The plugins are served under a `/plugins/` path. So "NameBobAssetActionProvider.
 
 Also a plugin list is served at `/plugins.repo.json` (e.g. `"http://farmos.test:8080/plugins.repo.json"`) which can be installed via the Manage Plugins page in Asset Link and which specifies an `updateChannel` websocket. This means that - if everything is working correctly - plugins should be live reloaded by Asset Link when they are changed on the local filesystem.
 
+*Note: It is probably necessary for the protocol (e.g. http vs https) to match between the farmOS / Asset Link instance and the dev server this creates. If connecting from https, the instructions below for enabling HTTPS in the dev server are most likely required.*
+
 #### HTTPS
 
 To enable HTTPS the following steps are needed;
@@ -109,7 +111,9 @@ export ASSET_LINK_PLUGIN_SERVING_DEV_HOST='https://mydomain.farmos.test'
 npm run serve
 ```
 
-Check out [mkcert](https://github.com/FiloSottile/mkcert) as a convenient tool for creating/trusting certs for development.
+*Note: It is necessary for the browser where Asset Link is running to fully trust the certificates above.*
+
+Check out [mkcert](https://github.com/FiloSottile/mkcert) as a convenient tool for creating/trusting certs for development on Linux.
 
 ## Example package
 

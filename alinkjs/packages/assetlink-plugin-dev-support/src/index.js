@@ -80,7 +80,7 @@ const createDevServerConfig = (options) => {
         throw new Error('webpack-dev-server is not defined');
       }
 
-      const getPluginFilenames = () => fs.readdirSync(`${__dirname}/`).filter(filename => filename.indexOf('.alink.') !== -1);
+      const getPluginFilenames = () => fs.readdirSync(`${options.pluginDir}/`).filter(filename => filename.indexOf('.alink.') !== -1);
 
       devServer.app.get('/plugins.repo.json', (_, res) => {
         const repo = {};
@@ -109,13 +109,13 @@ const createDevServerConfig = (options) => {
           ...serverConfig.headers,
         });
 
-        res.send(fs.readFileSync(`${__dirname}/${pluginMatch}`));
+        res.send(fs.readFileSync(`${options.pluginDir}/${pluginMatch}`));
       };
 
       devServer.app.options('/plugins/:pluginFilename', handlePluginRequest);
       devServer.app.get('/plugins/:pluginFilename', handlePluginRequest);
 
-      const files = [`${__dirname}/*.alink.*`];
+      const files = [`${options.pluginDir}/*.alink.*`];
       console.log(files);
       chokidar
         .watch(files, {
@@ -150,7 +150,7 @@ const createDevServerConfig = (options) => {
   };
 
   if (targetUrl.protocol === "https:") {
-    const devRootCA = `${__dirname}/devcerts/rootCA.pem`;
+    const devRootCA = `${options.pluginDir}/devcerts/rootCA.pem`;
 
     https.globalAgent.options.ca = https.globalAgent.options.ca || [];
     https.globalAgent.options.ca.push(fs.readFileSync(devRootCA));
@@ -160,8 +160,8 @@ const createDevServerConfig = (options) => {
         type: "https",
         options: {
           ca: devRootCA,
-          key: `${__dirname}/devcerts/${devHost}/privkey.pem`,
-          cert: `${__dirname}/devcerts/${devHost}/fullchain.pem`,
+          key: `${options.pluginDir}/devcerts/${devHost}/privkey.pem`,
+          cert: `${options.pluginDir}/devcerts/${devHost}/fullchain.pem`,
         },
       },
       host: devHost,
