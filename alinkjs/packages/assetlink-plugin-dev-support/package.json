@@ -1,0 +1,21 @@
+{
+  "name": "assetlink-plugin-dev-support",
+  "version": "1.0.0-alpha1",
+  "description": "Provides build and development support for Asset Link plugins",
+  "main": "src/index.js",
+  "scripts": {
+  },
+  "license": "GPLV3",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/symbioquine/farmOS_asset_link.git"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "peerDependencies": {
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "4.9.3"
+  }
+}

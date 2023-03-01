@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add a dev support package to improve the plugin dev experience - see https://www.npmjs.com/package/assetlink-plugin-dev-support
+
 ## [1.0.0-alpha1] - 2023-02-28
 
 ### Added

@@ -75,7 +75,7 @@ jobs:
           git fetch drupal-dot-org
           git push --tags --force drupal-dot-org 'HEAD:refs/heads/release'
 
-  publish-npm:
+  publish-plugin-api-to-npm:
     name: Publish assetlink-plugin-api to NPM
     needs: build
     runs-on: ubuntu-latest
@@ -89,6 +89,23 @@ jobs:
           cd ./alinkjs/packages/assetlink-plugin-api
           npm ci
           npm run build
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+  publish-dev-support-to-npm:
+    name: Publish assetlink-plugin-dev-support to NPM
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: https://registry.npmjs.org/
+      - run: |
+          cd ./alinkjs/packages/assetlink-plugin-dev-support
+          npm ci
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
