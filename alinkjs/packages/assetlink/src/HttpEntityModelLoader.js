@@ -49,6 +49,9 @@ export default class HttpEntityModelLoader {
       models[typeName] = {
         attributes: Object.fromEntries(
             Object.entries(relatedItemSchema.definitions.attributes.properties)
+              // Apparently some modules have properties without a proper definition
+              .filter(([attrName, attr]) => !!attr)
+              // Do some type munging for compatibility with Orbit.js
               .map(([attrName, attr]) => {
                 // Orbit.js seems to only support 'number', not 'integer' but handles the former well enough
                 if (attr.type === 'integer') {
