@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add support for falling back on not using subrequests when it fails with a 403/404
+
 ### Fixed
 
 - Skip schema properties without definitions

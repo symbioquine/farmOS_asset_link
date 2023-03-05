@@ -27,6 +27,7 @@ export default class SubrequestsGroupingRequestFetcher {
     this.fetcherDelegate = options.fetcherDelegate || DEFAULT_FETCHER_DELEGATE;
 
     this._queuedGetRequests = [];
+    this._fallbackMode = false;
   }
 
   /**
@@ -45,7 +46,7 @@ export default class SubrequestsGroupingRequestFetcher {
     const isFarmOSRequest = requestUrl.host === window.location.host && requestUrl.pathname.startsWith(farmOSBasePath);
 
     // For now just handle farmOS GET requests via subrequests
-    if (!isFarmOSRequest || options.method !== 'GET') {
+    if (!isFarmOSRequest || options.method !== 'GET' || this._fallbackMode) {
       return this.fetcherDelegate.fetch(url, options);
     }
 
@@ -105,6 +106,17 @@ export default class SubrequestsGroupingRequestFetcher {
       });
     } catch (err) {
       requests.forEach(r => r.reject(err));
+      return;
+    }
+
+    // A 403 or 404 from subrequests suggests that it either isn't installed
+    // or we aren't allowed to access it. In this case switch to fallback mode
+    // for future requests and resubmit our requests as separate fetch calls.
+    if ([403, 404].includes(subrequestsRes.status)) {
+      this._fallbackMode = true;
+      requests.forEach(request => {
+        request.resolve(this.fetcherDelegate.fetch(request.url, request.options));
+      });
       return;
     }
 
