@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha4] - 2023-03-06
+
+### Added
+
+- Add support for falling back on not using subrequests when it fails with a 403/404
+- Improve behaviour of cache query operators to more closely match Drupal's JSON:API and add some tests
+
+### Fixed
+
+- Skip schema properties without definitions
+
 ## [1.0.0-alpha3] - 2023-03-01
 
 ### Fixed
@@ -506,7 +517,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha3...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha4...HEAD
+[1.0.0-alpha4]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha3...unbuilt-v1.0.0-alpha4
 [1.0.0-alpha3]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha2...unbuilt-v1.0.0-alpha3
 [1.0.0-alpha2]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha1...unbuilt-v1.0.0-alpha2
 [1.0.0-alpha1]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v0.13.0...unbuilt-v1.0.0-alpha1
