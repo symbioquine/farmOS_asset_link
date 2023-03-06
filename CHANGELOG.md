@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add support for falling back on not using subrequests when it fails with a 403/404
+- Improve behaviour of cache query operators to more closely match Drupal's JSON:API and add some tests
 
 ### Fixed
 

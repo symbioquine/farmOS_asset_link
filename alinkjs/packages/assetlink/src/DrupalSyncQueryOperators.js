@@ -119,13 +119,66 @@ function applyFilter(recordModel, record, filter) {
       case '<=':
         return actual <= expected;
       case 'STARTS_WITH':
-        return typeof actual === 'string' && actual.toLowerCase().startsWith(expected.toLowerCase());
+        if (Array.isArray(actual)) {
+          return actual.some(a => {
+            return typeof a === 'string' && typeof expected === 'string' &&
+              a.toLowerCase().startsWith(expected.toLowerCase());
+          });
+        }
+        return typeof actual === 'string' && typeof expected === 'string' &&
+          actual.toLowerCase().startsWith(expected.toLowerCase());
       case 'CONTAINS':
-        return typeof actual === 'string' && actual.toLowerCase().includes(expected.toLowerCase());
+        if (Array.isArray(actual)) {
+          return actual.some(a => {
+            return typeof a === 'string' && typeof expected === 'string' &&
+              a.toLowerCase().includes(expected.toLowerCase());
+          });
+        }
+        return typeof actual === 'string' && typeof expected === 'string' &&
+          actual.toLowerCase().includes(expected.toLowerCase());
       case 'ENDS_WITH':
-        return typeof actual === 'string' && actual.toLowerCase().endsWith(expected.toLowerCase());
+        if (Array.isArray(actual)) {
+          return actual.some(a => {
+            return typeof a === 'string' && typeof expected === 'string' &&
+              a.toLowerCase().endsWith(expected.toLowerCase());
+          });
+        }
+        return typeof actual === 'string' && typeof expected === 'string' &&
+          actual.toLowerCase().endsWith(expected.toLowerCase());
       case 'IN':
+        if (Array.isArray(actual) && Array.isArray(expected)) {
+          return expected.some(e =>
+            actual.some(a => {
+              if (typeof a === 'string' && typeof e === 'string') {
+                return a.toLowerCase() === e.toLowerCase();
+              }
+              return a === e;
+          }));
+        } else if (Array.isArray(expected)) {
+          return expected.some(e => {
+            if (typeof actual === 'string' && typeof e === 'string') {
+              return actual.toLowerCase() === e.toLowerCase();
+            }
+            return actual === e;
+          });
+        }
       case 'NOT IN':
+        if (Array.isArray(actual) && Array.isArray(expected)) {
+          return !expected.some(e =>
+            actual.some(a => {
+              if (typeof a === 'string' && typeof e === 'string') {
+                return a.toLowerCase() === e.toLowerCase();
+              }
+              return a === e;
+          }));
+        } else if (Array.isArray(expected)) {
+          return !expected.some(e => {
+            if (typeof actual === 'string' && typeof e === 'string') {
+              return actual.toLowerCase() === e.toLowerCase();
+            }
+            return actual === e;
+          });
+        }
       case 'BETWEEN':
       case 'NOT BETWEEN':
         throw new QueryExpressionParseError(`Filter operation ${filter.op} is not yet implemented for Store.`);
