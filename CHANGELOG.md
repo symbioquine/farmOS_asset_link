@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix a bug when updating logs without specifying any attributes
+
 ## [1.0.0-alpha4] - 2023-03-06
 
 ### Added

@@ -708,7 +708,7 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       // assets in the asset reference field. Only do this if the log is not a
       // movement, otherwise it would be impossible to clear the geometry of a
       // non-fixed location asset via movement Logs.
-      if (!locationAssets.length && !log.attributes.is_movement) {
+      if (!locationAssets.length && !log.attributes?.is_movement) {
         const assets = await getReferencedRecordsFromUnsavedRelation(log, 'asset');
 
         assets.filter(a => a.attributes.is_location).forEach(a => locationAssets.push(a));
