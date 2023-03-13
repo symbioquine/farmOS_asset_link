@@ -4,7 +4,8 @@ import { Coordinator, RequestStrategy, SyncStrategy } from '@orbit/coordinator';
 import { Orbit, TaskQueue } from '@orbit/core';
 import { IndexedDBBucket } from '@orbit/indexeddb-bucket';
 import { IndexedDBSource } from '@orbit/indexeddb';
-import { RecordSchema } from '@orbit/records';
+import { RecordSchema, buildRecordValidatorFor, StandardRecordNormalizer } from '@orbit/records';
+
 import { MemorySource } from '@orbit/memory';
 
 import Barrier from '@/Barrier';
@@ -18,6 +19,8 @@ import PeekableAsyncIterator from '@/PeekableAsyncIterator';
 
 import DrupalJSONAPISource from '@/DrupalJSONAPISource';
 import DrupalSyncQueryOperators from '@/DrupalSyncQueryOperators';
+
+import DecoratedOrbitQueryBuilder from '@/DecoratedOrbitQueryBuilder';
 
 import fileUploadDirective from './updateDirectives/fileUpload';
 import relateTaxonomyTermDirective from './updateDirectives/relateTaxonomyTerm';
@@ -343,6 +346,7 @@ export default class AssetLinkFarmDataCore {
     Orbit.fetch = this._fetch;
 
     this._schema = new RecordSchema({ models: this._models });
+    const schema = this._schema;
 
     this._bucket = new IndexedDBBucket({ namespace: 'asset-link-orbitjs-bucket' });
 
@@ -353,8 +357,22 @@ export default class AssetLinkFarmDataCore {
     });
     this._updateDlq = updateDlq;
 
+    const normalizer = new StandardRecordNormalizer({
+      schema,
+    });
+
+    const recordValidators = undefined;
+
+    const validatorFor = buildRecordValidatorFor({ validators: recordValidators });
+
+    const queryBuilder = new DecoratedOrbitQueryBuilder({
+      schema,
+      normalizer,
+      validatorFor,
+    });
+
     this._remote = new DrupalJSONAPISource({
-      schema: this._schema,
+      schema,
       name: 'remote',
       host: createDrupalUrl('/api'),
       defaultFetchSettings: {
@@ -364,15 +382,19 @@ export default class AssetLinkFarmDataCore {
       requestQueueSettings: {
         autoProcess: this._connectionStatus.isOnline.value || false,
       },
+      validatorFor,
+      queryBuilder,
     });
 
     this._remoteEntitySource = new BarrierAwareOrbitSourceDecorator(this._remote, orbitCoordinatorActivationBarrier, { schema: this._schema });
 
     this._memory = new MemorySource({
-      schema: this._schema,
+      schema,
       cacheSettings: {
         queryOperators: DrupalSyncQueryOperators,
       },
+      validatorFor,
+      queryBuilder,
     });
 
     this._entitySource = new FarmDataModelOrbitMemorySourceDecorator(

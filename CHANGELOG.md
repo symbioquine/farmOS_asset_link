@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add support for AND/OR query groups in both cache and remote queries
+
 ### Changed
 
 - Make query behavior/operators more closely align with Drupal's JSON:API and add more tests

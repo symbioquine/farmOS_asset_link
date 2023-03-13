@@ -16,10 +16,42 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
   buildFilterParam(filterSpecifiers) {
     const filters = [];
 
-    filterSpecifiers.forEach((filterSpecifier, index) => {
+    let nextFilterIndex = 0;
+
+    const addFilterSpecifierToParams = (filterSpecifier, memberOf) => {
+      const index = nextFilterIndex++;
+
+      if (filterSpecifier.kind === 'group') {
+        if (!['AND', 'OR'].includes(filterSpecifier.op)) {
+          throw new QueryExpressionParseError(
+            `Filter group operation ${filterSpecifier.op} not recognized for JSONAPISource.`
+          );
+        }
+
+        const groupName = 'client-group-' + index;
+        const subFilterSpecifiers = filterSpecifier.filter;
+
+        if (subFilterSpecifiers?.length) {
+          filters.push({
+            [groupName]: {
+              group: {
+                conjunction: filterSpecifier.op
+              }
+            }
+          });
+
+          subFilterSpecifiers.forEach(subFilterSpecifier => {
+            addFilterSpecifierToParams(subFilterSpecifier, groupName);
+          });
+        }
+
+        return;
+      }
+
       if (
         filterSpecifier.kind === 'attribute' &&
-        filterSpecifier.op === 'equal'
+        filterSpecifier.op === 'equal' &&
+        !memberOf
       ) {
         const attributeFilter = filterSpecifier;
 
@@ -46,13 +78,48 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
           attributeFilter.attribute
         );
 
+        let filter = {
+          path: resourceAttribute,
+          operator: attributeFilter.op,
+          value: attributeFilter.value
+        };
+
+        if (memberOf) {
+          filter.memberOf = memberOf;
+          filter = { condition: filter };
+        }
+
         filters.push({
-          ['client-' + resourceAttribute + '-' + index]: {
-            path: resourceAttribute,
-            operator: attributeFilter.op,
-            value: attributeFilter.value
-          }
+          ['client-' + resourceAttribute + '-' + index]: filter,
         });
+        return;
+      }
+
+      const toRelationPath = r => !r.endsWith('.id') ? r + '.id' : r;
+
+      if (
+        ['relatedRecords', 'relatedRecord'].includes(filterSpecifier.kind) &&
+        ['=', 'equal'].includes(filterSpecifier.op) &&
+        !memberOf
+      ) {
+        const relatedRecordFilter = filterSpecifier;
+
+        if (Array.isArray(relatedRecordFilter.record)) {
+          // Disallow this for now because of https://www.drupal.org/project/drupal/issues/3066202
+          throw new QueryExpressionParseError(
+            `Filter ${filterSpecifier.kind} operation ${filterSpecifier.op} with multiple values is not supported for JSONAPISource.`
+          );
+        }
+
+        const resourceRelationAttribute = this.serializeAttributeAsParam(
+          undefined,
+          filterSpecifier.relation
+        );
+
+        filters.push({
+          [toRelationPath(resourceRelationAttribute)]: relatedRecordFilter?.record?.id
+        });
+
         return;
       }
 
@@ -72,8 +139,8 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
           filterSpecifier.relation
         );
 
-        const filter = {
-          path: resourceRelationAttribute + ".id",
+        let filter = {
+          path: toRelationPath(resourceRelationAttribute),
           operator: filterSpecifier.op,
           value: {},
         };
@@ -81,6 +148,11 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
         expected.forEach((e, idx) => {
           filter.value[idx] = e.id;
         });
+
+        if (memberOf) {
+          filter.memberOf = memberOf;
+          filter = { condition: filter };
+        }
 
         filters.push({
           ['client-' + resourceRelationAttribute + '-' + index]: filter,
@@ -92,35 +164,44 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
       if (filterSpecifier.kind === 'relatedRecord') {
         const relatedRecordFilter = filterSpecifier;
         if (Array.isArray(relatedRecordFilter.record)) {
-          filters.push({
-            [relatedRecordFilter.relation]: relatedRecordFilter.record
-              .map((e) => e.id)
-              .join(',')
-          });
-        } else {
-          filters.push({
-            [relatedRecordFilter.relation]: relatedRecordFilter?.record?.id
-          });
+          // Disallow this for now because of https://www.drupal.org/project/drupal/issues/3066202
+          throw new QueryExpressionParseError(
+            `Filter ${filterSpecifier.kind} operation ${filterSpecifier.op} with multiple values is not supported for JSONAPISource.`
+          );
         }
+
+        const resourceRelationAttribute = this.serializeAttributeAsParam(
+          undefined,
+          filterSpecifier.relation
+        );
+
+        let filter = {
+          path: toRelationPath(resourceRelationAttribute),
+          operator: relatedRecordFilter.op,
+          value: relatedRecordFilter.record.id
+        };
+
+        if (memberOf) {
+          filter.memberOf = memberOf;
+          filter = { condition: filter };
+        }
+
+        filters.push({
+          ['client-' + resourceRelationAttribute + '-' + index]: filter,
+        });
         return;
       }
 
       if (filterSpecifier.kind === 'relatedRecords') {
-        if (filterSpecifier.op === 'equal') {
-          const relatedRecordsFilter = filterSpecifier;
-          filters.push({
-            [relatedRecordsFilter.relation]: relatedRecordsFilter.records
-              .map((e) => e.id)
-              .join(',')
-          });
-        } else if (filterSpecifier.op === 'some') {
+
+        if (filterSpecifier.op === 'some') {
           const resourceRelationAttribute = this.serializeAttributeAsParam(
               undefined,
               filterSpecifier.relation
             );
 
           const filter = {
-            path: resourceRelationAttribute,
+            path: toRelationPath(resourceRelationAttribute),
             operator: 'IN',
             value: {},
           };
@@ -129,20 +210,28 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
             filter.value[idx] = e.id;
           });
 
+          if (memberOf) {
+            filter.memberOf = memberOf;
+            filter = { condition: filter };
+          }
+
           filters.push({
             ['client-' + resourceRelationAttribute + '-' + index]: filter,
           });
-        } else {
-          throw new Error(
-              `Operation "${filterSpecifier.op}" is not supported in JSONAPI for relatedRecords filtering`
-            );
+          return;
         }
-        return;
+
       }
 
+      console.log(filterSpecifier);
+
       throw new QueryExpressionParseError(
-        `Filter operation ${filterSpecifier.op} not recognized for JSONAPISource.`
+        `Filter ${filterSpecifier.kind} operation ${filterSpecifier.op} not recognized for JSONAPISource.`
       );
+    };
+
+    filterSpecifiers.forEach((filterSpecifier) => {
+      addFilterSpecifierToParams(filterSpecifier);
     });
 
     return filters;

@@ -184,3 +184,76 @@ test('NOT IN', async () => {
         [ "filter[client-parent-0][value][1]", rabbitAnimalType.id ],
       ]);
 });
+
+test('Conjuction: OR', async () => {
+  await expectRemoteQuery(q => q.findRecords('asset--animal')
+      .filterGroup('OR', fg => fg
+        .filter({ attribute: 'sex',  op: '=', value: 'F'})
+        .filter({ relation: 'animal_type',  op: '=', record: { type: rabbitAnimalType.type, id: rabbitAnimalType.id }})
+      )
+      .filter({ attribute: 'name',  op: 'CONTAINS', value: "y" })
+    )
+    .toHaveQueryParams([
+        [ "filter[client-group-0][group][conjunction]", "OR" ],
+
+        [ "filter[client-sex-1][condition][path]", "sex" ],
+        [ "filter[client-sex-1][condition][operator]", "=" ],
+        [ "filter[client-sex-1][condition][value]", "F" ],
+        [ "filter[client-sex-1][condition][memberOf]", "client-group-0" ],
+
+        [ "filter[client-animal_type-2][condition][path]", "animal_type.id" ],
+        [ "filter[client-animal_type-2][condition][operator]", "=" ],
+        [ "filter[client-animal_type-2][condition][value]", rabbitAnimalType.id ],
+        [ "filter[client-animal_type-2][condition][memberOf]", "client-group-0" ],
+
+        [ "filter[client-name-3][path]", "name" ],
+        [ "filter[client-name-3][operator]", "CONTAINS" ],
+        [ "filter[client-name-3][value]", "y" ],
+      ]);
+});
+
+test('Conjuction: Nested ANDs in OR', async () => {
+  await expectRemoteQuery(q => q.findRecords('asset--animal')
+      .filterGroup('OR', orFg => orFg
+        .filterGroup('AND', andFg => andFg
+          .filter({ attribute: 'drupal_internal__id',  op: '>=', value: 1})
+          .filter({ attribute: 'drupal_internal__id',  op: '<', value: 4})
+        )
+        .filterGroup('AND', andFg => andFg
+          .filter({ attribute: 'drupal_internal__id',  op: '>=', value: 5})
+          .filter({ attribute: 'drupal_internal__id',  op: '<', value: 8})
+        )
+      )
+      .filter({ attribute: 'name',  op: 'CONTAINS', value: "y" })
+    ).toHaveQueryParams([
+      [ "filter[client-group-0][group][conjunction]", "OR" ],
+
+      [ "filter[client-group-1][group][conjunction]", "AND" ],
+
+      [ "filter[client-drupal_internal__id-2][condition][operator]", ">=" ],
+      [ "filter[client-drupal_internal__id-2][condition][path]", "drupal_internal__id" ],
+      [ "filter[client-drupal_internal__id-2][condition][value]", "1" ],
+      [ "filter[client-drupal_internal__id-2][condition][memberOf]", "client-group-1" ],
+
+      [ "filter[client-drupal_internal__id-3][condition][operator]", "<" ],
+      [ "filter[client-drupal_internal__id-3][condition][path]", "drupal_internal__id" ],
+      [ "filter[client-drupal_internal__id-3][condition][value]", "4" ],
+      [ "filter[client-drupal_internal__id-3][condition][memberOf]", "client-group-1" ],
+
+      [ "filter[client-group-4][group][conjunction]", "AND" ],
+
+      [ "filter[client-drupal_internal__id-5][condition][operator]", ">=" ],
+      [ "filter[client-drupal_internal__id-5][condition][path]", "drupal_internal__id" ],
+      [ "filter[client-drupal_internal__id-5][condition][value]", "5" ],
+      [ "filter[client-drupal_internal__id-5][condition][memberOf]", "client-group-4" ],
+
+      [ "filter[client-drupal_internal__id-6][condition][operator]", "<" ],
+      [ "filter[client-drupal_internal__id-6][condition][path]", "drupal_internal__id" ],
+      [ "filter[client-drupal_internal__id-6][condition][value]", "8" ],
+      [ "filter[client-drupal_internal__id-6][condition][memberOf]", "client-group-4" ],
+
+      [ "filter[client-name-7][operator]", "CONTAINS" ],
+      [ "filter[client-name-7][path]", "name" ],
+      [ "filter[client-name-7][value]", "y" ],
+    ]);
+});

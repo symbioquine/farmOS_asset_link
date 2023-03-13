@@ -78,6 +78,31 @@ function filterRecords(schemas, records, filters) {
 }
 
 function applyFilter(recordModel, record, filter) {
+  if (filter.kind === 'group') {
+
+    // Map from the operator to the Array function used to combine the sub filters
+    let opFn = undefined
+    if (filter.op === 'AND') {
+      opFn = 'every';
+    } else if (filter.op === 'OR') {
+      opFn = 'some';
+    } else {
+      throw new QueryExpressionParseError(`Filter group operation ${filter.op} is not valid.`);
+    }
+
+    const filters = filter.filter;
+
+    // Vacuously truthy case for empty filter groups
+    if (!filters?.length) {
+      return true;
+    }
+
+    // Recursively apply our filter group
+    return filters[opFn](subFilter => {
+      return applyFilter(recordModel, record, subFilter);
+    });
+  }
+
   if (filter.kind === 'attribute') {
     let attributeKey = filter.attribute.split('.');
 

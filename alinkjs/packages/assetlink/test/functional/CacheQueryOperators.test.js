@@ -1,6 +1,10 @@
 import './mockHttpEntityModelLoader';
 import AssetLink from '@/AssetLink';
 import { initDefaults } from './functionalScaffold';
+import { uuidv4 } from 'assetlink-plugin-api';
+
+// From https://stackoverflow.com/a/37980601/1864479
+const range = n => [...Array(n).keys()];
 
 const {
   rootComponent,
@@ -26,6 +30,7 @@ const expectCacheQuery = (qFn) => {
     return {
         toReturn: (expectedEntities) => {
             const queryResults = assetLink.entitySource.cache.query(qFn);
+            queryResults.sort((a, b) => (a.attributes?.drupal_internal__id || a.id) - (b.attributes?.drupal_internal__id || b.id));
             expect(queryResults).toEqual(expectedEntities);
         },
     }
@@ -52,6 +57,7 @@ const dolly = {
   id: '8e10c68b-49b9-43e1-ad2a-c18b1696290b',
   attributes: {
       name: "Dolly",
+      drupal_internal__id: 1,
       nickname: [
         'Dorthea',
       ]
@@ -71,6 +77,7 @@ const fred = {
   id: '46f5f6f0-03c8-4e35-aec5-f2ed6391c204',
   attributes: {
       name: "Freddrick",
+      drupal_internal__id: 2,
       nickname: [
         'Wooly Buddy',,
         'Fred',
@@ -90,6 +97,7 @@ const tommy = {
   type: 'asset--animal',
   id: 'b0aedffd-b2b8-4c2c-8e44-4b64007bf1bf',
   attributes: {
+      drupal_internal__id: 8,
       name: "Tommy",
   },
   relationships: {
@@ -136,7 +144,7 @@ test('not equal', async () => {
     ]);
 
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: '<>', value: "zz" }))
-        .toReturn([fred, dolly]);
+        .toReturn([dolly, fred]);
 
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: '<>', value: "dolly" }))
         .toReturn([fred]);
@@ -209,16 +217,16 @@ test('IN', async () => {
         .toReturn([]);
     
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: 'IN', value: ["dolly", "freddrick", "pop"] }))
-        .toReturn([fred, dolly]);
+        .toReturn([dolly, fred]);
     
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'nickname',  op: 'IN', value: ['Dorthea', "fred"] }))
-        .toReturn([fred, dolly]);
+        .toReturn([dolly, fred]);
 
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ relation: 'animal_type',  op: 'IN', record: [
           { type: sheepAnimalType.type, id: sheepAnimalType.id },
           { type: rabbitAnimalType.type, id: rabbitAnimalType.id }
         ] }))
-        .toReturn([fred, tommy, dolly]);
+        .toReturn([dolly, fred, tommy]);
 });
 
 test('NOT IN', async () => {
@@ -229,7 +237,7 @@ test('NOT IN', async () => {
     ]);
 
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: 'NOT IN', value: ["zz", 'ff'] }))
-        .toReturn([fred, dolly]);
+        .toReturn([dolly, fred]);
     
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: 'NOT IN', value: ["dolly", "freddrick", "pop"] }))
         .toReturn([]);
@@ -240,5 +248,74 @@ test('NOT IN', async () => {
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ relation: 'animal_type',  op: 'NOT IN', record: [
           { type: rabbitAnimalType.type, id: rabbitAnimalType.id }
         ] }))
-        .toReturn([fred, dolly]);
+        .toReturn([dolly, fred]);
+});
+
+test('Conjuction: OR', async () => {
+  await assetLink.entitySource.cache.update(t => [
+    t.addRecord(sheepAnimalType),
+    t.addRecord(dolly),
+    t.addRecord(fred),
+    t.addRecord(tommy),
+  ]);
+
+  expectCacheQuery(q => q.findRecords('asset--animal')
+      .filterGroup('OR', fg => fg
+        .filter({ relation: 'animal_type',  op: '=', record: { type: sheepAnimalType.type, id: sheepAnimalType.id }})
+        .filter({ relation: 'animal_type',  op: '=', record: { type: rabbitAnimalType.type, id: rabbitAnimalType.id }})
+      )
+      .filter({ attribute: 'name',  op: 'CONTAINS', value: "y" })
+    ).toReturn([dolly, tommy]);
+});
+
+test('Conjuction: Nested ANDs in OR', async () => {
+  // Make some clones of Dolly so we have a enough possible results to validate a complex query
+  const dollyClonesByInternalId = {};
+  range(8).forEach(idx => {
+    if (idx === 0 || idx === 2) {
+      return;
+    }
+    dollyClonesByInternalId[idx] = {
+      type: dolly.type,
+      id: uuidv4(),
+      attributes: {
+        ...dolly.attributes,
+        drupal_internal__id: idx,
+        name: `Dolly #${idx}`,
+      },
+      relationships: {
+        ...dolly.relationships,
+      }
+    };
+  })
+
+  await assetLink.entitySource.cache.update(t => [
+    t.addRecord(sheepAnimalType),
+    ...Object.values(dollyClonesByInternalId).map(clone => t.addRecord(clone)),
+    t.addRecord(fred),
+    t.addRecord(tommy),
+  ]);
+
+  expectCacheQuery(q => q.findRecords('asset--animal')
+      .filterGroup('OR', orFg => orFg
+        .filterGroup('AND', andFg => andFg
+          .filter({ attribute: 'drupal_internal__id',  op: '>=', value: 1})
+          .filter({ attribute: 'drupal_internal__id',  op: '<', value: 4})
+        )
+        .filterGroup('AND', andFg => andFg
+          .filter({ attribute: 'drupal_internal__id',  op: '>=', value: 5})
+          .filter({ attribute: 'drupal_internal__id',  op: '<', value: 8})
+        )
+      )
+      .filter({ attribute: 'name',  op: 'CONTAINS', value: "y" })
+    ).toReturn([
+      dollyClonesByInternalId[1],
+      // 2 is Fred who doesn't have a y in their name
+      dollyClonesByInternalId[3],
+      // 4 is larger than the first range and less than the start of the second range
+      dollyClonesByInternalId[5],
+      dollyClonesByInternalId[6],
+      dollyClonesByInternalId[7],
+      // 8 is Tommy who is larger than the end of the second range
+    ]);
 });
