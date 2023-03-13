@@ -36,7 +36,10 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
         }
 
         filters.push({ [resourceAttribute]: filterValue });
-      } else if (filterSpecifier.kind === 'attribute') {
+        return;
+      }
+
+      if (filterSpecifier.kind === 'attribute') {
         const attributeFilter = filterSpecifier;
         const resourceAttribute = this.serializeAttributeAsParam(
           undefined,
@@ -50,7 +53,43 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
             value: attributeFilter.value
           }
         });
-      } else if (filterSpecifier.kind === 'relatedRecord') {
+        return;
+      }
+
+      if (
+        ['relatedRecords', 'relatedRecord'].includes(filterSpecifier.kind) &&
+        ['IN', 'NOT IN'].includes(filterSpecifier.op)
+      ) {
+        const relatedRecordFilter = filterSpecifier;
+
+        let expected = relatedRecordFilter.record;
+        if (!Array.isArray(expected)) {
+          expected = [expected];
+        }
+
+        const resourceRelationAttribute = this.serializeAttributeAsParam(
+          undefined,
+          filterSpecifier.relation
+        );
+
+        const filter = {
+          path: resourceRelationAttribute + ".id",
+          operator: filterSpecifier.op,
+          value: {},
+        };
+
+        expected.forEach((e, idx) => {
+          filter.value[idx] = e.id;
+        });
+
+        filters.push({
+          ['client-' + resourceRelationAttribute + '-' + index]: filter,
+        });
+
+        return;
+      }
+
+      if (filterSpecifier.kind === 'relatedRecord') {
         const relatedRecordFilter = filterSpecifier;
         if (Array.isArray(relatedRecordFilter.record)) {
           filters.push({
@@ -63,7 +102,10 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
             [relatedRecordFilter.relation]: relatedRecordFilter?.record?.id
           });
         }
-      } else if (filterSpecifier.kind === 'relatedRecords') {
+        return;
+      }
+
+      if (filterSpecifier.kind === 'relatedRecords') {
         if (filterSpecifier.op === 'equal') {
           const relatedRecordsFilter = filterSpecifier;
           filters.push({
@@ -84,7 +126,6 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
           };
 
           filterSpecifier.records.forEach((e, idx) => {
-            // filter[`value[${idx}]`] = e.id;
             filter.value[idx] = e.id;
           });
 
@@ -96,11 +137,12 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
               `Operation "${filterSpecifier.op}" is not supported in JSONAPI for relatedRecords filtering`
             );
         }
-      } else {
-        throw new QueryExpressionParseError(
-          `Filter operation ${filterSpecifier.op} not recognized for JSONAPISource.`
-        );
+        return;
       }
+
+      throw new QueryExpressionParseError(
+        `Filter operation ${filterSpecifier.op} not recognized for JSONAPISource.`
+      );
     });
 
     return filters;

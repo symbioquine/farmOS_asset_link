@@ -101,11 +101,27 @@ function applyFilter(recordModel, record, filter) {
     switch (filter.op) {
       case 'equal':
       case '=':
+        if (Array.isArray(actual)) {
+          return actual.some(a => {
+            if (typeof a === 'string' && typeof expected === 'string') {
+              return a.toLowerCase().startsWith(expected.toLowerCase());
+            }
+            return a === expected;
+          });
+        }
         if (typeof actual === 'string') {
           return actual.toLowerCase() === expected.toLowerCase();
         }
         return actual === expected;
       case '<>':
+        if (Array.isArray(actual)) {
+          return !actual.some(a => {
+            if (typeof a === 'string' && typeof expected === 'string') {
+              return a.toLowerCase().startsWith(expected.toLowerCase());
+            }
+            return a === expected;
+          });
+        }
         if (typeof actual === 'string') {
           return actual.toLowerCase() !== expected.toLowerCase();
         }
@@ -208,6 +224,7 @@ function applyFilter(recordModel, record, filter) {
     let expected = filter.records;
     switch (filter.op) {
       case 'equal':
+      case '=':
         return (
           actual.length === expected.length &&
           expected.every((e) =>
@@ -219,10 +236,12 @@ function applyFilter(recordModel, record, filter) {
           actual.some((a) => a.id === e.id && a.type === e.type)
         );
       case 'some':
+      case 'IN':
         return expected.some((e) =>
           actual.some((a) => a.id === e.id && a.type === e.type)
         );
       case 'none':
+      case 'NOT IN':
         return !expected.some((e) =>
           actual.some((a) => a.id === e.id && a.type === e.type)
         );
@@ -239,6 +258,7 @@ function applyFilter(recordModel, record, filter) {
     let expected = filter.record;
     switch (filter.op) {
       case 'equal':
+      case '=':
         if (actual === null) {
           return expected === null;
         } else {
@@ -252,6 +272,17 @@ function applyFilter(recordModel, record, filter) {
             return false;
           }
         }
+
+      case 'IN':
+        return Array.isArray(expected) && expected.some(
+          (e) => actual.type === e.type && actual.id === e.id
+        );
+
+      case 'NOT IN':
+        return Array.isArray(expected) && !expected.some(
+          (e) => actual.type === e.type && actual.id === e.id
+        );
+
       default:
         throw new QueryExpressionParseError(
           'Filter operation ${filter.op} not recognized for Store.'

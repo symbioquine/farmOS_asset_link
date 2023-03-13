@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Make query behavior/operators more closely align with Drupal's JSON:API and add more tests
+
 ### Fixed
 
 - Fix a bug when updating logs without specifying any attributes

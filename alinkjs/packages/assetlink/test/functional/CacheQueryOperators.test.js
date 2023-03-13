@@ -1,10 +1,6 @@
 import './mockHttpEntityModelLoader';
 import AssetLink from '@/AssetLink';
-import { formatRFC3339 } from "assetlink-plugin-api";
-
-import { Response } from 'cross-fetch';
-
-import { fetchDelegate, initDefaults } from './functionalScaffold';
+import { initDefaults } from './functionalScaffold';
 
 const {
   rootComponent,
@@ -40,6 +36,14 @@ const sheepAnimalType = {
   "id": "4cef80fe-7c57-4960-958d-abfe74c34b30",
   "attributes": {
     "name": "Sheep",
+  },
+};
+
+const rabbitAnimalType = {
+  "type": "taxonomy_term--animal_type",
+  "id": "af0fc82b-f0e7-43ee-90bd-c5af78e50e44",
+  "attributes": {
+    "name": "Rabbit",
   },
 };
 
@@ -82,13 +86,66 @@ const fred = {
   }
 };
 
+const tommy = {
+  type: 'asset--animal',
+  id: 'b0aedffd-b2b8-4c2c-8e44-4b64007bf1bf',
+  attributes: {
+      name: "Tommy",
+  },
+  relationships: {
+    animal_type: {
+      data: {
+        type: rabbitAnimalType.type,
+        id: rabbitAnimalType.id,
+      },
+    }
+  }
+};
+
+test('equal', async () => {
+    await assetLink.entitySource.cache.update(t => [
+      t.addRecord(sheepAnimalType),
+      t.addRecord(dolly),
+      t.addRecord(fred),
+    ]);
+
+    expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: 'equal', value: "zz" }))
+        .toReturn([]);
+
+    expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: '=', value: "zz" }))
+        .toReturn([]);
+
+    expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: 'equal', value: "dolly" }))
+        .toReturn([dolly]);
+
+    expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: '=', value: "dolly" }))
+        .toReturn([dolly]);
+
+    expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'nickname',  op: 'equal', value: "FRED" }))
+        .toReturn([fred]);
+
+    expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'nickname',  op: '=', value: "FRED" }))
+        .toReturn([fred]);
+});
+
+test('not equal', async () => {
+    await assetLink.entitySource.cache.update(t => [
+      t.addRecord(sheepAnimalType),
+      t.addRecord(dolly),
+      t.addRecord(fred),
+    ]);
+
+    expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: '<>', value: "zz" }))
+        .toReturn([fred, dolly]);
+
+    expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: '<>', value: "dolly" }))
+        .toReturn([fred]);
+
+    expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'nickname',  op: '<>', value: "FRED" }))
+        .toReturn([dolly]);
+});
+
 test('STARTS_WITH', async () => {
-    assetLink.cores.farmData.getAssetTypes = async () => ['animal', 'land'].map(lt => ({ attributes: { drupal_internal__id: lt }}));
-    assetLink.cores.farmData.getLogTypes = async () => ['activity', 'observation'].map(lt => ({ attributes: { drupal_internal__id: lt }}));
-    assetLink.cores.farmData.getTaxonomyVocabularies = async () => [];
-
-    await assetLink.boot();
-
     await assetLink.entitySource.cache.update(t => [
       t.addRecord(sheepAnimalType),
       t.addRecord(dolly),
@@ -142,18 +199,26 @@ test('ENDS_WITH', async () => {
 test('IN', async () => {
     await assetLink.entitySource.cache.update(t => [
       t.addRecord(sheepAnimalType),
+      t.addRecord(rabbitAnimalType),
       t.addRecord(dolly),
       t.addRecord(fred),
+      t.addRecord(tommy),
     ]);
 
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: 'IN', value: ["zz", 'ff'] }))
         .toReturn([]);
-
+    
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: 'IN', value: ["dolly", "freddrick", "pop"] }))
         .toReturn([fred, dolly]);
-
+    
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'nickname',  op: 'IN', value: ['Dorthea', "fred"] }))
         .toReturn([fred, dolly]);
+
+    expectCacheQuery(q => q.findRecords('asset--animal').filter({ relation: 'animal_type',  op: 'IN', record: [
+          { type: sheepAnimalType.type, id: sheepAnimalType.id },
+          { type: rabbitAnimalType.type, id: rabbitAnimalType.id }
+        ] }))
+        .toReturn([fred, tommy, dolly]);
 });
 
 test('NOT IN', async () => {
@@ -165,10 +230,15 @@ test('NOT IN', async () => {
 
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: 'NOT IN', value: ["zz", 'ff'] }))
         .toReturn([fred, dolly]);
-
+    
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'name',  op: 'NOT IN', value: ["dolly", "freddrick", "pop"] }))
         .toReturn([]);
-
+    
     expectCacheQuery(q => q.findRecords('asset--animal').filter({ attribute: 'nickname',  op: 'NOT IN', value: ['Dorthea', "fred"] }))
         .toReturn([]);
+
+    expectCacheQuery(q => q.findRecords('asset--animal').filter({ relation: 'animal_type',  op: 'NOT IN', record: [
+          { type: rabbitAnimalType.type, id: rabbitAnimalType.id }
+        ] }))
+        .toReturn([fred, dolly]);
 });
