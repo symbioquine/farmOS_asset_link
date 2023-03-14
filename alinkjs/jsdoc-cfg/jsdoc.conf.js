@@ -2,7 +2,10 @@
 
 module.exports = {
   "source": {
-    "include": ["./packages/assetlink-plugin-api/src"],
+    "include": [
+      "./packages/assetlink-plugin-api/src",
+      "./packages/assetlink-plugin-dev-support/src"
+    ],
     "includePattern": "\\.(js|vue)$"
   },
   "plugins": [
@@ -23,7 +26,7 @@ module.exports = {
   },
   "opts": {
     "encoding": "utf8",
-    "destination": "../website/assetlink-plugin-api/",
+    "destination": "../website/",
     "recurse": true,
     "verbose": true,
     "readme": "./packages/assetlink-plugin-api/README.md",
@@ -33,9 +36,9 @@ module.exports = {
   "templates": {
     "search": true,
     "better-docs": {
-      "name": "Asset Link Plugin API",
+      "name": "Asset Link",
       "logo": "https://user-images.githubusercontent.com/30754460/184543756-4bbd5d3b-7a87-487b-b2ab-5d7244e728ac.png",
-      "title": "Asset Link Plugin API docs",
+      "title": "Asset Link docs",
       "css": "./custom-styles.css",
       "search": true,
       "hideGenerator": false,
@@ -45,9 +48,13 @@ module.exports = {
             "href": "https://github.com/symbioquine/farmOS_asset_link"
         },
         {
-          "label": "npm",
+          "label": "Plugin API 📦",
           "href": "https://www.npmjs.com/package/assetlink-plugin-api"
-      }
+        },
+        {
+          "label": "Dev Support 📦",
+          "href": "https://www.npmjs.com/package/assetlink-plugin-dev-support"
+        }
       ]
     },
     "default": {

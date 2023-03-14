@@ -26,7 +26,7 @@
     "serve:plugins": "ASSET_LINK_DEV_PROXY_TARGET='http://127.0.0.1:1235' lerna run serve --stream --scope=assetlink-default-plugins -- -- --port=1236",
     "lint": "lerna run lint",
     "docs": "jsdoc -c ./jsdoc-cfg/jsdoc.conf.js",
-    "watch-doc-src": "nodemon --exec 'npm run docs' -e js,vue,md,ejs,json,png,webm --watch ./jsdoc-cfg --watch ./packages/assetlink-plugin-api/src --watch ./packages/assetlink-plugin-api/tutorials --watch ./packages/assetlink-plugin-api/README.md",
+    "watch-doc-src": "nodemon --exec 'npm run docs' -e js,vue,md,ejs,json,png,webm --watch ./jsdoc-cfg --watch ./packages/assetlink-plugin-api/src --watch ./packages/assetlink-plugin-api/tutorials --watch ./packages/assetlink-plugin-api/README.md --watch ./packages/assetlink-plugin-dev-support/src",
     "serve-docs": "cd ../website && live-server --no-browser --wait=1000",
     "docs-dev": "npm run docs && npm run serve-docs & npm run watch-doc-src"
   }

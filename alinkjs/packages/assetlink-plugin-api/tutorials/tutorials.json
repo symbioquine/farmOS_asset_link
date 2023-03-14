@@ -1,13 +1,22 @@
 {
-  "extension-model": {
-    "title": "Extension Model"
-  },
-  "farm-data-access": {
-    "title": "Farm Data Access"
-  },
-  "writing-plugins": {
-    "title": "Writing Plugins",
+  "user-guide": {
+    "title": "User Guide",
     "children": {
+
+    }
+  },
+  "development": {
+    "title": "Development",
+    "children": {
+      "extension-model": {
+        "title": "Extension Model"
+      },
+      "farm-data-access": {
+        "title": "Farm Data Access"
+      },
+      "writing-plugins": {
+        "title": "Writing Plugins"
+      },
       "simple-asset-action-plugin": {
         "title": "Simple Asset Action"
       },

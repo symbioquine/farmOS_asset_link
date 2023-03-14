@@ -8,9 +8,26 @@ const path = require('path');
 
 const SERVE_DEV_HOST = process.env.ASSET_LINK_PLUGIN_SERVING_DEV_HOST || 'http://farmos.test';
 
-/*
- * Custom plugin to generate configuration entity yml files for each of our included
+/**
+ * Custom Webpack plugin to generate configuration entity yml files for each of our included
  * Asset Link plugins.
+ * 
+ * ### Usage
+ *
+ * ```js
+ * const { GenerateDefaultPluginConfigYmlFilesPlugin } = require('assetlink-plugin-dev-support');
+ * 
+ * module.exports = {
+ *   ...
+ *   plugins: [
+ *     new GenerateDefaultPluginConfigYmlFilesPlugin({
+ *       pluginDir: __dirname,
+ *       // This must match your drupal module name for Asset Link to be able to serve your plugins
+ *       drupalModuleName: 'example_alink_plugins',
+ *     }),
+ *   ]
+ * };
+ * ```
  */
 function GenerateDefaultPluginConfigYmlFilesPlugin(options) {
   if (!options?.pluginDir) {
@@ -59,6 +76,19 @@ module.exports.GenerateDefaultPluginConfigYmlFilesPlugin = GenerateDefaultPlugin
 
 /**
  * Generate a Webpack dev server configuration to serve our plugins with live-reload and (optionally) https.
+ * 
+ * ### Usage
+ *
+ * ```js
+ * const { createDevServerConfig } = require('assetlink-plugin-dev-support');
+ * 
+ * module.exports = {
+ *   ...
+ *   devServer: createDevServerConfig({
+ *     pluginDir: __dirname,
+ *   }),
+ * };
+ * ```
  */
 const createDevServerConfig = (options) => {
   if (!options?.pluginDir) {
