@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asset Link docs User Guide</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="./custom-styles.css">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+             
+                <a class="image" href="index.html">
+                    <img src="https://user-images.githubusercontent.com/30754460/184543756-4bbd5d3b-7a87-487b-b2ab-5d7244e728ac.png" alt="logo">
+                </a>
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">Asset Link</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                <div class="dropdown is-hoverable is-right">
+                    <a class="dropdown-trigger link">
+                        Tutorials
+                        <i class="fas fa-chevron-down fa-xs"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-content">
+                        
+                            <a class="dropdown-item" href="tutorial-user-guide.html">
+                                User Guide
+                            </a>
+                        
+                            <a class="dropdown-item" href="tutorial-development.html">
+                                Development
+                            </a>
+                        
+                        </div>
+                    </div>
+                </div>
+                
+                 
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/symbioquine/farmOS_asset_link"
+                        >
+                            Github
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://www.npmjs.com/package/assetlink-plugin-api"
+                        >
+                            Plugin API 📦
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://www.npmjs.com/package/assetlink-plugin-dev-support"
+                        >
+                            Dev Support 📦
+                        </a>
+                    
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar tutorials"
+            id="sidebarNav"
+        >
+            
+                <div class="search-wrapper">
+                    <input id="search" type="text" placeholder="Search docs..." class="input">
+                </div>
+            
+            <nav>
+                
+                    <div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-user-guide.html">User Guide</a></li><li><a href="tutorial-development.html">Development</a><ul><li><a href="tutorial-extension-model.html">Extension Model</a></li><li><a href="tutorial-farm-data-access.html">Farm Data Access</a></li><li><a href="tutorial-writing-plugins.html">Writing Plugins</a></li><li><a href="tutorial-simple-asset-action-plugin.html">Simple Asset Action</a></li><li><a href="tutorial-plugin-as-farm-os-module.html">Packaging a plugin as a farmOS contrib module</a></li><li><a href="tutorial-custom-styles-in-plugins.html">Custom styles in plugins</a></li></ul></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Tutorial</p>
+                    <h1>User Guide</h1>
+                </header>
+                <section>
+
+<article>
+    <h2 id="welcome-to-asset-link">Welcome to Asset Link</h2>
+<p>Asset Link is a highly extensible mobile app for farmOS which aims to connect users with their farmOS data via a minimal action-driven
+user interface.</p>
+<p>Once Asset Link is installed in farmOS, it adds a big orange floating button on the right hand side of each Asset Page.</p>
+<p><img src="./farmOS_asset_page.png" alt=""></p>
+<p>This button can be used to navigate from farmOS into the Asset Link page for that same asset.</p>
+<h3 id="asset-page">Asset Page</h3>
+<p><img src="./asset_page.png" alt=""></p>
+<p>The Asset Link asset page displays key information for the asset - and sometimes relationships to other assets - and surfaces contextually relevant actions.</p>
+<h3 id="top-toolbar">Top Toolbar</h3>
+<p><img src="./top_toolbar_labeled.png" alt=""></p>
+<p>The top toolbar in Asset Link contains menus and icons that show the status of Asset Link in general and facilitates navigating within Asset Link.</p>
+<p>From left to right:</p>
+<p><strong>Sync Status Icon</strong></p>
+<p>This shows the current online/offline status and sometimes is badged with a red or orange numbers to indicate pending/failed data updates waiting to be written to the farmOS server.</p>
+<p>Clicking this icon shows/hides the Asset Link &quot;sync tray&quot; which displays more detail about Asset Link's current synchronization status with the farmOS server.</p>
+<p><strong>Config Actions Menu</strong></p>
+<p>This menu has entries which allow one to change the behavior of Asset Link. This icon could be missing if no such functionality is available.</p>
+<p><strong>Open Tasks Page</strong></p>
+<p>This button opens the Asset Link tasks page where the current status of recent/upcoming logs can be viewed.</p>
+<p><strong>Search Assets</strong></p>
+<p>This button opens the Asset Link asset search dialog - by default text search is selected, but other asset search options such as QR code and geolocation may be available.</p>
+<p><strong>Scan QR Code</strong></p>
+<p>This button allows QR codes to be scanned for navigation within Asset Link. By default this is the same as searching by asset URL.</p>
+<p><strong>Meta Actions Menu</strong></p>
+<p>This menu has entries related to the current page such as refreshing the local data from the server or opening the currently displayed asset/log in the regular farmOS user interface.</p>
+<h3 id="sync-tray">Sync Tray</h3>
+<p>TODO: Coming soon...</p>
+<h3 id="asset-search">Asset Search</h3>
+<p>TODO: Coming soon...</p>
+<h3 id="tasks-page">Tasks Page</h3>
+<p>TODO: Coming soon...</p>
+<h3 id="log-page">Log Page</h3>
+<p>TODO: Coming soon...</p>
+<h3 id="manage-plugins-page">Manage Plugins Page</h3>
+<p>TODO: Coming soon...</p>
+<h3 id="user-defined-asset-action-plugins">User Defined Asset Action Plugins</h3>
+<p>TODO: Coming soon...</p>
+</article>
+
+</section>
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.11</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+<script src="scripts/search.js"> </script>
+
+
+</body>
+</html>

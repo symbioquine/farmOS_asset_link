@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asset Link docs PhotoInput</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="./custom-styles.css">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+             
+                <a class="image" href="index.html">
+                    <img src="https://user-images.githubusercontent.com/30754460/184543756-4bbd5d3b-7a87-487b-b2ab-5d7244e728ac.png" alt="logo">
+                </a>
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">Asset Link</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                <div class="dropdown is-hoverable is-right">
+                    <a class="dropdown-trigger link">
+                        Tutorials
+                        <i class="fas fa-chevron-down fa-xs"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-content">
+                        
+                            <a class="dropdown-item" href="tutorial-user-guide.html">
+                                User Guide
+                            </a>
+                        
+                            <a class="dropdown-item" href="tutorial-development.html">
+                                Development
+                            </a>
+                        
+                        </div>
+                    </div>
+                </div>
+                
+                 
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/symbioquine/farmOS_asset_link"
+                        >
+                            Github
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://www.npmjs.com/package/assetlink-plugin-api"
+                        >
+                            Plugin API 📦
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://www.npmjs.com/package/assetlink-plugin-dev-support"
+                        >
+                            Dev Support 📦
+                        </a>
+                    
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+                <div class="search-wrapper">
+                    <input id="search" type="text" placeholder="Search docs..." class="input">
+                </div>
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-@orbit_jsonapi.html">@orbit/jsonapi</a></li><li><a href="external-@orbit_memory.html">@orbit/memory</a></li><li><a href="external-localForage.html">localForage</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-URL.html">URL</a></li></ul><h3>Classes</h3><ul><li><a href="external-@orbit_jsonapi.JSONAPISource.html">JSONAPISource</a></li><li><a href="external-@orbit_memory.MemorySource.html">MemorySource</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li><li><a href="IAssetLinkUI.html">IAssetLinkUI</a></li><li><a href="IAssetLinkUIDialogs.html">IAssetLinkUIDialogs</a></li><li><a href="IFarmOSConnectionStatus.html">IFarmOSConnectionStatus</a></li></ul><h3>Global</h3><ul><li><a href="global.html#components">components</a></li><li><a href="global.html#createDevServerConfig">createDevServerConfig</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#EventBus">EventBus</a></li><li><a href="global.html#GenerateDefaultPluginConfigYmlFilesPlugin">GenerateDefaultPluginConfigYmlFilesPlugin</a></li><li><a href="global.html#getDrupalBasePath">getDrupalBasePath</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-EntityName.html">EntityName</a></li><li><a href="module-EntityResolver.html">EntityResolver</a></li><li><a href="module-EntitySearch.html">EntitySearch</a></li><li><a href="module-EntitySelect.html">EntitySelect</a></li><li><a href="module-PhotoInput.html">PhotoInput</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Module</p>
+                    <h1>PhotoInput</h1>
+                </header>
+                
+
+
+
+
+<section>
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>Renders buttons used to capture/select photo file inputs.</p>
+<h3 id="usage">Usage</h3>
+<pre class="prettyprint source lang-js"><code>&lt;photo-input v-model=&quot;photoFile&quot;>&lt;/photo-input>
+</code></pre>
+<h3 class="subsection-title" style="margin-top: 1em" data-jsdoc-vuejs="section-props">Props</h3>
+<table data-jsdoc-vuejs="table-props">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Default value</th>
+        <th>Required?</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+    <tbody><tr>
+        <td><code>modelValue</code></td>
+        <td>Object</td>
+        <td><code>null</code></td>
+        <td>No</td>
+        <td>The initially selected photo file</td>
+    </tr></tbody>
+</table>
+<h3 class="subsection-title" style="margin-top: 1em" data-jsdoc-vuejs="section-event">Events</h3>
+<table data-jsdoc-vuejs="table-event">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Payload Type</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+    <tbody><tr>
+        <td><code>update:modelValue</code></td>
+        <td>String</td>
+        <td>Emitted when a photo has been captured/selected</td>
+    </tr></tbody>
+</table></div>
+        
+
+        
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+    </div>
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.11</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+<script src="scripts/search.js"> </script>
+
+
+</body>
+</html>

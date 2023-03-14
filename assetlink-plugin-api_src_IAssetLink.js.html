@@ -1,0 +1,424 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asset Link docs assetlink-plugin-api/src/IAssetLink.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="./custom-styles.css">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+             
+                <a class="image" href="index.html">
+                    <img src="https://user-images.githubusercontent.com/30754460/184543756-4bbd5d3b-7a87-487b-b2ab-5d7244e728ac.png" alt="logo">
+                </a>
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">Asset Link</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                <div class="dropdown is-hoverable is-right">
+                    <a class="dropdown-trigger link">
+                        Tutorials
+                        <i class="fas fa-chevron-down fa-xs"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-content">
+                        
+                            <a class="dropdown-item" href="tutorial-user-guide.html">
+                                User Guide
+                            </a>
+                        
+                            <a class="dropdown-item" href="tutorial-development.html">
+                                Development
+                            </a>
+                        
+                        </div>
+                    </div>
+                </div>
+                
+                 
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/symbioquine/farmOS_asset_link"
+                        >
+                            Github
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://www.npmjs.com/package/assetlink-plugin-api"
+                        >
+                            Plugin API 📦
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://www.npmjs.com/package/assetlink-plugin-dev-support"
+                        >
+                            Dev Support 📦
+                        </a>
+                    
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+                <div class="search-wrapper">
+                    <input id="search" type="text" placeholder="Search docs..." class="input">
+                </div>
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-@orbit_jsonapi.html">@orbit/jsonapi</a></li><li><a href="external-@orbit_memory.html">@orbit/memory</a></li><li><a href="external-localForage.html">localForage</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-URL.html">URL</a></li></ul><h3>Classes</h3><ul><li><a href="external-@orbit_jsonapi.JSONAPISource.html">JSONAPISource</a></li><li><a href="external-@orbit_memory.MemorySource.html">MemorySource</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li><li><a href="IAssetLinkUI.html">IAssetLinkUI</a></li><li><a href="IAssetLinkUIDialogs.html">IAssetLinkUIDialogs</a></li><li><a href="IFarmOSConnectionStatus.html">IFarmOSConnectionStatus</a></li></ul><h3>Global</h3><ul><li><a href="global.html#components">components</a></li><li><a href="global.html#createDevServerConfig">createDevServerConfig</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#EventBus">EventBus</a></li><li><a href="global.html#GenerateDefaultPluginConfigYmlFilesPlugin">GenerateDefaultPluginConfigYmlFilesPlugin</a></li><li><a href="global.html#getDrupalBasePath">getDrupalBasePath</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-EntityName.html">EntityName</a></li><li><a href="module-EntityResolver.html">EntityResolver</a></li><li><a href="module-EntitySearch.html">EntitySearch</a></li><li><a href="module-EntitySelect.html">EntitySelect</a></li><li><a href="module-PhotoInput.html">PhotoInput</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>assetlink-plugin-api/src/IAssetLink.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-disable no-unused-vars */
+
+/**
+ * The main API entry-point for accessing app/data state within Asset Link.
+ *
+ * @interface
+ * @property {VueComponentInstance} rootComponent The root Vue component instance - sometimes needed for registering things like global dialogs.
+ * @property {IFarmOSConnectionStatus} connectionStatus The current network/farmOS connection status information.
+ * @property {EventBus} eventBus An async event bus used to signal certain key occurrences.
+ * @property {IAssetLinkUI} ui UI components/methods exposed for Asset Link plugins.
+ * @property {external:Promise} booted A Promise that is fulfilled once Asset Link has booted.
+ * @property {external:localForage} store A localForage instance that is used to store and retrieve data from IndexedDB.
+ * @property {Object} devToolsApi A semi-private mechanism to interact with the browser dev tools.
+ * @property {IAssetLinkPlugin[]} plugins The currently loaded plugins.
+ * @property {external:@orbit/memory.MemorySource} entitySource The Orbit.js MemorySource which is used to access/modify farmOS assets/logs/etc.
+ *
+ * Will be `undefined` until Asset Link has booted.
+ * @property {external:@orbit/jsonapi.JSONAPISource} remoteEntitySource The Orbit.js JSONAPISource which is used to directly access/modify
+ * farmOS assets/logs/etc - unless you know what you are doing, use `IAssetLink#entitySource` instead.
+ *
+ * Will be `undefined` until Asset Link has booted.
+ */
+export default class IAssetLink {}
+
+/**
+ * A decorated version of the fetch API which has some tricks up its
+ * sleeve.
+ *
+ * - Automatically gets CSRF tokens for certain HTTP methods that need them
+ * - Automatically tracks farmOS connection status
+ *
+ * @method IAssetLink#fetch
+ * @param {String|URL} resource the URL of the resource you want to fetch
+ * @param {Object} options an object containing any custom settings that you want to apply to the request
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/fetch
+ */
+IAssetLink.prototype.fetch = async function (resource, options) {};
+
+/**
+ * Gets the model for an entity type given that the type name. e.g. `"asset--plant"`
+ *
+ * @method IAssetLink#getEntityModel
+ * @param {String} typeName A farmOS JSON:API type - e.g. "asset--plant"
+ */
+IAssetLink.prototype.getEntityModel = async function (typeName) {};
+
+/**
+ * Get an entity by type and UUID or Drupal internal id.
+ *
+ * ##### Usage
+ *
+ * ```js
+ * const log = await assetLink.resolveEntity('log', 42);
+ *
+ * console.log(log.attributes.name);
+ * ```
+ *
+ * @method IAssetLink#resolveEntity
+ * @param {String} entityType the type of the entity
+ * @param {String|Number} entityRef the ID/UUID of the entity
+ * @param {Object[]} additionalFilters additional resolution criteria in Orbit.js filter format
+ *   e.g. `[{ attribute: 'is_location', op: 'equal', value: true }]`
+ * @param {String[]} limitedEntityBundles Limit the entity bundles that will be resolved from
+ *   e.g. `['activity', 'observation']`
+ */
+IAssetLink.prototype.resolveEntity = async function (
+  entityType,
+  entityRef,
+  additionalFilters
+) {};
+
+/**
+ * Get a list of the asset_type entities.
+ *
+ * @method IAssetLink#getAssetTypes
+ */
+IAssetLink.prototype.getAssetTypes = async function () {};
+
+/**
+ * Get a list of the log_type entities.
+ *
+ * @method IAssetLink#getLogTypes
+ */
+IAssetLink.prototype.getLogTypes = async function () {};
+
+/**
+ * Get a list of the taxonomy_vocabulary entities.
+ *
+ * @method IAssetLink#getTaxonomyVocabularies
+ */
+IAssetLink.prototype.getTaxonomyVocabularies = async function () {};
+
+/**
+ * Get a taxonomy term by type and name.
+ *
+ * @method IAssetLink#getTaxonomyTermByName
+ * @param {String} termType The type of taxonomy term to get. e.g. `taxonomy_term--animal_type`
+ * @param {String} termName The name of the taxonomy term to be retrieved.
+ */
+IAssetLink.prototype.getTaxonomyTermByName = async function (termType, termName) {};
+
+/**
+ * @typedef GetOrCreateTaxonomyTermByNameOptions
+ * @description Options that can be passed to {@link IAssetLink.getOrCreateTaxonomyTermByName}
+ *
+ * ##### Usage
+ *
+ * ```js
+ * const term = await assetLink.getOrCreateTaxonomyTermByName('taxonomy_term--plant_type', 'Beans', {
+ *  idToCreate: 'bccd50a8-a017-4cad-b2df-712e40e4d263',
+ * });
+ * ```
+ *
+ * @property {Boolean} idToCreate The unique id of the term to create if one cannot be found
+ *   with the specified name.
+ */
+
+/**
+ * Get or create a taxonomy term by type and name.
+ * 
+ * Note that it is often preferable to use the '$relateByName' directive instead of explicitly getting
+ * or creating taxonomy terms because it reduces the likelihood of duplicate terms from multiple users
+ * working simultaneously offline. See the [Farm Data Access tutorial](./tutorial-farm-data-access.html#directive-%24relatebyname) for
+ * more about that directive.
+ * 
+  * ##### Usage
+ *
+ * ```js
+ * const term = await assetLink.getOrCreateTaxonomyTermByName('taxonomy_term--plant_type', 'Beans');
+ * ```
+ *
+ * @method IAssetLink#getOrCreateTaxonomyTermByName
+ * @param {String} termType The type of taxonomy term to get or create. e.g. `taxonomy_term--animal_type`
+ * @param {String} termName The name of the taxonomy term to be retrieved or created.
+ * @param {GetOrCreateTaxonomyTermByNameOptions} options An object with options.
+ */
+IAssetLink.prototype.getOrCreateTaxonomyTermByName = async function (termType, termName, options) {};
+
+/**
+ * Central entity searching entry-point. Responsible for delegating to entity searching plugins.
+ *
+ * *Note: It would be unusual to call this directly. Most use-cases should use the [EntitySearch](module-EntitySearch.html)
+ * or [EntitySearch](module-EntitySelect.html) components which internally handles calling `searchEntities` and presenting
+ * the results.*
+ *
+ * @method IAssetLink#searchEntities
+ * @param {Object} searchRequest An object with varying structure produced by
+ *   a search method plugin - passed through to {@link IAssetLinkPlugin.searchEntities}
+ *   implementations.
+ * @param {String} searchPhase One of "local" or "remote" to request
+ *   offline or online entity search results respectively.
+ */
+IAssetLink.prototype.searchEntities = function (searchRequest, searchPhase) {};
+
+/**
+ * @typedef RenderableDef
+ * @description A combination of a Vue component plus the information needed to render it in
+ *   the requested context - `id` and `props`.
+ *
+ * ##### Usage
+ *
+ * ```js
+ * &lt;component
+ *     :key="renderableDef.id"
+ *     :is="renderableDef.id.component"
+ *     v-bind="renderableDef.id.props">&lt;/component>
+ * ```
+ *
+ * @property {String} id The unique (for this context) id of the thing to render
+ * @property {VueComponent} component The component to render
+ * @property {Object} props The props to render the component with
+ * @property {Number} weight The weight of this renderable
+ */
+
+/**
+ * Get slots that match a given context.
+ *
+ * ##### Usage
+ *
+ * ```js
+ * &lt;component
+ *     v-for="slotDef in assetLink.getSlots({ type: 'page-slot', route: $route, pageName: 'my-page', asset })"
+ *     :key="slotDef.id"
+ *     :is="slotDef.component"
+ *     v-bind="slotDef.props">&lt;/component>
+ * ```
+ *
+ * @method IAssetLink#getSlots
+ * @param {Object} context The context used to filter/render the slots. Must at least have the key `type`.
+ * @return {RenderableDef[]} The renderable slots already sorted by weight
+ */
+IAssetLink.prototype.getSlots = function (context) {};
+
+/**
+ * Get widget decorators that match a given context.
+ *
+ * *Note: It would be unusual to call this directly. Most use-cases should use the [RenderWidget](module-RenderWidget.html) component
+ * which internally calls `getWidgetDecorators` and composes the resulting widget decorator renderable defs.*
+ *
+ * ```js
+ * &lt;render-widget
+ *   name="asset-name"
+ *   :context="{ asset }"
+ * >{{ asset.attributes.name }}&lt;/render-widget>
+ * ```
+ *
+ * @method IAssetLink#getWidgetDecorators
+ * @param {Object} context The context object usually assembled by the RenderWidget component. Must at least have the key `widgetName`.
+ * @return {RenderableDef[]} The renderable widget decorators already sorted by weight
+ */
+IAssetLink.prototype.getWidgetDecorators = function (context) {};
+
+/**
+ * The built-in class representing the eventual completion (or failure) of an
+ * asynchronous operation and its resulting value.
+ * @external Promise
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Promise
+ */
+
+/**
+ * An Orbit.js class that stores/provides access to in-memory data.
+ * @class MemorySource
+ * @memberof external:@orbit/memory
+ * @see https://orbitjs.com/docs/api/memory/classes/MemorySource
+ */
+
+/**
+ * The Orbit.js in-memory data source package.
+ * @external @orbit/memory
+ * @see https://orbitjs.com/docs/api/memory
+ */
+
+/**
+ * An Orbit.js class that stores/provides access to in-memory data.
+ * @class JSONAPISource
+ * @memberof external:@orbit/jsonapi
+ * @see https://orbitjs.com/docs/api/jsonapi/classes/JSONAPISource
+ */
+
+/**
+ * The Orbit.js in-memory data source package.
+ * @external @orbit/jsonapi
+ * @see https://orbitjs.com/docs/api/jsonapi
+ */
+
+/**
+ * The localForage API.
+ * @external localForage
+ * @see https://localforage.github.io/localForage/
+ */
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.11</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+<script src="scripts/search.js"> </script>
+
+
+</body>
+</html>
