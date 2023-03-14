@@ -47,6 +47,7 @@
     "jmespath": "^0.16.0",
     "js-cookie": "^3.0.1",
     "localforage": "^1.10.0",
+    "micromustache": "^8.0.3",
     "ngeohash": "^0.6.3",
     "priorityqueuejs": "^2.0.0",
     "qr-scanner": "^1.4.1",

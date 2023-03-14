@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add support for AND/OR query groups in both cache and remote queries
+- Add user defined asset log plugins with a wizard to create them
 
 ### Changed
 

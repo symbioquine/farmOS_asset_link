@@ -5,6 +5,7 @@ import * as AssetlinkPluginApi from 'assetlink-plugin-api';
 import ngeohash from 'ngeohash';
 import haversineDistance from 'haversine-distance';
 import jmespath from 'jmespath';
+import * as micromustache from 'micromustache';
 
 const libraries = {
   'assetlink-plugin-api': AssetlinkPluginApi,
@@ -17,12 +18,7 @@ const libraries = {
 
   jmespath,
 
-  // TODO: Figure out how to make loading these cleaner/on-demand
-  // 'vue-codemirror': import('vue-codemirror'),
-  // 'codemirror/mode/javascript/javascript.js': import('codemirror/mode/javascript/javascript.js'),
-  // 'codemirror/mode/vue/vue.js': import('codemirror/mode/vue/vue.js'),
-  // 'codemirror/lib/codemirror.css': import('codemirror/lib/codemirror.css'),
-  // 'codemirror/theme/base16-dark.css': import('codemirror/theme/base16-dark.css'),
+  micromustache,
 }
 
 export const pluginModuleLibraryNames = Object.keys(libraries);
