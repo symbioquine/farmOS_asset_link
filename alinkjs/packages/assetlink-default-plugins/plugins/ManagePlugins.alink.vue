@@ -32,7 +32,7 @@
                   <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin'">
                     <q-item-section @click="removePluginByUrl(prop.node.pluginUrl)">remove</q-item-section>
                   </q-item>
-                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin' && pluginsByUrl[prop.node.pluginUrl.toString()]?.rawSource">
+                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin' && prop.node.getPlugin()?.rawSource">
                     <q-item-section @click="editPluginByUrl(prop.node.pluginUrl)">edit</q-item-section>
                   </q-item>
                   <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin' && !prop.node.isBlacklisted">
@@ -41,6 +41,20 @@
                   <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin' && prop.node.isBlacklisted">
                     <q-item-section @click="enablePluginByUrl(prop.node.pluginUrl)">enable</q-item-section>
                   </q-item>
+                  <template v-if="prop.node.nodeType === 'plugin-list'">
+                    <component
+                        v-for="slotDef in assetLink.getSlots({ type: 'manage-plugin-list-menu-action', pluginListNode: prop.node })"
+                        :key="slotDef.id"
+                        :is="slotDef.component"
+                        v-bind="slotDef.props"></component>
+                  </template>
+                  <template v-if="prop.node.nodeType === 'plugin'">
+                    <component
+                        v-for="slotDef in assetLink.getSlots({ type: 'manage-plugin-menu-action', pluginNode: prop.node })"
+                        :key="slotDef.id"
+                        :is="slotDef.component"
+                        v-bind="slotDef.props"></component>
+                  </template>
                 </q-list>
               </q-menu>
             </q-btn>
@@ -561,6 +575,7 @@ export default {
             isBlacklisted,
             error,
             pluginUrl: plugin.url,
+            getPlugin: () => this.pluginsByUrl[plugin.url.toString()],
           });
         });
 
