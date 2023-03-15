@@ -46,14 +46,16 @@
                         v-for="slotDef in assetLink.getSlots({ type: 'manage-plugin-list-menu-action', pluginListNode: prop.node })"
                         :key="slotDef.id"
                         :is="slotDef.component"
-                        v-bind="slotDef.props"></component>
+                        v-bind="slotDef.props"
+                        v-close-popup></component>
                   </template>
                   <template v-if="prop.node.nodeType === 'plugin'">
                     <component
                         v-for="slotDef in assetLink.getSlots({ type: 'manage-plugin-menu-action', pluginNode: prop.node })"
                         :key="slotDef.id"
                         :is="slotDef.component"
-                        v-bind="slotDef.props"></component>
+                        v-bind="slotDef.props"
+                        v-close-popup></component>
                   </template>
                 </q-list>
               </q-menu>
