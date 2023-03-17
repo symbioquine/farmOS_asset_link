@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add menu action slots to manage plugins page
 - Add a share menu action for exporting Asset Link plugins
 
+### Changed
+
+- Made precaching opt-in and smarter about only caching new asset/log changes
+
 ## [1.0.0-alpha5] - 2023-03-14
 
 ### Added
