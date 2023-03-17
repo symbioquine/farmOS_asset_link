@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Made precaching opt-in and smarter about only caching new asset/log changes
 
+### Fixed
+
+- Fix precaching menu item so it isn't also a link to the manage plugins page
+
 ## [1.0.0-alpha5] - 2023-03-14
 
 ### Added

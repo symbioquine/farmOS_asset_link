@@ -38,7 +38,7 @@ export default class DefaultPrecacher {
 
       slot.component(() => {
 
-        return h(QItem, { to: "/manage-plugins", clickable: true, 'v-close-popup': true }, () => [
+        return h(QItem, () => [
           h(QItemSection, {}, () => [
             h(QItemLabel, { class: 'q-mx-none' }, () => "Precaching"),
           ]),
