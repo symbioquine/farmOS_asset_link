@@ -2,7 +2,9 @@
   "user-guide": {
     "title": "User Guide",
     "children": {
-
+      "installation-and-upgrades": {
+        "title": "Installation and Upgrades"
+      }
     }
   },
   "development": {
