@@ -229,6 +229,7 @@ test('Conjuction: Nested ANDs in OR', async () => {
       [ "filter[client-group-0][group][conjunction]", "OR" ],
 
       [ "filter[client-group-1][group][conjunction]", "AND" ],
+      [ "filter[client-group-1][group][memberOf]", "client-group-0" ],
 
       [ "filter[client-drupal_internal__id-2][condition][operator]", ">=" ],
       [ "filter[client-drupal_internal__id-2][condition][path]", "drupal_internal__id" ],
@@ -241,6 +242,7 @@ test('Conjuction: Nested ANDs in OR', async () => {
       [ "filter[client-drupal_internal__id-3][condition][memberOf]", "client-group-1" ],
 
       [ "filter[client-group-4][group][conjunction]", "AND" ],
+      [ "filter[client-group-4][group][memberOf]", "client-group-0" ],
 
       [ "filter[client-drupal_internal__id-5][condition][operator]", ">=" ],
       [ "filter[client-drupal_internal__id-5][condition][path]", "drupal_internal__id" ],

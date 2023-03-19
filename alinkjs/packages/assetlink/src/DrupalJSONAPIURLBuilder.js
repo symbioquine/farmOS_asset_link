@@ -32,12 +32,18 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
         const subFilterSpecifiers = filterSpecifier.filter;
 
         if (subFilterSpecifiers?.length) {
-          filters.push({
-            [groupName]: {
-              group: {
-                conjunction: filterSpecifier.op
-              }
+          const filter = {
+            group: {
+              conjunction: filterSpecifier.op
             }
+          };
+
+          if (memberOf) {
+            filter.group.memberOf = memberOf;
+          }
+
+          filters.push({
+            [groupName]: filter,
           });
 
           subFilterSpecifiers.forEach(subFilterSpecifier => {
