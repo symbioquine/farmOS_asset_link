@@ -19,7 +19,7 @@ export default {
       let exp = expression;
       let results = cache.getRecordsSync(exp.records || exp.type);
       if (exp.filter) {
-        results = filterRecords(cache.schema, results, exp.filter);
+        results = filterRecords(cache, results, exp.filter);
       }
       if (exp.sort) {
         results = sortRecords(results, exp.sort);
@@ -52,7 +52,7 @@ export default {
       let results = cache.getRecordsSync(relatedIds);
 
       if (exp.filter) {
-        results = filterRecords(results, exp.filter);
+        results = filterRecords(cache, results, exp.filter);
       }
       if (exp.sort) {
         results = sortRecords(results, exp.sort);
@@ -64,12 +64,14 @@ export default {
   },
 }
 
-function filterRecords(schemas, records, filters) {
+function filterRecords(cache, records, filters) {
+  const schema = cache.schema;
+
   return records.filter((record) => {
-    const recordModel = schemas.models[record.type] || {};
+    const recordModel = schema.models[record.type] || {};
 
     for (let i = 0, l = filters.length; i < l; i++) {
-      if (!applyFilter(recordModel, record, filters[i])) {
+      if (!applyFilter(cache, recordModel, record, filters[i])) {
         return false;
       }
     }
@@ -77,7 +79,7 @@ function filterRecords(schemas, records, filters) {
   });
 }
 
-function applyFilter(recordModel, record, filter) {
+function applyFilter(cache, recordModel, record, filter) {
   if (filter.kind === 'group') {
 
     // Map from the operator to the Array function used to combine the sub filters
@@ -99,12 +101,54 @@ function applyFilter(recordModel, record, filter) {
 
     // Recursively apply our filter group
     return filters[opFn](subFilter => {
-      return applyFilter(recordModel, record, subFilter);
+      return applyFilter(cache, recordModel, record, subFilter);
     });
   }
 
   if (filter.kind === 'attribute') {
     let attributeKey = filter.attribute.split('.');
+
+    if (attributeKey[0] && Object.hasOwn(recordModel.relationships, attributeKey[0])) {
+      const relationshipName = attributeKey[0];
+
+      const relationshipModel = recordModel.relationships[relationshipName];
+      let relatedAttributeKey = attributeKey.slice(1);
+
+      let relatedRecords = [];
+      if (relationshipModel.kind === 'hasOne') {
+        const relatedRecord = cache.query(q => q.findRelatedRecord({ type: record.type, id: record.id }, relationshipName));
+        if (relatedRecord) {
+          relatedRecords.push(relatedRecord);
+        }
+      } else {
+        relatedRecords = cache.query(q => q.findRelatedRecords({ type: record.type, id: record.id }, relationshipName)) || [];
+      }
+
+      // If the next segment of the attribute key consists of only digits, then apply the filtering to only
+      // that index of the relationship
+      if (/^\d+$/.test(attributeKey[1])) {
+        const relatedIndex = parseInt(attributeKey[1]);
+        relatedRecords = relatedRecords.filter((r, idx) => idx === relatedIndex);
+
+        // Also skip the index when recursing into the related entities' attributes
+        relatedAttributeKey = attributeKey.slice(2);
+      }
+
+      const subFilter = {
+        kind: filter.kind,
+        op: filter.op,
+        attribute: relatedAttributeKey.join('.'),
+        value: filter.value,
+      };
+
+      // Recursively call applyFilter to see if **any** of our relatedRecords match
+      // the related attribute key
+      return relatedRecords.some(relatedRecord => {
+        const relatedRecordModel = cache.schema.models[relatedRecord.type] || {};
+
+        return applyFilter(cache, relatedRecordModel, relatedRecord, subFilter);
+      });
+    }
 
     const attributeModel = deepGet(recordModel || {}, ['attributes', ...attributeKey]) || {};
 
@@ -275,7 +319,9 @@ function applyFilter(recordModel, record, filter) {
           'Filter operation ${filter.op} not recognized for Store.'
         );
     }
-  } else if (filter.kind === 'relatedRecord') {
+  }
+
+  if (filter.kind === 'relatedRecord') {
     let actual = deepGet(record, ['relationships', relationKey[0], 'data']);
     if (actual === undefined) {
       return false;
@@ -314,6 +360,7 @@ function applyFilter(recordModel, record, filter) {
         );
     }
   }
+
   return false;
 }
 

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Implement nested relationship attribute filtering
+
 ### Fixed
 
 - Fix a bug with nested AND/OR query groups not being added as memberOf eachother

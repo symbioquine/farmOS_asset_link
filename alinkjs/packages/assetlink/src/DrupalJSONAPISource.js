@@ -39,8 +39,18 @@ export default class DrupalJSONAPISource extends JSONAPISource {
           },
         }
       }),
-      URLBuilderClass: DrupalJSONAPIURLBuilder,
+      // URLBuilderClass: DrupalJSONAPIURLBuilder,
     }));
+
+    // Overwrite this with our own constructed instance so we can pass
+    // the schema also
+    this.requestProcessor.urlBuilder = new DrupalJSONAPIURLBuilder({
+      host: settings.host,
+      namespace: settings.namespace,
+      keyMap: settings.keyMap,
+      serializerFor: this.requestProcessor.serializerFor,
+      schema: this.schema,
+    });
 
     const requestQueueSettings = settings.requestQueueSettings || {};
 

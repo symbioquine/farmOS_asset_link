@@ -11,6 +11,7 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
 
   constructor(settings) {
     super(settings);
+    this.schema = settings.schema;
   }
 
   buildFilterParam(filterSpecifiers) {
@@ -96,7 +97,7 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
         }
 
         filters.push({
-          ['client-' + resourceAttribute + '-' + index]: filter,
+          ['client-' + resourceAttribute.replaceAll('.', '-') + '-' + index]: filter,
         });
         return;
       }
@@ -241,6 +242,86 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
     });
 
     return filters;
+  }
+
+  buildIncludeParam(includeSpecifier, request) {
+    const schemaModels = this.schema.models;
+
+    const getModels = types => types.filter(t => Object.hasOwn(schemaModels, t)).map(t => schemaModels[t]);
+
+    const filters = request.options?.filter || [];
+
+    let rootRecordModels = [];
+    if (request.op === 'findRecords') {
+      rootRecordModels.push(...getModels([request.type]));
+    }
+    if (request.op === 'findRelatedRecords') {
+      const rootRecordModel = schemaModels[request.record.type];
+
+      const refTypes = rootRecordModel.relationships[request.relationship].type || [];
+
+      rootRecordModels.push(...getModels(refTypes));
+    }
+
+    // Traverse filters, finding nested relationship attribute filtering and adding
+    // those relationship paths to the include specifier
+    const walkFilter = (recordModels, relationPath, filter) => {
+      if (filter.kind === 'group') {
+        const subFilters = filter.filter;
+        subFilters.forEach(f => walkFilter(recordModels, relationPath, f));
+      }
+      if (filter.kind === 'attribute') {
+        let attributeKey = filter.attribute.split('.');
+
+        if (!attributeKey[0]) {
+          return
+        }
+
+        let isRelatedAttribute = false;
+
+        const nestedRecordModels = recordModels.flatMap(recordModel => {
+          if (!Object.hasOwn(recordModel.relationships, attributeKey[0])) {
+            return [];
+          }
+          isRelatedAttribute = true;
+          const refTypes = recordModel.relationships[attributeKey[0]].type || [];
+          return getModels(refTypes);
+        });
+
+        if (!isRelatedAttribute) {
+          return;
+        }
+
+        const nestedRelationPath = [...relationPath, attributeKey[0]];
+
+        // Add the relation path to the include specifier
+        const relationInclude = nestedRelationPath.join('.');
+        if (!includeSpecifier.includes(relationInclude)) {
+          includeSpecifier.push(relationInclude);
+        }
+
+        let relatedAttributeKey = attributeKey.slice(1);
+
+        // If the next segment of the attribute key consists of only digits, then apply the filtering to only
+        // that index of the relationship
+        if (/^\d+$/.test(attributeKey[1])) {
+          // Also skip the index when recursing into the related entities' attributes
+          relatedAttributeKey = attributeKey.slice(2);
+        }
+
+        const subFilter = {
+          kind: filter.kind,
+          op: filter.op,
+          attribute: relatedAttributeKey.join('.'),
+          value: filter.value,
+        };
+
+        walkFilter(nestedRecordModels, nestedRelationPath, subFilter);
+      }
+    };
+    filters.forEach(f => walkFilter(rootRecordModels, [], f));
+
+    return super.buildIncludeParam(includeSpecifier, request);
   }
 
   serializeAttributeAsParam(type, attribute) {

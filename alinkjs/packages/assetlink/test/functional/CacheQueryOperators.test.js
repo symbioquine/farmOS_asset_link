@@ -79,7 +79,7 @@ const fred = {
       name: "Freddrick",
       drupal_internal__id: 2,
       nickname: [
-        'Wooly Buddy',,
+        'Wooly Buddy',
         'Fred',
       ]
   },
@@ -318,4 +318,27 @@ test('Conjuction: Nested ANDs in OR', async () => {
       dollyClonesByInternalId[7],
       // 8 is Tommy who is larger than the end of the second range
     ]);
+});
+
+test('Nested relationship attribute filtering', async () => {
+  assetLink.entitySource.cache.update(t => [
+    t.addRecord(sheepAnimalType),
+    t.addRecord(rabbitAnimalType),
+    t.addRecord(dolly),
+    t.addRecord(tommy),
+  ]);
+
+  fred.relationships.parent = {
+    data: [{ type: tommy.type, id: tommy.id }],
+  };
+
+  assetLink.entitySource.cache.update(t => [
+    t.addRecord(fred),
+  ]);
+
+  expectCacheQuery(q => q.findRecords('asset--animal')
+      .filter({ attribute: 'parent.animal_type.name',  op: 'CONTAINS', value: "abb" })
+      .filter({ attribute: 'parent.name',  op: 'CONTAINS', value: "omm" })
+      .filter({ attribute: 'name',  op: 'CONTAINS', value: "red" })
+    ).toReturn([fred]);
 });

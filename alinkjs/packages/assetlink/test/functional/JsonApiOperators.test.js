@@ -259,3 +259,27 @@ test('Conjuction: Nested ANDs in OR', async () => {
       [ "filter[client-name-7][value]", "y" ],
     ]);
 });
+
+test('Nested relationship attribute filtering adds include', async () => {
+  await expectRemoteQuery(q => q
+      .findRecords('asset--animal')
+      .filterGroup('OR', orFg => orFg
+        .filterGroup('AND', andFg => andFg
+          .filter({ attribute: 'parent.animal_type.name',  op: 'STARTS_WITH', value: "zz" })
+        )
+      )
+      .options({ include: ['animal_type'] })
+    )
+    .toHaveQueryParams([
+         [ "filter[client-group-0][group][conjunction]", "OR" ],
+
+         [ "filter[client-group-1][group][conjunction]", "AND" ],
+         [ "filter[client-group-1][group][memberOf]", "client-group-0" ],
+
+         [ "filter[client-parent-animal_type-name-2][condition][path]", "parent.animal_type.name" ],
+         [ "filter[client-parent-animal_type-name-2][condition][operator]", "STARTS_WITH" ],
+         [ "filter[client-parent-animal_type-name-2][condition][value]", "zz" ],
+         [ "filter[client-parent-animal_type-name-2][condition][memberOf]", "client-group-1" ],
+         [ "include", "animal_type,parent" ],
+       ]);
+});
