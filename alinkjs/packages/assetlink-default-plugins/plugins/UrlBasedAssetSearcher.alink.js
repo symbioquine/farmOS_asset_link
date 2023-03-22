@@ -25,7 +25,7 @@ export default class UrlBasedAssetSearcher {
     const assetDrupalInternalId = matches[1];
 
     async function* assetResultsIterator() {
-      const asset = await assetLink.resolveAsset(assetDrupalInternalId, additionalFilters, searchRequest.entityBundles);
+      const asset = await assetLink.resolveEntity('asset', assetDrupalInternalId, additionalFilters, searchRequest.entityBundles);
 
       if (!asset) {
         return;
