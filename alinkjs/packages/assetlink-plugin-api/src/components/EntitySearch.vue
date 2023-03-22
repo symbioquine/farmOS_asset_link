@@ -11,6 +11,25 @@
  *   &commat;submit="(assets) => onAssetSelected(assets)"
  * ></entity-search>
  * ```
+ * 
+ * With promoted results;
+ *
+ * ```js
+ * <entity-search
+ *   title="Find Asset"
+ *   &commat;submit="(assets) => onAssetSelected(assets)"
+ * >
+ *  <template v-slot:promoted-results="{ searchRequest }">
+ *    <div class="q-ml-lg q-mb-md">
+ *      <q-item clickable to="/some-route-path">
+ *        <q-item-section>
+ *          <q-item-label>Shows above actual search results</q-item-label>
+ *        </q-item-section>
+ *      </q-item>
+ *    </div>
+ *  </template>
+ * </entity-search>
+ * ```
  *
  * @category components
  * @vue-prop {String} title - the title to show at the top of the selector
@@ -205,6 +224,7 @@ const onCancel = () => {
         overflow: auto;
       "
     >
+      <slot name="promoted-results" :search-request="searchRequest"></slot>
       <q-tree
         node-key="id"
         :nodes="nodes"

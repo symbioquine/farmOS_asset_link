@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Implement nested relationship attribute filtering
+- Surface navigation for exact route matches above asset search results
 
 ### Fixed
 

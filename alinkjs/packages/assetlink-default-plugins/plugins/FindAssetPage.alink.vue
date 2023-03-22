@@ -42,10 +42,19 @@ const onAssetSelected = async (selectedAssets) => {
     <entity-search
         title="Find Asset"
         entity-type="asset"
+        no-results-label="No matching assets found"
         :search-method="searchMethod"
         :key="searchMethod"
         @changed:search-method="searchMethod => router.replace(`/find/asset/${searchMethod}`)"
         @submit="(assets) => onAssetSelected(assets)"
-        class="col"></entity-search>
+        class="col">
+          <template v-slot:promoted-results="{ searchRequest }">
+            <component
+                v-for="slotDef in assetLink.getSlots({ type: 'asset-search-promoted-result', searchRequest })"
+                :key="slotDef.id"
+                :is="slotDef.component"
+                v-bind="slotDef.props"></component>
+          </template>
+        </entity-search>
   </q-page>
 </template>
