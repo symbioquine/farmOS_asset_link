@@ -117,8 +117,10 @@ import {
   QCardSection,
   QDialog,
   QForm,
+  QIcon,
   QInput,
   QItem,
+  QItemLabel,
   QItemSection,
   QList,
   QMenu,
@@ -197,7 +199,7 @@ PluginCodeEditor.emits = ['save'];
 const UrlPromptDialog = defineComponent((props, { slots, emit, attrs }) => {
   const { dialogRef, onDialogOK, onDialogCancel } = useDialogPluginComponent();
 
-  const url = ref('');
+  const url = ref(props.prefilledValue || '');
   const confirmText = ref('');
 
   return () => h(QDialog, { ref: dialogRef }, () => [
@@ -259,7 +261,7 @@ const UrlPromptDialog = defineComponent((props, { slots, emit, attrs }) => {
     ]),
   ]);
 });
-UrlPromptDialog.props = ['title', 'promptLabel', 'promptHint', 'requiredUrlPathnamePattern', 'requiredUrlPathnameMismatchError', 'warningText'];
+UrlPromptDialog.props = ['title', 'promptLabel', 'promptHint', 'requiredUrlPathnamePattern', 'requiredUrlPathnameMismatchError', 'warningText', 'prefilledValue'];
 
 const PLUGIN_DATA_URL_PREFIX = "data:application/javascript;base64,";
 const PERSISTENT_EDITORS_IDX_KEY = `manage-plugins-persistent-edit-dialogs-index`;
@@ -376,6 +378,42 @@ const closePersistentEditor = async (assetLink, localPluginUrl) => {
   });
 };
 
+const promptForPluginUrl = async (assetLink, prefilledValue) => {
+  const url = await assetLink.ui.dialog.custom(UrlPromptDialog, {
+      title: "Add Plugin",
+      promptLabel: "Plugin URL",
+      promptHint: "What is the url of the plugin to be added?",
+      requiredUrlPathnamePattern: /[^/]+\.alink\.[^/]+$/,
+      requiredUrlPathnameMismatchError: "Plugin URL path must end with '.alink.*'",
+      warningText: "Warning: Installing plugins from untrusted sources could leak or corrupt your farmOS data!",
+      prefilledValue,
+  });
+
+  if (!url) {
+    return;
+  }
+
+  await assetLink.cores.pluginLists.addPluginToLocalList(new URL(url));
+};
+
+const promptForPluginListUrl = async (assetLink, prefilledValue) => {
+  const url = await assetLink.ui.dialog.custom(UrlPromptDialog, {
+      title: "Add Plugin List",
+      promptLabel: "Plugin List URL",
+      promptHint: "What is the url of the plugin list to be added?",
+      requiredUrlPathnamePattern: /[^/]+\.repo\.json$/,
+      requiredUrlPathnameMismatchError: "Plugin list URL path must end with '.repo.json'",
+      warningText: "Warning: Installing untrusted plugin lists could leak or corrupt your farmOS data!",
+      prefilledValue,
+  });
+
+  if (!url) {
+    return;
+  }
+
+  await assetLink.cores.pluginLists.addExtraPluginList(new URL(url));
+};
+
 export default {
   components: {
     PluginCodeEditor,
@@ -395,20 +433,7 @@ export default {
 
   methods: {
     async addPluginFromUrl() {
-      const url = await this.assetLink.ui.dialog.custom(UrlPromptDialog, {
-          title: "Add Plugin",
-          promptLabel: "Plugin URL",
-          promptHint: "What is the url of the plugin to be added?",
-          requiredUrlPathnamePattern: /[^/]+\.alink\.[^/]+$/,
-          requiredUrlPathnameMismatchError: "Plugin URL path must end with '.alink.*'",
-          warningText: "Warning: Installing plugins from untrusted sources could leak or corrupt your farmOS data!",
-      });
-
-      if (!url) {
-        return;
-      }
-
-      await this.assetLink.cores.pluginLists.addPluginToLocalList(new URL(url));
+      await promptForPluginUrl(this.assetLink);
     },
     async reloadPluginByUrl(pluginUrl) {
       await this.assetLink.cores.pluginLoader.reloadPlugin(pluginUrl);
@@ -486,20 +511,7 @@ export default {
       await this.assetLink.cores.pluginLists.removePluginFromLocalBlacklist(pluginUrl);
     },
     async addPluginListFromUrl() {
-      const url = await this.assetLink.ui.dialog.custom(UrlPromptDialog, {
-          title: "Add Plugin List",
-          promptLabel: "Plugin List URL",
-          promptHint: "What is the url of the plugin list to be added?",
-          requiredUrlPathnamePattern: /[^/]+\.repo\.json$/,
-          requiredUrlPathnameMismatchError: "Plugin list URL path must end with '.repo.json'",
-          warningText: "Warning: Installing untrusted plugin lists could leak or corrupt your farmOS data!",
-      });
-
-      if (!url) {
-        return;
-      }
-
-      await this.assetLink.cores.pluginLists.addExtraPluginList(new URL(url));
+      await promptForPluginListUrl(this.assetLink);
     },
     async reloadPluginListByUrl(sourcePluginListUrl) {
       await this.assetLink.cores.pluginLists.reloadPluginList(sourcePluginListUrl);
@@ -630,6 +642,39 @@ export default {
 
         ])
       );
+    });
+
+    handle.defineSlot('net.symbioquine.farmos_asset_link.promoted_search_slot.v0.install_plugins', slot => {
+      slot.type('asset-search-promoted-result');
+
+      slot.showIf(({ searchRequest }) => /^https?:\/\/.*[^/]+(\.alink\.[^/]+|\.repo\.json)/.test(searchRequest?.term || ''));
+
+      const doInstallWorkflow = (url) => {
+        if (url.pathname.endsWith('.repo.json')) {
+          promptForPluginListUrl(assetLink, url.toString());
+        } else {
+          promptForPluginUrl(assetLink, url.toString());
+        }
+      };
+
+      slot.component(({ searchRequest }) => {
+        const url = new URL(searchRequest.term);
+
+        const filename = url.pathname.split('/').pop();
+
+        const icon = url.pathname.endsWith('.repo.json') ? 'mdi-playlist-plus' : 'mdi-link-variant-plus';
+
+        const installSubject = url.pathname.endsWith('.repo.json') ? 'Plugin List' : 'Plugin'
+
+        return h(QItem, { 'clickable': true, onClick: () => doInstallWorkflow(url), class: 'q-ml-lg q-mb-md' }, () => [
+          h(QItemSection, { avatar: true, class: 'q-mr-none' }, () => 
+            h(QIcon, { color: 'primary', name: icon })),
+          h(QItemSection, {}, () => [
+            h(QItemLabel, {}, () => `Install ${installSubject}: ` + filename),
+            h(QItemLabel, { caption: true, lines: 2 }, () => searchRequest.term),
+          ]),
+        ])
+      });
     });
 
   }
