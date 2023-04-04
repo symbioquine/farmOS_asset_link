@@ -123,7 +123,7 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-@orbit_jsonapi.html">@orbit/jsonapi</a></li><li><a href="external-@orbit_memory.html">@orbit/memory</a></li><li><a href="external-localForage.html">localForage</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-URL.html">URL</a></li></ul><h3>Classes</h3><ul><li><a href="external-@orbit_jsonapi.JSONAPISource.html">JSONAPISource</a></li><li><a href="external-@orbit_memory.MemorySource.html">MemorySource</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li><li><a href="IAssetLinkUI.html">IAssetLinkUI</a></li><li><a href="IAssetLinkUIDialogs.html">IAssetLinkUIDialogs</a></li><li><a href="IFarmOSConnectionStatus.html">IFarmOSConnectionStatus</a></li></ul><h3>Global</h3><ul><li><a href="global.html#components">components</a></li><li><a href="global.html#createDevServerConfig">createDevServerConfig</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#EventBus">EventBus</a></li><li><a href="global.html#GenerateDefaultPluginConfigYmlFilesPlugin">GenerateDefaultPluginConfigYmlFilesPlugin</a></li><li><a href="global.html#getDrupalBasePath">getDrupalBasePath</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-EntityName.html">EntityName</a></li><li><a href="module-EntityResolver.html">EntityResolver</a></li><li><a href="module-EntitySearch.html">EntitySearch</a></li><li><a href="module-EntitySelect.html">EntitySelect</a></li><li><a href="module-PhotoInput.html">PhotoInput</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-@orbit_jsonapi.html">@orbit/jsonapi</a></li><li><a href="external-@orbit_memory.html">@orbit/memory</a></li><li><a href="external-localForage.html">localForage</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-URL.html">URL</a></li></ul><h3>Classes</h3><ul><li><a href="external-@orbit_jsonapi.JSONAPISource.html">JSONAPISource</a></li><li><a href="external-@orbit_memory.MemorySource.html">MemorySource</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li><li><a href="IAssetLinkUI.html">IAssetLinkUI</a></li><li><a href="IAssetLinkUIDialogs.html">IAssetLinkUIDialogs</a></li><li><a href="IFarmOSConnectionStatus.html">IFarmOSConnectionStatus</a></li></ul><h3>Global</h3><ul><li><a href="global.html#assetLinkIncludedLibraries">assetLinkIncludedLibraries</a></li><li><a href="global.html#components">components</a></li><li><a href="global.html#createDevServerConfig">createDevServerConfig</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#EventBus">EventBus</a></li><li><a href="global.html#GenerateDefaultPluginConfigYmlFilesPlugin">GenerateDefaultPluginConfigYmlFilesPlugin</a></li><li><a href="global.html#getDrupalBasePath">getDrupalBasePath</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-EntityName.html">EntityName</a></li><li><a href="module-EntityResolver.html">EntityResolver</a></li><li><a href="module-EntitySearch.html">EntitySearch</a></li><li><a href="module-EntitySelect.html">EntitySelect</a></li><li><a href="module-PhotoInput.html">PhotoInput</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
                 
             </nav>
         </div>
@@ -149,6 +149,51 @@ const path = require('path');
 
 
 const SERVE_DEV_HOST = process.env.ASSET_LINK_PLUGIN_SERVING_DEV_HOST || 'http://farmos.test';
+
+/**
+ * Libraries that are available for import in Asset Link plugins.
+ * 
+ * 'buffer/' 6.0.3 - https://www.npmjs.com/package/buffer
+ * 'assetlink-plugin-api' - https://symbioquine.github.io/farmOS_asset_link/global.html
+ * 'vue' 3.0.0 - https://vuejs.org/api/
+ * 'vue-router' 4.0.0 - https://router.vuejs.org/api/
+ * 'quasar' 2.6.0 - https://quasar.dev/docs
+ * 'ngeohash' 0.6.3 - https://www.npmjs.com/package/ngeohash
+ * 'haversine-distance' 1.2.1 - https://www.npmjs.com/package/haversine-distance
+ * 'jmespath' 0.16.0 - https://www.npmjs.com/package/jmespath
+ * 'micromustache' 8.0.3 - https://www.npmjs.com/package/micromustache
+ * 
+ * ### Usage in webpack.config.js
+ * 
+ * ```js
+ * const { assetLinkIncludedLibraries } = require('assetlink-plugin-dev-support');
+ * 
+ * module.exports = {
+ *   ...
+ *   externals: {
+ *     ...assetLinkIncludedLibraries,
+ *   }
+ * };
+ * ```
+ * 
+ * ### Usage in Plugins
+ *
+ * ```js
+ * import { h } from 'vue';
+ * import { QBtn } from 'quasar';
+ * ```
+ */
+module.exports.assetLinkIncludedLibraries = {
+  'buffer/': 'buffer/',
+  'assetlink-plugin-api': 'assetlink-plugin-api',
+  'vue': 'vue',
+  'vue-router': 'vue-router',
+  'quasar': 'quasar',
+  'ngeohash': 'ngeohash',
+  'haversine-distance': 'haversine-distance',
+  'jmespath': 'jmespath',
+  'micromustache': 'micromustache',
+}
 
 /**
  * Custom Webpack plugin to generate configuration entity yml files for each of our included
@@ -181,7 +226,7 @@ function GenerateDefaultPluginConfigYmlFilesPlugin(options) {
   }
 
   GenerateDefaultPluginConfigYmlFilesPlugin.prototype.apply = (compiler) => {
-    compiler.hooks.beforeCompile.tap('GenerateDefaultPluginConfigYmlFilesPlugin', (compilation) => {
+    compiler.hooks.afterEmit.tap('GenerateDefaultPluginConfigYmlFilesPlugin', (compilation) => {
 
       const configOutputDir = options.configOutputDir || `${options.pluginDir}/config/install`;
 
@@ -244,7 +289,8 @@ const createDevServerConfig = (options) => {
   let serverPort;
 
   let serverConfig = {
-    hot: true,
+    hot: false,
+    liveReload: false,
     webSocketServer: 'ws',
     allowedHosts: "all",
     setupMiddlewares: function (middlewares, devServer) {
@@ -252,7 +298,12 @@ const createDevServerConfig = (options) => {
         throw new Error('webpack-dev-server is not defined');
       }
 
-      const getPluginFilenames = () => fs.readdirSync(`${options.pluginDir}/`).filter(filename => filename.indexOf('.alink.') !== -1);
+      const compiledPlugins = {};
+
+      const getPluginFilenames = () => Array.from(new Set([
+        ...Object.keys(compiledPlugins),
+        ...fs.readdirSync(`${options.pluginDir}/`).filter(filename => filename.indexOf('.alink.') !== -1),
+      ])).filter(filename => !filename.endsWith('LICENSE.txt'));
 
       devServer.app.get('/plugins.repo.json', (_, res) => {
         const repo = {};
@@ -281,6 +332,11 @@ const createDevServerConfig = (options) => {
           ...serverConfig.headers,
         });
 
+        if (Object.hasOwn(compiledPlugins, req.params.pluginFilename)) {
+          res.send(compiledPlugins[req.params.pluginFilename]);
+          return;
+        }
+
         res.send(fs.readFileSync(`${options.pluginDir}/${pluginMatch}`));
       };
 
@@ -308,6 +364,20 @@ const createDevServerConfig = (options) => {
 
           devServer.sendMessage(devServer.webSocketServer.clients, eventToSend, pluginUrl);
         });
+
+      devServer.compiler.hooks.assetEmitted.tap('ServeCompiledPlugins',
+        (fileName, { content, source, outputPath, compilation, targetPath }) => {
+          if (fileName.includes('hot-update') || fileName.endsWith('LICENSE.txt')) {
+            return;
+          }
+
+          compiledPlugins[fileName] = content;
+
+          const pluginUrl = `${targetUrl.protocol}//${devHost}:${serverPort}/plugins/${fileName}`;
+
+          devServer.sendMessage(devServer.webSocketServer.clients, 'asset-link-plugin-changed', pluginUrl);
+        }
+      );
 
       return middlewares;
     },
