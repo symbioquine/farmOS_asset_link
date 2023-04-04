@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Surface option to install plugin and plugin list urls above asset search results
 - Add support for built Asset Link plugins in assetlink-plugin-dev-support
 
+### Changed
+
+- Change to new utf-8 compatible data url encoding format for storing plugins
+
 ### Fixed
 
 - Fix a bug with nested AND/OR query groups not being added as memberOf eachother

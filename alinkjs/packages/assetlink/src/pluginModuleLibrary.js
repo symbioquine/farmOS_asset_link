@@ -6,8 +6,11 @@ import ngeohash from 'ngeohash';
 import haversineDistance from 'haversine-distance';
 import jmespath from 'jmespath';
 import * as micromustache from 'micromustache';
+import * as Buffer from 'buffer/';
 
 const libraries = {
+  'buffer/': Buffer,
+
   'assetlink-plugin-api': AssetlinkPluginApi,
   vue: Vue,
   'vue-router': VueRouter,

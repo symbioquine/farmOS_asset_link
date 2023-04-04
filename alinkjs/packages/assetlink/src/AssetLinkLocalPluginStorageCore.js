@@ -1,4 +1,9 @@
+import { Buffer } from 'buffer/';
+
 import { currentEpochSecond, EventBus } from "assetlink-plugin-api";
+
+const OLD_PLUGIN_DATA_URL_PREFIX = "data:application/javascript;base64,";
+const PLUGIN_DATA_URL_PREFIX = "data:application/octet-stream;base64,";
 
 export default class AssetLinkLocalPluginStorageCore {
 
@@ -35,6 +40,17 @@ export default class AssetLinkLocalPluginStorageCore {
       throw new Error(`Missing local plugin data for: ${url.toString()}`);
     }
 
+    // Rewrite old data urls into new binary compatible format
+    if (storeItem.value.startsWith(OLD_PLUGIN_DATA_URL_PREFIX)) {
+      const rawPluginSource = Buffer.from(storeItem.value.substring(OLD_PLUGIN_DATA_URL_PREFIX.length), 'base64');
+
+      const updatedPluginDataUrl = PLUGIN_DATA_URL_PREFIX + rawPluginSource.toString('base64');
+
+      await this._store.setItem(storeKey, {key: storeKey, timestamp: storeItem.timestamp, value: updatedPluginDataUrl});
+
+      return updatedPluginDataUrl;
+    }
+
     return storeItem.value;
   }
 
@@ -47,7 +63,7 @@ export default class AssetLinkLocalPluginStorageCore {
 
     const timestamp = currentEpochSecond();
 
-    const pluginDataUrl = "data:application/javascript;base64," + btoa(pluginSrc);
+    const pluginDataUrl = PLUGIN_DATA_URL_PREFIX + Buffer.from(pluginSrc, 'utf8').toString('base64');
 
     await this._store.setItem(storeKey, {key: storeKey, timestamp, value: pluginDataUrl});
 

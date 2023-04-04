@@ -1,3 +1,5 @@
+import { Buffer } from 'buffer/';
+
 import { markRaw, reactive } from 'vue';
 
 import { loadModule } from 'vue3-sfc-loader/dist/vue3-sfc-loader.esm.js';
@@ -8,9 +10,11 @@ import fetch from 'cross-fetch';
 import VuePluginShorthandDecorator from '@/VuePluginShorthandDecorator';
 import { default as pluginModuleLibrary, pluginModuleLibraryNames } from '@/pluginModuleLibrary';
 
-import { createDrupalUrl, currentEpochSecond, EventBus, uuidv4 } from "assetlink-plugin-api";
+import { currentEpochSecond, EventBus, uuidv4 } from "assetlink-plugin-api";
 
-const PLUGIN_DATA_URL_PREFIX = "data:application/javascript;base64,";
+const OLD_PLUGIN_DATA_URL_PREFIX = "data:application/javascript;base64,";
+const PLUGIN_DATA_URL_PREFIX = "data:application/octet-stream;base64,";
+
 
 export default class AssetLinkPluginLoaderCore {
 
@@ -77,7 +81,7 @@ export default class AssetLinkPluginLoaderCore {
         throw new Error(`Fetched plugin data must start with: '${PLUGIN_DATA_URL_PREFIX}'`);
       }
 
-      rawPluginSource = atob(pluginData.substring(PLUGIN_DATA_URL_PREFIX.length));
+      rawPluginSource = Buffer.from(pluginData.substring(PLUGIN_DATA_URL_PREFIX.length), 'base64').toString('utf8');
 
       let pluginDecorator = p => p;
 
@@ -276,6 +280,18 @@ export default class AssetLinkPluginLoaderCore {
     if (!skipCache && cacheItem
         // Cache for at least 15 minutes and until we have a network connection
         && ((timestamp - cacheItem.timestamp) < 900 || !this._connectionStatus.hasNetworkConnection.value)) {
+
+      // Rewrite old data urls into new binary compatible format
+      if (cacheItem.value.startsWith(OLD_PLUGIN_DATA_URL_PREFIX)) {
+        const rawPluginSource = Buffer.from(cacheItem.value.substring(OLD_PLUGIN_DATA_URL_PREFIX.length), 'base64');
+
+        const updatedPluginDataUrl = PLUGIN_DATA_URL_PREFIX + rawPluginSource.toString('base64');
+
+        await this._store.setItem(cacheKey, {key: cacheKey, timestamp: cacheItem.timestamp, value: updatedPluginDataUrl});
+
+        return updatedPluginDataUrl;
+      }
+
       return cacheItem.value;
     }
 
@@ -291,9 +307,9 @@ export default class AssetLinkPluginLoaderCore {
       throw new Error(`HTTP Error ${pluginSrcRes.status}: ${pluginSrcRes.statusText}`);
     }
 
-    const pluginSrc = await pluginSrcRes.text();
+    const pluginSrc = await pluginSrcRes.blob();
 
-    const pluginDataUrl = PLUGIN_DATA_URL_PREFIX + btoa(pluginSrc);
+    const pluginDataUrl = PLUGIN_DATA_URL_PREFIX + Buffer.from(await pluginSrc.arrayBuffer()).toString('base64');
 
     await this._store.setItem(cacheKey, {key: cacheKey, timestamp, value: pluginDataUrl});
 

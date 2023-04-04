@@ -108,6 +108,8 @@
 </template>
 
 <script>
+import { Buffer } from 'buffer/';
+
 import { defineComponent, h, ref, onMounted, onUnmounted } from 'vue';
 import {
   QBadge,
@@ -263,7 +265,8 @@ const UrlPromptDialog = defineComponent((props, { slots, emit, attrs }) => {
 });
 UrlPromptDialog.props = ['title', 'promptLabel', 'promptHint', 'requiredUrlPathnamePattern', 'requiredUrlPathnameMismatchError', 'warningText', 'prefilledValue'];
 
-const PLUGIN_DATA_URL_PREFIX = "data:application/javascript;base64,";
+const OLD_PLUGIN_DATA_URL_PREFIX = "data:application/javascript;base64,";
+const PLUGIN_DATA_URL_PREFIX = "data:application/octet-stream;base64,";
 const PERSISTENT_EDITORS_IDX_KEY = `manage-plugins-persistent-edit-dialogs-index`;
 const PERSISTENT_EDITOR_KEY_PREFIX = `manage-plugins-persistent-edit-dialog:`;
 
@@ -310,19 +313,28 @@ const openPersistentEditor = async (assetLink, localPluginUrl, initialCodeMimety
 
   let code = initialCode;
   if (isNewEditor) {
-    const pluginDataUrl = PLUGIN_DATA_URL_PREFIX + btoa(initialCode);
+    const pluginDataUrl = PLUGIN_DATA_URL_PREFIX + Buffer.from(initialCode, 'utf8').toString('base64');
 
     await assetLink.store.setItem(editorDataKey, { pluginDataUrl });
   } else {
     const storedState = await assetLink.store.getItem(editorDataKey);
     if (storedState) {
+      // Rewrite old data urls into new binary compatible format
+      if (storedState.pluginDataUrl.startsWith(OLD_PLUGIN_DATA_URL_PREFIX)) {
+        const rawPluginSource = Buffer.from(storedState.pluginDataUrl.substring(OLD_PLUGIN_DATA_URL_PREFIX.length), 'base64');
+
+        storedState.pluginDataUrl = PLUGIN_DATA_URL_PREFIX + rawPluginSource.toString('base64');
+
+        await assetLink.store.setItem(editorDataKey, storedState);
+      }
+
       const pluginDataUrl = storedState.pluginDataUrl;
 
       if (!pluginDataUrl.startsWith(PLUGIN_DATA_URL_PREFIX)) {
         throw new Error(`Persistent editor plugin data url must start with: '${PLUGIN_DATA_URL_PREFIX}'`);
       }
 
-      code = atob(pluginDataUrl.substring(PLUGIN_DATA_URL_PREFIX.length));
+      code = Buffer.from(pluginDataUrl.substring(PLUGIN_DATA_URL_PREFIX.length), 'base64').toString('utf8');
     }
   }
 
@@ -339,7 +351,7 @@ const openPersistentEditor = async (assetLink, localPluginUrl, initialCodeMimety
       });
     }
 
-    const updatedPluginDataUrl = PLUGIN_DATA_URL_PREFIX + btoa(codeToSave);
+    const updatedPluginDataUrl = PLUGIN_DATA_URL_PREFIX + Buffer.from(codeToSave, 'utf8').toString('base64');
 
     await assetLink.store.setItem(editorDataKey, { pluginDataUrl: updatedPluginDataUrl });
 
