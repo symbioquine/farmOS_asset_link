@@ -9,7 +9,7 @@ PWA experience.
 
 ## Installation
 
-**Warning: *Asset Link is pre-alpha software at this point. Please consider it highly experimental and don't use it for anything critical.***
+**Warning: *Asset Link is alpha software at this point. Please consider it highly experimental and don't use it for anything critical.***
 
 Use Composer and Drush to install farmOS_asset_link in farmOS 2.x;
 

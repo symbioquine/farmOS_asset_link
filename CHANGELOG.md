@@ -7,12 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha8] - 2023-04-04
+
+### Fixed
+
+- Fix some lint build errors
+
+## [1.0.0-alpha7] - 2023-04-04
+
+### Added
+
+- Implement nested relationship attribute filtering
+- Surface navigation for exact route matches above asset search results
+- Surface option to install plugin and plugin list urls above asset search results
+- Add support for built Asset Link plugins in assetlink-plugin-dev-support
+
+### Changed
+
+- Change to new utf-8 compatible data url encoding format for storing plugins
+
+### Fixed
+
+- Fix a bug with nested AND/OR query groups not being added as memberOf eachother
+- Fix a bug with the UrlBasedAssetSearcher plugin
+
 ## [1.0.0-alpha6] - 2023-03-17
 
 ### Added
 
 - Add menu action slots to manage plugins page
 - Add a share menu action for exporting Asset Link plugins
+- Add an installation and upgrades section to the docs
 
 ### Changed
 
@@ -548,7 +573,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha6...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha8...HEAD
+[1.0.0-alpha8]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha7...unbuilt-v1.0.0-alpha8
+[1.0.0-alpha7]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha6...unbuilt-v1.0.0-alpha7
 [1.0.0-alpha6]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha5...unbuilt-v1.0.0-alpha6
 [1.0.0-alpha5]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha4...unbuilt-v1.0.0-alpha5
 [1.0.0-alpha4]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha3...unbuilt-v1.0.0-alpha4
