@@ -9,6 +9,51 @@ const path = require('path');
 const SERVE_DEV_HOST = process.env.ASSET_LINK_PLUGIN_SERVING_DEV_HOST || 'http://farmos.test';
 
 /**
+ * Libraries that are available for import in Asset Link plugins.
+ * 
+ * 'buffer/' 6.0.3 - https://www.npmjs.com/package/buffer
+ * 'assetlink-plugin-api' - https://symbioquine.github.io/farmOS_asset_link/global.html
+ * 'vue' 3.0.0 - https://vuejs.org/api/
+ * 'vue-router' 4.0.0 - https://router.vuejs.org/api/
+ * 'quasar' 2.6.0 - https://quasar.dev/docs
+ * 'ngeohash' 0.6.3 - https://www.npmjs.com/package/ngeohash
+ * 'haversine-distance' 1.2.1 - https://www.npmjs.com/package/haversine-distance
+ * 'jmespath' 0.16.0 - https://www.npmjs.com/package/jmespath
+ * 'micromustache' 8.0.3 - https://www.npmjs.com/package/micromustache
+ * 
+ * ### Usage in webpack.config.js
+ * 
+ * ```js
+ * const { assetLinkIncludedLibraries } = require('assetlink-plugin-dev-support');
+ * 
+ * module.exports = {
+ *   ...
+ *   externals: {
+ *     ...assetLinkIncludedLibraries,
+ *   }
+ * };
+ * ```
+ * 
+ * ### Usage in Plugins
+ *
+ * ```js
+ * import { h } from 'vue';
+ * import { QBtn } from 'quasar';
+ * ```
+ */
+module.exports.assetLinkIncludedLibraries = {
+  'buffer/': 'buffer/',
+  'assetlink-plugin-api': 'assetlink-plugin-api',
+  'vue': 'vue',
+  'vue-router': 'vue-router',
+  'quasar': 'quasar',
+  'ngeohash': 'ngeohash',
+  'haversine-distance': 'haversine-distance',
+  'jmespath': 'jmespath',
+  'micromustache': 'micromustache',
+}
+
+/**
  * Custom Webpack plugin to generate configuration entity yml files for each of our included
  * Asset Link plugins.
  * 
@@ -39,7 +84,7 @@ function GenerateDefaultPluginConfigYmlFilesPlugin(options) {
   }
 
   GenerateDefaultPluginConfigYmlFilesPlugin.prototype.apply = (compiler) => {
-    compiler.hooks.beforeCompile.tap('GenerateDefaultPluginConfigYmlFilesPlugin', (compilation) => {
+    compiler.hooks.afterEmit.tap('GenerateDefaultPluginConfigYmlFilesPlugin', (compilation) => {
 
       const configOutputDir = options.configOutputDir || `${options.pluginDir}/config/install`;
 
@@ -102,7 +147,8 @@ const createDevServerConfig = (options) => {
   let serverPort;
 
   let serverConfig = {
-    hot: true,
+    hot: false,
+    liveReload: false,
     webSocketServer: 'ws',
     allowedHosts: "all",
     setupMiddlewares: function (middlewares, devServer) {
@@ -110,7 +156,12 @@ const createDevServerConfig = (options) => {
         throw new Error('webpack-dev-server is not defined');
       }
 
-      const getPluginFilenames = () => fs.readdirSync(`${options.pluginDir}/`).filter(filename => filename.indexOf('.alink.') !== -1);
+      const compiledPlugins = {};
+
+      const getPluginFilenames = () => Array.from(new Set([
+        ...Object.keys(compiledPlugins),
+        ...fs.readdirSync(`${options.pluginDir}/`).filter(filename => filename.indexOf('.alink.') !== -1),
+      ])).filter(filename => !filename.endsWith('LICENSE.txt'));
 
       devServer.app.get('/plugins.repo.json', (_, res) => {
         const repo = {};
@@ -139,6 +190,11 @@ const createDevServerConfig = (options) => {
           ...serverConfig.headers,
         });
 
+        if (Object.hasOwn(compiledPlugins, req.params.pluginFilename)) {
+          res.send(compiledPlugins[req.params.pluginFilename]);
+          return;
+        }
+
         res.send(fs.readFileSync(`${options.pluginDir}/${pluginMatch}`));
       };
 
@@ -166,6 +222,20 @@ const createDevServerConfig = (options) => {
 
           devServer.sendMessage(devServer.webSocketServer.clients, eventToSend, pluginUrl);
         });
+
+      devServer.compiler.hooks.assetEmitted.tap('ServeCompiledPlugins',
+        (fileName, { content, source, outputPath, compilation, targetPath }) => {
+          if (fileName.includes('hot-update') || fileName.endsWith('LICENSE.txt')) {
+            return;
+          }
+
+          compiledPlugins[fileName] = content;
+
+          const pluginUrl = `${targetUrl.protocol}//${devHost}:${serverPort}/plugins/${fileName}`;
+
+          devServer.sendMessage(devServer.webSocketServer.clients, 'asset-link-plugin-changed', pluginUrl);
+        }
+      );
 
       return middlewares;
     },

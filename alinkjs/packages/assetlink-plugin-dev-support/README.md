@@ -2,7 +2,7 @@ Welcome to the documentation for Asset Link's Plugin Dev Support package!
 
 ## Usage
 
-```sh
+```shell
 mkdir example_alink_plugins && cd example_alink_plugins
 npm init -y
 npm install --save-dev assetlink-plugin-dev-support webpack webpack-cli webpack-dev-server
@@ -72,13 +72,13 @@ dependencies:
 
 ### Build Config Yaml Files
 
-```sh
+```shell
 npm run build
 ```
 
 ### Serve Plugins for Development
 
-```sh
+```shell
 npm run serve
 ```
 
@@ -86,7 +86,7 @@ By default this will serve the plugins using a free port at `http://farmos.test`
 
 Alternatively, you can just use localhost by exporting the following environment variable;
 
-```sh
+```shell
 export ASSET_LINK_PLUGIN_SERVING_DEV_HOST="http://localhost"
 ```
 
@@ -102,7 +102,7 @@ Also a plugin list is served at `/plugins.repo.json` (e.g. `"http://farmos.test:
 
 To enable HTTPS the following steps are needed;
 
-```sh
+```shell
 mkdir -p ./devcerts/mydomain.farmos.test/
 cp /path/to/my/dev/server/rootCA.pem ./devcerts/rootCA.pem
 cp /path/to/my/dev/server/privkey.pem ./devcerts/mydomain.farmos.test/privkey.pem
@@ -118,3 +118,129 @@ Check out [mkcert](https://github.com/FiloSottile/mkcert) as a convenient tool f
 ## Example package
 
 See https://github.com/symbioquine/example-assetlink-plugin-pkg
+
+## Plugins that require a (Webpack) build step
+
+For a plugin to include modules that don't come with Asset Link, a Webpack build step may be required.
+
+First we would create the new plugin in a `src` directory;
+
+```shell
+mkdir ./src
+edit ./src/ExampleChartPage.alink.js
+```
+
+**src/ExampleChartPage.alink.js**
+
+```javascript
+import { h } from 'vue';
+import {
+  Chart as ChartJS,
+  Colors,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Legend
+} from 'chart.js'
+
+ChartJS.register(
+  Colors,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Legend
+);
+
+import {
+  Bar as BarChart
+} from 'vue-chartjs'
+
+export default class ExampleChartPage {
+  static onLoad(handle, assetLink) {
+
+    handle.defineRoute('com.example.farmos_asset_link.routes.v0.example_chart_page', route => {
+      route.path('/example-chart-page');
+
+      const data = [
+          { year: 2010, count: 10 },
+          { year: 2011, count: 20 },
+          { year: 2012, count: 15 },
+          { year: 2013, count: 25 },
+          { year: 2014, count: 22 },
+          { year: 2015, count: 30 },
+          { year: 2016, count: 28 },
+      ];
+
+      route.component(async () => h(BarChart, {
+        data: {
+          labels: data.map(row => row.year),
+          datasets: [
+            {
+              label: 'Acquisitions by year',
+              data: data.map(row => row.count)
+            }
+          ]
+        }
+      }));
+    });
+
+  }
+}
+
+```
+
+Add our dependencies;
+
+```shell
+npm install chart.js vue-chartjs
+```
+
+Finally, our webpack.config.js gets a bit more complicated than the earlier example;
+
+```diff
+--- a/./webpack.config.js
++++ b/./webpack.config.js
+@@ -1,17 +1,42 @@
+-const { GenerateDefaultPluginConfigYmlFilesPlugin, createDevServerConfig } = require('assetlink-plugin-dev-support');
++const {
++  assetLinkIncludedLibraries,
++  GenerateDefaultPluginConfigYmlFilesPlugin,
++  createDevServerConfig
++} = require('assetlink-plugin-dev-support');
+ 
+ module.exports = {
+-  // We have no entry since this package just contains uncompiled plugins
+-  entry: {},
++  entry: {
++    // Add an entry here for each plugin in the `src` directory that needs building
++    'ExampleChartPage.alink.js': './src/ExampleChartPage.alink.js',
++  },
+   output: {
+-    // Use the current directory to prevent a 'dist/' folder from being created there should be no output, otherwise
++    // Output the built plugins in the current directory - alongside any unbuilt plugins
+     path: __dirname,
++    // Use just the entry name as our output plugin name
++    filename: '[name]',
++    // Make our built plugin code use module import/exports
++    library: { type: 'commonjs-module' },
++    // Required, but don't worry about it (For nerds: with the default `publicPath: "auto"` Webpack
++    // outputs code that doesn't work in our Asset Link browser environment - similar to this issue:
++    // https://github.com/angular-architects/module-federation-plugin/issues/96)
++    publicPath: '/',
+   },
++  // This can be changed to 'production' - see https://webpack.js.org/configuration/mode/
+   mode: 'development',
++
++  // Output a module and don't try and bundle things like `vue` that are provided by Asset Link
++  experiments: {
++    outputModule: true,
++  },
++  externalsType: 'module',
++  externals: {
++    ...assetLinkIncludedLibraries,
++  },
+```
+
+## Example package with Built Plugin
+
+See https://github.com/symbioquine/example-assetlink-built-plugin-pkg
