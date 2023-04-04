@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha7] - 2023-04-04
+
 ### Added
 
 - Implement nested relationship attribute filtering
@@ -565,7 +567,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha6...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha7...HEAD
+[1.0.0-alpha7]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha6...unbuilt-v1.0.0-alpha7
 [1.0.0-alpha6]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha5...unbuilt-v1.0.0-alpha6
 [1.0.0-alpha5]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha4...unbuilt-v1.0.0-alpha5
 [1.0.0-alpha4]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha3...unbuilt-v1.0.0-alpha4
