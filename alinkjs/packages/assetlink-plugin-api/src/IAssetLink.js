@@ -97,7 +97,10 @@ IAssetLink.prototype.getTaxonomyVocabularies = async function () {};
  * @param {String} termType The type of taxonomy term to get. e.g. `taxonomy_term--animal_type`
  * @param {String} termName The name of the taxonomy term to be retrieved.
  */
-IAssetLink.prototype.getTaxonomyTermByName = async function (termType, termName) {};
+IAssetLink.prototype.getTaxonomyTermByName = async function (
+  termType,
+  termName
+) {};
 
 /**
  * @typedef GetOrCreateTaxonomyTermByNameOptions
@@ -117,13 +120,13 @@ IAssetLink.prototype.getTaxonomyTermByName = async function (termType, termName)
 
 /**
  * Get or create a taxonomy term by type and name.
- * 
+ *
  * Note that it is often preferable to use the '$relateByName' directive instead of explicitly getting
  * or creating taxonomy terms because it reduces the likelihood of duplicate terms from multiple users
  * working simultaneously offline. See the [Farm Data Access tutorial](./tutorial-farm-data-access.html#directive-%24relatebyname) for
  * more about that directive.
- * 
-  * ##### Usage
+ *
+ * ##### Usage
  *
  * ```js
  * const term = await assetLink.getOrCreateTaxonomyTermByName('taxonomy_term--plant_type', 'Beans');
@@ -134,7 +137,11 @@ IAssetLink.prototype.getTaxonomyTermByName = async function (termType, termName)
  * @param {String} termName The name of the taxonomy term to be retrieved or created.
  * @param {GetOrCreateTaxonomyTermByNameOptions} options An object with options.
  */
-IAssetLink.prototype.getOrCreateTaxonomyTermByName = async function (termType, termName, options) {};
+IAssetLink.prototype.getOrCreateTaxonomyTermByName = async function (
+  termType,
+  termName,
+  options
+) {};
 
 /**
  * Central entity searching entry-point. Responsible for delegating to entity searching plugins.

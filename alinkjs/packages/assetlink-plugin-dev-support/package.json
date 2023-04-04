@@ -1,6 +1,6 @@
 {
   "name": "assetlink-plugin-dev-support",
-  "version": "1.0.0-alpha7",
+  "version": "1.0.0-alpha8",
   "description": "Provides build and development support for Asset Link plugins",
   "main": "src/index.js",
   "scripts": {},

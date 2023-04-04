@@ -11,7 +11,7 @@
  *   &commat;submit="(assets) => onAssetSelected(assets)"
  * ></entity-search>
  * ```
- * 
+ *
  * With promoted results;
  *
  * ```js
