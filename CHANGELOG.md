@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add documentation about how to build .vue plugins via Webpack
+
 ## [1.0.0-alpha8] - 2023-04-04
 
 ### Fixed

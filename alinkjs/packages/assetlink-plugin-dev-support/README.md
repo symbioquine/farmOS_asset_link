@@ -244,3 +244,145 @@ Finally, our webpack.config.js gets a bit more complicated than the earlier exam
 ## Example package with Built Plugin
 
 See https://github.com/symbioquine/example-assetlink-built-plugin-pkg
+
+## Vue SFC Plugins that require a (Webpack) build step
+
+If we want to write `.alink.vue` plugins that need a build step to include other modules, we can do that too.
+
+From the previous example we can rename our `ExampleChartPage.alink.js` to `ExampleChartPage.alink.vue` and make a few changes;
+
+```shell
+mv ./src/ExampleChartPage.alink.js ./src/ExampleChartPage.alink.vue
+edit ./src/ExampleChartPage.alink.vue
+```
+
+The new **ExampleChartPage.alink.vue** file;
+
+```vue
+<script setup>
+import {
+  Chart as ChartJS,
+  Colors,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Legend
+} from 'chart.js'
+
+ChartJS.register(
+  Colors,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Legend
+);
+
+import {
+  Bar as BarChart
+} from 'vue-chartjs'
+
+const data = [
+  { year: 2010, count: 10 },
+  { year: 2011, count: 20 },
+  { year: 2012, count: 15 },
+  { year: 2013, count: 25 },
+  { year: 2014, count: 22 },
+  { year: 2015, count: 30 },
+  { year: 2016, count: 28 },
+];
+
+const chartData = {
+  labels: data.map(row => row.year),
+  datasets: [
+    {
+      label: 'Acquisitions by year',
+      data: data.map(row => row.count)
+    }
+  ]
+};
+</script>
+
+<template>
+  <bar-chart :data="chartData"></bar-chart>
+</template>
+
+<script>
+export default {
+  onLoad(handle, assetLink) {
+    handle.defineRoute('com.example.farmos_asset_link.routes.v0.example_chart_page', route => {
+      route.path('/example-chart-page');
+      route.component(handle.thisPlugin);
+    });
+  }
+}
+</script>
+
+<style scoped>
+/* This style block isn't required, just included as an example to show that the scoped styling works */
+canvas {
+  border: solid black 10px;
+}
+</style>
+
+```
+
+Add our dependencies;
+
+```shell
+npm install -D vue-loader vue-style-loader css-loader
+```
+
+Update **webpack.config.js**;
+
+```diff
+--- a/./webpack.config.js
++++ b/./webpack.config.js
+@@ -1,3 +1,5 @@
++const { VueLoaderPlugin } = require("vue-loader");
++
+ const {
+   assetLinkIncludedLibraries,
+   GenerateDefaultPluginConfigYmlFilesPlugin,
+@@ -7,7 +9,8 @@ const {
+ module.exports = {
+   entry: {
+     // Add an entry here for each plugin in the `src` directory that needs building
+-    'ExampleChartPage.alink.js': './src/ExampleChartPage.alink.js',
++    'ExampleSimplePage.alink.js': './src/ExampleSimplePage.alink.vue',
++    'ExampleChartPage.alink.js': './src/ExampleChartPage.alink.vue',
+   },
+   output: {
+     // Output the built plugins in the current directory - alongside any unbuilt plugins
+@@ -33,7 +36,27 @@ module.exports = {
+     ...assetLinkIncludedLibraries,
+   },
+ 
++  module: {
++    rules: [
++      {
++        test: /\.vue$/i,
++        exclude: /(node_modules)/,
++        use: {
++          loader: "vue-loader",
++        },
++      },
++      {
++        test: /\.css$/,
++        use: [
++          { loader: "vue-style-loader" },
++          { loader: "css-loader" },
++        ],
++      },
++    ]
++  },
++
+   plugins: [
++    new VueLoaderPlugin(),
+     new GenerateDefaultPluginConfigYmlFilesPlugin({
+       pluginDir: __dirname,
+       drupalModuleName: 'example_built_vue_alink_plugins',
+```
+
+## Example package with Built Vue SFC Plugins
+
+See https://github.com/symbioquine/example-assetlink-built-vue-plugin-pkg
