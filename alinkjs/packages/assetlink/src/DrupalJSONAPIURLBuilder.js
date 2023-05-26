@@ -88,11 +88,16 @@ export default class DrupalJSONAPIURLBuilder extends JSONAPIURLBuilder {
         let filter = {
           path: resourceAttribute,
           operator: attributeFilter.op,
-          value: attributeFilter.value
         };
+
+        if (!['IS NULL', 'IS NOT NULL'].includes(attributeFilter.op)) {
+          filter.value = attributeFilter.value;
+        }
 
         if (memberOf) {
           filter.memberOf = memberOf;
+          filter = { condition: filter };
+        } else if (['IS NULL', 'IS NOT NULL'].includes(attributeFilter.op)) {
           filter = { condition: filter };
         }
 
