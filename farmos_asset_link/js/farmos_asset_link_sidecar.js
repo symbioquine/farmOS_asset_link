@@ -28,7 +28,11 @@
 
   const json = await data.json();
 
-  const requiredJsFiles = json.entrypoints?.app?.assets?.js || [];
+  if (!json.entrypoints || !json.entrypoints.app || !json.entrypoints.app.assets || !json.entrypoints.app.assets.js) {
+    return;
+  }
+
+  const requiredJsFiles = json.entrypoints.app.assets.js || [];
 
   for (const requiredJsFile of requiredJsFiles) {
     console.log("Importing sidecar...", requiredJsFile);
