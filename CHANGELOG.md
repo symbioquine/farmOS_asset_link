@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix bug with sidecar UI breaking certain mobile clicks in farmOS - #42
 - Improve compatibility with old versions of Safari avoiding elvis operator in Sidecar bootstrapping code
+- Fix edge case bug with computing location relationships
 
 ## [1.0.0-alpha8] - 2023-04-04
 

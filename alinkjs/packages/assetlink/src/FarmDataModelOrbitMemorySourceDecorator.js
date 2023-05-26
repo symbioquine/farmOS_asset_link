@@ -331,6 +331,8 @@ export default class FarmDataModelOrbitMemorySourceDecorator {
       // Query the cache here because _getLatestMovementLog includes the location from the remote source
       const locations = await this.cache.query(q => q.findRelatedRecords({ type: latestMovementLog.type, id: latestMovementLog.id }, 'location')) || [];
 
+      asset.relationships = asset.relationships || {};
+      asset.relationships.location = asset.relationships.location || {};
       asset.relationships.location.data = locations.map(l => ({ type: l.type, id: l.id }));
     }
 
