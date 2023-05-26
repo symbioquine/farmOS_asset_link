@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add documentation about how to build .vue plugins via Webpack
 
+### Fixed
+
+- Fix bug with sidecar UI breaking certain mobile clicks in farmOS - #42
+
 ## [1.0.0-alpha8] - 2023-04-04
 
 ### Fixed
