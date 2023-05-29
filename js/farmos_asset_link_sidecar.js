@@ -16,7 +16,7 @@
   const container = document.createElement('div');
   container.className = "quasar-style-wrap";
   container.setAttribute('data-quasar', '');
-  container.style = "width: 1vw; height: 1vh; position: fixed; top: 0px; left: 0px;";
+  container.style = "width: 1vw; height: 1vh; position: fixed; top: 0px; left: -100px;";
   document.body.appendChild(container);
 
   const sidebar = document.createElement('div');
@@ -28,7 +28,11 @@
 
   const json = await data.json();
 
-  const requiredJsFiles = json.entrypoints?.app?.assets?.js || [];
+  if (!json.entrypoints || !json.entrypoints.app || !json.entrypoints.app.assets || !json.entrypoints.app.assets.js) {
+    return;
+  }
+
+  const requiredJsFiles = json.entrypoints.app.assets.js || [];
 
   for (const requiredJsFile of requiredJsFiles) {
     console.log("Importing sidecar...", requiredJsFile);

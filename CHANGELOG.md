@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha9] - 2023-05-29
+
+### Added
+
+- Add documentation about how to build .vue plugins via Webpack
+
+### Fixed
+
+- Fix bug with sidecar UI breaking certain mobile clicks in farmOS - #42
+- Improve compatibility with old versions of Safari avoiding elvis operator in Sidecar bootstrapping code
+- Fix edge case bug with computing location relationships
+- Fix URL building with 'IS NULL' and 'IS NOT NULL' operators for remote queries
+- Improve responsiveness of searching and opening assets within Asset Link
+
 ## [1.0.0-alpha8] - 2023-04-04
 
 ### Fixed
@@ -573,7 +587,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha8...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha9...HEAD
+[1.0.0-alpha9]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha8...unbuilt-v1.0.0-alpha9
 [1.0.0-alpha8]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha7...unbuilt-v1.0.0-alpha8
 [1.0.0-alpha7]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha6...unbuilt-v1.0.0-alpha7
 [1.0.0-alpha6]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha5...unbuilt-v1.0.0-alpha6
