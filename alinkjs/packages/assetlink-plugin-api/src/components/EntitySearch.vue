@@ -49,7 +49,7 @@ export default {};
 <script setup>
 import { inject, ref, computed, watch } from "vue";
 import { useRoute } from "vue-router";
-import { throttle } from "lodash";
+import { debounce } from "quasar";
 import RacingLocalRemoteAsyncIterator from "../RacingLocalRemoteAsyncIterator";
 
 const props = defineProps({
@@ -122,7 +122,7 @@ const nodes = computed(() => {
 // TODO: Add a "show more" button at the bottom of the search to increase this
 const maxDesiredSearchEntries = 10;
 
-const searchEntities = throttle(async function searchEntities() {
+const searchEntities = debounce(async function searchEntities() {
   const currSearchReq = {
     entityType: props.entityType,
     entityBundles: props.entityBundles,

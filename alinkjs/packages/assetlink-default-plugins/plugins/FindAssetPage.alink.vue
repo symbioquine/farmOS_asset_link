@@ -22,6 +22,8 @@ const onAssetSelected = async (selectedAssets) => {
 
     const include = Object.keys(model.relationships);
 
+    router.push(`/asset/${asset.attributes.drupal_internal__id}`);
+
     // Load the asset from the server (if online) again to ensure
     // all the relationships get loaded (since search plugins may
     // not load all the data)
@@ -30,7 +32,6 @@ const onAssetSelected = async (selectedAssets) => {
         .options({ include }),
       { forceRemote: true });
 
-    router.push(`/asset/${asset.attributes.drupal_internal__id}`);
     return;
   }
   // TODO: Implement multi-asset page

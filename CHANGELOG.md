@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve compatibility with old versions of Safari avoiding elvis operator in Sidecar bootstrapping code
 - Fix edge case bug with computing location relationships
 - Fix URL building with 'IS NULL' and 'IS NOT NULL' operators for remote queries
+- Improve responsiveness of searching and opening assets within Asset Link
 
 ## [1.0.0-alpha8] - 2023-04-04
 
