@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Improve browser compatibility by avoiding `Blob::arrayBuffer()` fn
+
 ## [1.0.0-alpha9] - 2023-05-29
 
 ### Added

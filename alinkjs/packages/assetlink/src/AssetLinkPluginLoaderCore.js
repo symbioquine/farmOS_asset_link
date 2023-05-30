@@ -309,7 +309,7 @@ export default class AssetLinkPluginLoaderCore {
 
     const pluginSrc = await pluginSrcRes.blob();
 
-    const pluginDataUrl = PLUGIN_DATA_URL_PREFIX + Buffer.from(await pluginSrc.arrayBuffer()).toString('base64');
+    const pluginDataUrl = PLUGIN_DATA_URL_PREFIX + Buffer.from(await blobToArrayBuffer(pluginSrc)).toString('base64');
 
     await this._store.setItem(cacheKey, {key: cacheKey, timestamp, value: pluginDataUrl});
 
@@ -553,16 +553,20 @@ class AssetLinkPluginHandle {
 
 }
 
+// More backwards compatible alternative to `Blob::arrayBuffer()`
+const blobToArrayBuffer = blob => {
+  // TODO: Reject on failures? (possible?)
+  return new Promise((resolve, reject) => {
+    // Copied from https://stackoverflow.com/a/15981017/1864479
+    const fileReader = new FileReader();
+    fileReader.onload = function(event) {
+        resolve(event.target.result);
+    };
+    fileReader.readAsArrayBuffer(blob);
+  });
+}
+
 //Copied from https://github.com/vuetifyjs/vuetify-loader/blob/9c828d72354d5c37ec97eb58badb9e164451e802/lib/util.js#L6-L18
-const camelizeRE = /-(\w)/g
-const camelize = str => {
-  return str.replace(camelizeRE, (_, c) => c ? c.toUpperCase() : '')
-}
-
-const capitalize = str => {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
 const hyphenateRE = /\B([A-Z])/g
 const hyphenate = str => {
   return str.replace(hyphenateRE, '-$1').toLowerCase()
