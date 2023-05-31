@@ -1,4 +1,4 @@
-import { defineComponent, h, provide, onMounted, ref } from "vue";
+import { computed, defineComponent, h, provide, ref, nextTick } from "vue";
 import { QBtn, QBtnGroup } from "quasar";
 
 // Copied from https://github.com/quasarframework/quasar/blob/30e051fcd5163f57b89d553ec5091c1c854e7e53/ui/src/utils/private/vm.js#L18-L40
@@ -67,11 +67,19 @@ const SearchMethodTileTabber = defineComponent({
 
     provide("currentSearchMethod", currentSearchMethod);
 
-    const slotsContents = slots.default();
+    const slotsContents = computed(() => {
+      const contents = slots.default();
 
-    const tabs = ref([]);
+      // This is a bit of a hack, but necessary because the slot contents needs to be fully rendered
+      // before we can traverse it for children to find the search-method tabs
+      nextTick(() => {
+        tabs.value = computeTabs(contents);
+      });
 
-    onMounted(() => {
+      return contents;
+    });
+
+    const computeTabs = (contents) => {
       const foundTabs = [];
 
       const traverse = (nodes) => {
@@ -101,10 +109,12 @@ const SearchMethodTileTabber = defineComponent({
         });
       };
 
-      traverse(slotsContents);
+      traverse(contents);
 
-      tabs.value = foundTabs;
-    });
+      return foundTabs;
+    };
+
+    const tabs = ref([]);
 
     return () => {
       const buttonGroupChildren = [];
@@ -134,7 +144,7 @@ const SearchMethodTileTabber = defineComponent({
         h(QBtnGroup, { push: true, spread: true }, () => buttonGroupChildren)
       );
 
-      children.push(h("div", { class: "q-my-md" }, slotsContents));
+      children.push(h("div", { class: "q-my-md" }, slotsContents.value));
 
       return h("div", { class: "text-center q-ma-md" }, children);
     };

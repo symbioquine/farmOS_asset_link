@@ -122,7 +122,11 @@ const nodes = computed(() => {
 // TODO: Add a "show more" button at the bottom of the search to increase this
 const maxDesiredSearchEntries = 10;
 
+const isSearching = ref(false);
+
 const searchEntities = debounce(async function searchEntities() {
+  isSearching.value = true;
+
   const currSearchReq = {
     entityType: props.entityType,
     entityBundles: props.entityBundles,
@@ -173,6 +177,7 @@ const searchEntities = debounce(async function searchEntities() {
       searchResultEntries.value.push(searchIterItem.value);
     }
   }
+  isSearching.value = false;
 }, 500);
 
 watch(searchRequest, (val) => {
@@ -210,6 +215,7 @@ const onCancel = () => {
         v-for="slotDef in searchMethodTileDefs"
         :key="slotDef.id"
         @update:searchRequest="(req) => (searchRequest = req)"
+        :is-searching="isSearching"
       />
     </search-method-tile-tabber>
 

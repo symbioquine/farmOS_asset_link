@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add a loading indicator for asset search
+
 ### Fixed
 
 - Improve browser compatibility by avoiding `Blob::arrayBuffer()` fn
