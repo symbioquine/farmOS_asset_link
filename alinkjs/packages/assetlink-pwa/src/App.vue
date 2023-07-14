@@ -238,7 +238,7 @@ export default defineComponent({
           name: routeDef.name,
           path: routeDef.path,
           component: routeDef.component,
-          props: routeDef.props,
+          props: true,
         });
 
         const resolved = router.resolve(currentRoutePath);

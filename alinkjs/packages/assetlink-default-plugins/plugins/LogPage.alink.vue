@@ -6,6 +6,13 @@ const emit = defineEmits(['expose-meta-actions', 'expose-route-title']);
 
 const route = useRoute();
 
+const props = defineProps({
+  logRef: {
+    type: String,
+    required: true,
+  },
+});
+
 const assetLink = inject('assetLink');
 
 const resolvedLog = ref(null);
@@ -32,10 +39,10 @@ watch([logName, resolvedLog], () => {
   <q-page padding class="text-left">
     <entity-resolver
       entity-type="log"
-      :entity-ref="$route.params.logRef"
+      :entity-ref="props.logRef"
       #default="{ entity }"
       @entity-resolved="resolvedLog = $event"
-      :key="$route.params.logRef">
+      :key="props.logRef">
         <h4 class="q-my-xs"><render-widget
               name="log-page-title"
               :context="{ log: entity }"
