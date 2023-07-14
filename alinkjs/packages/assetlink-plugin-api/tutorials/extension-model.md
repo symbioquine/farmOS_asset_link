@@ -141,6 +141,29 @@ Asset Link provides a shorthand for defining simple routes. The above route can 
 </template>
 ```
 
+#### Params
+
+If a route has params in the URL, those will be passed as string props to the Vue component.
+
+For example;
+
+```vue
+<script setup>
+const props = defineProps({
+  name: {
+    type: String,
+    required: true,
+  },
+});
+</script>
+
+<template alink-route[com.example.farmos_asset_link.routes.v0.greeter]="/greet/:name">
+  <q-page padding class="text-left">
+    <h4>Welcome {{ props.name }}</h4>
+  </q-page>
+</template>
+```
+
 ### Slots
 
 ```javascript

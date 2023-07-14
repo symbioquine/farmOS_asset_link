@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add a loading indicator for asset search
+- Add an explanation of route prop handling to docs
 
 ### Fixed
 
