@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a loading indicator for asset search
 - Add an explanation of route prop handling to docs
 
+### Changed
+
+- Improved log page date formatting
+
 ### Fixed
 
 - Improve browser compatibility by avoiding `Blob::arrayBuffer()` fn
