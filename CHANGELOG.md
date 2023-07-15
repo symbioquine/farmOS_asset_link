@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add a loading indicator for asset search
 - Add an explanation of route prop handling to docs
+- Add log owner to the log page
 
 ### Changed
 
