@@ -32,9 +32,8 @@ jobs:
       - name: NPM Build
         run: |
           cd ./main/alinkjs
-          npm ci
-          npm exec lerna bootstrap
-          npm run build
+          npm --workspaces ci
+          npm --workspaces run build
 
       - name: Copy Module to Release Working Dir
         run: |
@@ -110,7 +109,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
-  publish-to-gh-pages:
+  publish-docs-to-gh-pages:
     name: Publish to Github Pages
     needs: build
     runs-on: ubuntu-latest

@@ -2,7 +2,10 @@
   "name": "assetlink",
   "version": "1.0.0-alpha9",
   "description": "",
-  "main": "index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./*": "./dist/*"
+  },
   "publishConfig": {
     "directory": "dist"
   },

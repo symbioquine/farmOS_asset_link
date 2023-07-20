@@ -100,7 +100,6 @@ module.exports = defineConfig({
   configureWebpack(config) {
     config.resolve.alias = {
       ...config.resolve.alias,
-      quasar: path.resolve("./node_modules/quasar"),
     };
 
     config.plugins.push(

@@ -104,7 +104,7 @@ git add CHANGELOG.md [...]
 
 # Update NPM package versions
 cd ./alinkjs
-npx lerna version --no-push --no-changelog --no-git-tag-version v9000.0.1
+npm -ws --no-git-tag-version version v9000.0.1
 
 # Add the version changes
 git add -u
