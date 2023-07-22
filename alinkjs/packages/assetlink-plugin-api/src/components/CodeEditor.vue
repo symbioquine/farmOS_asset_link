@@ -10,6 +10,7 @@ import "codemirror/mode/vue/vue.js";
 import "codemirror/addon/display/fullscreen.js";
 
 const editor = ref(null);
+const lastSize = ref(null);
 
 const props = defineProps({
   modelValue: { type: String, required: true },
@@ -32,11 +33,19 @@ onMounted(() => {
     emit("update:modelValue", cm.getValue());
   });
 
+  // Sometimes the resize handler fires now so set the size to the most recent value
+  if (lastSize.value) {
+    cm.setSize(lastSize.value.width, lastSize.value.height);
+  }
+
   // Ugly hack!
   setTimeout(() => cm.refresh(), 1000);
 });
 
-const onResize = (size) => cm.setSize(size.width, size.height);
+const onResize = (size) => {
+  lastSize.value = size;
+  cm && cm.setSize(size.width, size.height);
+};
 </script>
 
 <template>
