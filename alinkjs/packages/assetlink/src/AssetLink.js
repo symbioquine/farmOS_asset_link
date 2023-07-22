@@ -12,6 +12,7 @@ import AssetLinkLocalPluginStorageCore from '@/AssetLinkLocalPluginStorageCore';
 import HttpAccessDeniedException from '@/HttpAccessDeniedException';
 
 import { createDrupalUrl, EventBus, uuidv4 } from "assetlink-plugin-api";
+import OnlineStructuralDataPreloader from './OnlineStructuralDataPreloader';
 
 
 /**
@@ -49,6 +50,8 @@ export default class AssetLink {
     this._connectionStatus = new FarmOSConnectionStatusDetector(connectionStatusOptions);
 
     this._fetcherDelegate = opts.disableSubrequestGrouping ? this._connectionStatus : new SubrequestsGroupingRequestFetcher(this._connectionStatus);
+
+    this._structuralDataPreloader = opts.structuralDataPreloader || new OnlineStructuralDataPreloader();
 
     this._eventBus = new EventBus();
 
@@ -236,6 +239,9 @@ export default class AssetLink {
     });
 
     await this.cores.farmData.boot();
+
+    this._structuralDataPreloader.load(this);
+
     await this.cores.localPluginStorage.boot();
     await this.cores.pluginLoader.boot();
     try {

@@ -695,17 +695,6 @@ export default class AssetLinkFarmDataCore {
       }
     });
 
-    // Make sure we have some of the core data model structure
-    // data as part of booting so we don't end up offline without
-    // it since plugins will tend to assume this information is
-    // available.
-    await this._precacheKeyStructuralData();
-  }
-
-  async _precacheKeyStructuralData() {
-    await this.getAssetTypes();
-    await this.getLogTypes();
-    await this.getTaxonomyVocabularies();
   }
 
 }
