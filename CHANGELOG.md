@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Switch to npm workspaces instead of lerna
 - Load farmOS models via a special controller to improve performance/flexibility
 - Refactor structural data preloading into separate/replaceable class
+- Load default plugin list using path relative to Asset Link
 
 ### Fixed
 

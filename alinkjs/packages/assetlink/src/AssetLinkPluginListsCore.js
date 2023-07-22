@@ -1,6 +1,6 @@
 import { reactive } from 'vue';
 
-import { createDrupalUrl, currentEpochSecond, EventBus } from "assetlink-plugin-api";
+import { createAlinkUrl, currentEpochSecond, EventBus } from "assetlink-plugin-api";
 
 import DefaultPluginListLoadingFailure from '@/DefaultPluginListLoadingFailure';
 import HttpAccessDeniedException from '@/HttpAccessDeniedException';
@@ -25,7 +25,7 @@ export default class AssetLinkPluginListsCore {
 
     this._defaultPluginList = new HttpPluginList(
         assetLink._store, 
-        createDrupalUrl('/alink/backend/default-plugins.repo.json'),
+        createAlinkUrl('/backend/default-plugins.repo.json'),
         this._pluginReferenceTracker,
         true,
         () => this._connectionStatus.isOnline.value,
