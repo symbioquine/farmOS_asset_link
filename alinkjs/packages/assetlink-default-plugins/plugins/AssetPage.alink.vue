@@ -18,6 +18,9 @@ const assetLink = inject('assetLink');
 const resolvedAsset = ref(null);
 
 const metaActionDefs = computed(() => {
+  if (!resolvedAsset.value) {
+    return [];
+  }
   return assetLink.getSlots({ type: 'asset-meta-action', route, asset: resolvedAsset.value });
 });
 
