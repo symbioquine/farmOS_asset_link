@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Improved log page date formatting
 - Switch to npm workspaces instead of lerna
+- Load farmOS models via a special controller to improve performance/flexibility
 
 ### Fixed
 

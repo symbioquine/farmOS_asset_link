@@ -3,6 +3,7 @@ import { defineAsyncComponent } from "vue";
 /**
  * @alias module:something-nifty/lib/plugins/Plugin
  */
+export { default as createAlinkUrl } from "./createAlinkUrl";
 export { default as createDrupalUrl } from "./createDrupalUrl";
 export { default as currentEpochSecond } from "./currentEpochSecond";
 export { default as getDrupalBasePath } from "./getDrupalBasePath";
