@@ -7,7 +7,6 @@ on:
 jobs:
   publish-lite-preview-to-gh-pages:
     name: Publish Lite Preview to Github Pages
-    needs: build
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
