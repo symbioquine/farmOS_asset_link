@@ -61,7 +61,8 @@ export default {
       slot.showIf(({ pageName }) => pageName === 'log-page');
 
       slot.multiplexContext(({ log }) => {
-        return log.relationships.owner.data.map(ownerRef => ({ log, ownerRef }));
+        const ownerRefs = log.relationships?.owner?.data || [];
+        return ownerRefs.map(ownerRef => ({ log, ownerRef }));
       });
 
       slot.component(handle.thisPlugin);

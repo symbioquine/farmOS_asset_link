@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve browser compatibility by avoiding `Blob::arrayBuffer()` fn
 - Fix route prop handling for log and asset pages
 - Improve asset/log page handling of unresolved state
+- Improve handling for assets/logs without certain fields
 
 ## [1.0.0-alpha9] - 2023-05-29
 

@@ -19,7 +19,7 @@ import {
   useDialogPluginComponent,
 } from 'quasar';
 
-import { currentEpochSecond, parseJSONDate, formatRFC3339 } from "assetlink-plugin-api";
+import { currentEpochSecond, parseJSONDate, formatRFC3339, uuidv4 } from "assetlink-plugin-api";
 
 const emit = defineEmits(['expose-meta-actions', 'expose-route-title']);
 
@@ -119,7 +119,11 @@ const logClicked = (nodeKey) => {
   if (!node?.log) {
     return;
   }
-  router.push(`/log/${node.log.attributes.drupal_internal__id}`);
+  if (node.log.attributes.drupal_internal__id) {
+    router.push(`/log/${node.log.attributes.drupal_internal__id}`);
+  } else {
+    router.push(`/log/${node.log.id}`);
+  }
 };
 
 const GenericCreateLogDialog = defineComponent((props, { slots, emit, attrs }) => {
@@ -234,6 +238,7 @@ const createLogClicked = async () => {
 
   const log = {
     type: `log--${params.logType}`,
+    id: uuidv4(),
     attributes: {
       name: params.logName,
       timestamp: params.logDate,
