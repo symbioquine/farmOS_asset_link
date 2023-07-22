@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Load farmOS models via a special controller to improve performance/flexibility
 - Refactor structural data preloading into separate/replaceable class
 - Load default plugin list using path relative to Asset Link
+- Make reload and "open in farmOS" meta actions appear only when relevant
 
 ### Fixed
 

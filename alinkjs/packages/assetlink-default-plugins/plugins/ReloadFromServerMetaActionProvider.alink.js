@@ -25,6 +25,8 @@ export default class ReloadFromServerMetaActionProvider {
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.reload_asset_from_server', slot => {
       slot.type('asset-meta-action');
 
+      slot.showIf(() => assetLink.connectionStatus.canReachFarmOS.value);
+
       slot.component(({ asset }) =>
         h(QItem, { clickable: true, onClick: () => doReloadFromServer('asset', asset.type, asset.id) }, () => [
             h(QItemSection, {}, () => "Reload from Server"),
@@ -34,6 +36,8 @@ export default class ReloadFromServerMetaActionProvider {
 
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.reload_log_from_server', slot => {
       slot.type('log-meta-action');
+
+      slot.showIf(() => assetLink.connectionStatus.canReachFarmOS.value);
 
       slot.component(({ log }) =>
         h(QItem, { clickable: true, onClick: () => doReloadFromServer('log', log.type, log.id) }, () => [

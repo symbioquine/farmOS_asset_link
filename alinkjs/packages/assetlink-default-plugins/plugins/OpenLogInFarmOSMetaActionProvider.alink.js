@@ -9,6 +9,8 @@ export default class OpenInFarmOSMetaActionProvider {
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.open_log_in_farm_os', slot => {
       slot.type('log-meta-action');
 
+      slot.showIf(({ log }) => assetLink.connectionStatus.canReachFarmOS.value && log.attributes?.drupal_internal__id);
+
       const getTargetUrl = (log) => createDrupalUrl(`/log/${log.attributes.drupal_internal__id}`).toString();
 
       slot.component(({ log }) =>
