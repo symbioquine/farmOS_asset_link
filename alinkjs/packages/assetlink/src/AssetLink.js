@@ -42,7 +42,9 @@ export default class AssetLink {
       messages: [],
     });
 
-    const connectionStatusOptions = {};
+    this._liteMode = opts.liteMode || false;
+
+    const connectionStatusOptions = { liteMode: this._liteMode };
     if (opts.fetch) {
       connectionStatusOptions.fetcherDelegate = { fetch: opts.fetch };
     }
@@ -380,7 +382,7 @@ export default class AssetLink {
 
         let contexts = [context];
         if (typeof a.contextMultiplexerFn === 'function') {
-          contexts = a.contextMultiplexerFn(context);
+          contexts = a.contextMultiplexerFn(context) || [];
         }
 
         return contexts.map((c, idx) => ({

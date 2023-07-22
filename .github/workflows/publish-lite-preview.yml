@@ -1,0 +1,32 @@
+name: Publish Lite Preview
+on:
+  push:
+    branches:
+      - 'development'
+
+jobs:
+  publish-lite-preview-to-gh-pages:
+    name: Publish Lite Preview to Github Pages
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '16.x'
+
+    - name: Build
+      run: |
+        cd ./alinkjs
+        npm --workspaces ci
+        npm --workspaces run build
+
+    - name: Deploy to gh-pages 'latest' version
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        deploy_key: ${{ secrets.PREVIEWDOTASSETLINKDOTFARM_GITHUB_DEPLOY_KEY }}
+        external_repository: symbioquine/PreviewDotAssetLinkDotFarm
+        publish_branch: main
+        publish_dir: ./alinkjs/packages/assetlink-lite/dist

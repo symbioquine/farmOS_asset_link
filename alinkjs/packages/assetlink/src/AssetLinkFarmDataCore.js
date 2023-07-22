@@ -40,6 +40,8 @@ export default class AssetLinkFarmDataCore {
     this._vm = assetLink.vm;
     this._booted = assetLink.booted;
 
+    this._liteMode = assetLink._liteMode;
+
     this._getPlugins = () => assetLink.plugins;
 
     this._entityModelLoader = new HttpEntityModelLoader({
@@ -114,6 +116,15 @@ export default class AssetLinkFarmDataCore {
     await this._booted;
 
     return this._models[typeName];
+  }
+
+  /**
+   * Synchronously gets all the entity models keyed by the type name. e.g. "asset--plant".
+   * 
+   * Will only return results if Asset Link is already booted.
+   */
+  getEntityModelsSync() {
+    return this._models;
   }
 
   /**
@@ -437,90 +448,94 @@ export default class AssetLinkFarmDataCore {
     });
 
     // Query the remote server when the memory source is queried (and online)
-    this._coordinator.addStrategy(new RequestStrategy({
-      name: 'remoteRequestStrategy',
+    if (!this._liteMode) {
+      this._coordinator.addStrategy(new RequestStrategy({
+        name: 'remoteRequestStrategy',
 
-      source: 'memory',
-      on: 'beforeQuery',
-
-      target: 'remote',
-      action: 'query',
-
-      blocking: true,
-
-      filter: (query) => {
-        if (!this._connectionStatus.isOnline.value) {
-          return false;
-        }
-
-        if (query.options?.forceRemote) {
-          return true;
-        }
-
-        // TODO: Figure out whether we need to do this filtering on a expression-by-expression basis,
-        // rather than for the query as a whole.
-        let multiQuery = true;
-        let expressions = query?.expressions || [];
-        if (!Array.isArray(expressions)) {
-          multiQuery = false;
-          expressions = [expressions];
-        }
-
-        const dataInCache = this._memory.cache.query(query);
-
-        const flattenResults = (r, e) => {
-          if (r === undefined) {
-            return [];
-          }
-          if (e.op === 'findRecord' || e.op === 'findRelatedRecord') {
-            return [r];
-          }
-          return r;
-        }
-
-        const zip = (...rows) => [...rows[0]].map((_,c) => rows.map(row => row[c]))
-
-        let cacheResultEntities = [];
-        if (multiQuery) {
-          cacheResultEntities = zip(dataInCache, expressions).flatMap(([r, e]) => flattenResults(r, e));
-        } else {
-          cacheResultEntities = flattenResults(dataInCache, expressions[0]);
-        }
-
-        if (cacheResultEntities.length) {
-          return false;
-        }
-
-        return true;
-      },
-
-      // Discard failed queries
-      catch (e, query) {
-        // console.log('Error performing remote.query()', query, e);
-        this.source.requestQueue.skip(e);
-        this.target.requestQueue.skip(e);
-        throw e;
-      },
-    }));
-
-    // Update the remote server whenever the memory source is updated
-    this._coordinator.addStrategy(
-      new RequestStrategy({
         source: 'memory',
-        on: 'beforeUpdate',
+        on: 'beforeQuery',
 
         target: 'remote',
-        action: 'update',
+        action: 'query',
 
-        blocking: () => this._connectionStatus.isOnline.value,
+        blocking: true,
 
-        passHints: true,
+        filter: (query) => {
+          if (!this._connectionStatus.isOnline.value) {
+            return false;
+          }
 
-        filter(query) {
-          return !query.options?.localOnly;
+          if (query.options?.forceRemote) {
+            return true;
+          }
+
+          // TODO: Figure out whether we need to do this filtering on a expression-by-expression basis,
+          // rather than for the query as a whole.
+          let multiQuery = true;
+          let expressions = query?.expressions || [];
+          if (!Array.isArray(expressions)) {
+            multiQuery = false;
+            expressions = [expressions];
+          }
+
+          const dataInCache = this._memory.cache.query(query);
+
+          const flattenResults = (r, e) => {
+            if (r === undefined) {
+              return [];
+            }
+            if (e.op === 'findRecord' || e.op === 'findRelatedRecord') {
+              return [r];
+            }
+            return r;
+          }
+
+          const zip = (...rows) => [...rows[0]].map((_,c) => rows.map(row => row[c]))
+
+          let cacheResultEntities = [];
+          if (multiQuery) {
+            cacheResultEntities = zip(dataInCache, expressions).flatMap(([r, e]) => flattenResults(r, e));
+          } else {
+            cacheResultEntities = flattenResults(dataInCache, expressions[0]);
+          }
+
+          if (cacheResultEntities.length) {
+            return false;
+          }
+
+          return true;
         },
-      })
-    );
+
+        // Discard failed queries
+        catch (e, query) {
+          // console.log('Error performing remote.query()', query, e);
+          this.source.requestQueue.skip(e);
+          this.target.requestQueue.skip(e);
+          throw e;
+        },
+      }));
+    }
+
+    // Update the remote server whenever the memory source is updated
+    if (!this._liteMode) {
+      this._coordinator.addStrategy(
+        new RequestStrategy({
+          source: 'memory',
+          on: 'beforeUpdate',
+
+          target: 'remote',
+          action: 'update',
+
+          blocking: () => this._connectionStatus.isOnline.value,
+
+          passHints: true,
+
+          filter(query) {
+            return !query.options?.localOnly;
+          },
+        })
+      );
+    }
 
     // Retry and DLQ for remote source
     this._coordinator.addStrategy(

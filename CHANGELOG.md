@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add an explanation of route prop handling to docs
 - Add log owner to the log page
 - Add log date decorator to log names
+- Add package for a "lite" version of Asset Link which works without a farmOS server
 
 ### Changed
 

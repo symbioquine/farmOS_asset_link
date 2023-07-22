@@ -21,6 +21,7 @@ export default class FarmOSConnectionStatusDetector {
     const options = opts || {};
     this.fetcherDelegate = options.fetcherDelegate || DEFAULT_FETCHER_DELEGATE;
 
+    this.$_liteMode = options.liteMode || false;
     this.$_running = false;
     this.$_barrier = new Barrier(true);
     this.hasNetworkConnection = ref(window.navigator.onLine);
@@ -108,6 +109,10 @@ export default class FarmOSConnectionStatusDetector {
 
   async $_checkConnectionStatus() {
     if (!this.hasNetworkConnection.value) {
+      return;
+    }
+
+    if (this.$_liteMode) {
       return;
     }
 
