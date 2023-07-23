@@ -19,7 +19,7 @@ jobs:
     - name: Build
       run: |
         cd ./alinkjs
-        npm --workspaces ci
+        npm --workspaces install
         npm --workspaces run build
 
     - name: Deploy to gh-pages 'latest' version
