@@ -96,6 +96,7 @@ module.exports = defineConfig({
 
   runtimeCompiler: true,
   transpileDependencies: ["quasar"],
+  parallel: false,
 
   configureWebpack(config) {
     config.resolve.alias = {

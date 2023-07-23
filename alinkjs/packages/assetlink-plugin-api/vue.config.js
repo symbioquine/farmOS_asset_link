@@ -2,6 +2,7 @@ const { defineConfig } = require("@vue/cli-service");
 
 module.exports = defineConfig({
   transpileDependencies: ["quasar"],
+  parallel: false,
 
   configureWebpack: (config) => {
     config.output.library = config.output.library || {};
