@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve asset/log page handling of unresolved state
 - Improve handling for assets/logs without certain fields
 - Handle resize events that occur before code editor is instantiated
+- Cleanup some stale config from using Lerna
 
 ## [1.0.0-alpha9] - 2023-05-29
 
