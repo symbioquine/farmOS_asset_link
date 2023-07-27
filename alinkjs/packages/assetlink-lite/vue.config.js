@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const chokidar = require('chokidar');
 const https = require("https");
 const CopyPlugin = require("copy-webpack-plugin");
 const { defineConfig } = require("@vue/cli-service");
@@ -13,10 +14,17 @@ const defaultPluginsSourceDir = path.resolve(
   "../assetlink-default-plugins/plugins"
 );
 
+const litePluginsSourceDir = path.resolve(
+  __dirname,
+  "src/plugins"
+);
+
 const createDevServerConfig = () => {
   const targetUrl = new URL(DEV_PROXY_TARGET);
 
   const devHost = targetUrl.hostname;
+
+  let serverPort;
 
   const serverConfig = {
     hot: true,
@@ -25,6 +33,30 @@ const createDevServerConfig = () => {
       if (!devServer) {
         throw new Error("webpack-dev-server is not defined");
       }
+
+      const files = [
+        `${defaultPluginsSourceDir}/**`,
+        `${litePluginsSourceDir}/**`,
+      ];
+      chokidar
+        .watch(files, {
+          alwaysStat: true,
+          atomic: false,
+          followSymlinks: false,
+          ignoreInitial: true,
+          ignorePermissionErrors: true,
+          persistent: true,
+          usePolling: true,
+        })
+        .on("all", (event, pluginFilePath) => {
+          const fileName = path.basename(pluginFilePath);
+    
+          const pluginUrl = `plugins/${fileName}`;
+
+          const eventToSend = (event === 'unlink') ? 'asset-link-plugin-removed' : 'asset-link-plugin-changed';
+
+          devServer.sendMessage(devServer.webSocketServer.clients, eventToSend, pluginUrl);
+        });
 
       devServer.app.get("/backend/default-plugins.repo.json", (_, response) => {
         const plugins = [];
@@ -35,14 +67,27 @@ const createDevServerConfig = () => {
           });
         });
 
+        fs.readdirSync(litePluginsSourceDir).forEach((filename) => {
+          plugins.push({
+            url: `plugins/${filename}`,
+          });
+        });
+
+        const wsProtocol = (targetUrl.protocol === "https:") ? 'wss' : 'ws';
+        const updateChannel = `${wsProtocol}://${devHost}:${serverPort}/ws`;
+
         response.send(
           JSON.stringify({
             plugins,
+            updateChannel,
           })
         );
       });
 
       return middlewares;
+    },
+    onListening: (devServer) => {
+      serverPort = devServer.server.address().port;
     },
   };
 
@@ -86,6 +131,12 @@ function GenerateDefaultPluginRepoDotJsonFilePlugin() {
         const plugins = [];
 
         fs.readdirSync(defaultPluginsSourceDir).forEach((filename) => {
+          plugins.push({
+            url: `plugins/${filename}`,
+          });
+        });
+
+        fs.readdirSync(litePluginsSourceDir).forEach((filename) => {
           plugins.push({
             url: `plugins/${filename}`,
           });
@@ -154,6 +205,13 @@ module.exports = defineConfig({
         patterns: [
           {
             from: defaultPluginsSourceDir,
+            to: path.resolve(__dirname, "dist/backend/plugins"),
+            toType: "dir",
+            // Terser skip this file for minimization
+            info: { minimized: true },
+          },
+          {
+            from: litePluginsSourceDir,
             to: path.resolve(__dirname, "dist/backend/plugins"),
             toType: "dir",
             // Terser skip this file for minimization
