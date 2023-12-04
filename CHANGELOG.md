@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve handling for assets/logs without certain fields
 - Handle resize events that occur before code editor is instantiated
 - Cleanup some stale config from using Lerna
+- Fix url encoding in handling of `$relateByName` directive
 
 ## [1.0.0-alpha9] - 2023-05-29
 

@@ -147,7 +147,7 @@ export default {
           if (!term) {
             // Run this query directly via fetch to avoid deadlock where the update we're handling
             // becomes dependent on a query that is in the remote queue behind it.
-            const findTermResult = await dataCore._fetch(`${termUrl}?filter[name]=${termName}`, {
+            const findTermResult = await dataCore._fetch(`${termUrl}?filter[name]=${encodeURIComponent(termName)}`, {
               method: 'GET',
               headers: {
                 'Accept': 'application/vnd.api+json',
