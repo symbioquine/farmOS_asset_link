@@ -1,6 +1,6 @@
 {
   "name": "assetlink-plugin-api",
-  "version": "1.0.0-alpha9",
+  "version": "1.0.0-alpha10",
   "description": "Plugin API for Asset Link - a contrib module for farmOS 2.x that supercharges links to your farmOS assets with an extensible hybrid PWA experience",
   "license": "GPLV3",
   "repository": {

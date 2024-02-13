@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha10] - 2024-02-13
+
 ### Added
 
 - Add a loading indicator for asset search
@@ -24,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor structural data preloading into separate/replaceable class
 - Load default plugin list using path relative to Asset Link
 - Make reload and "open in farmOS" meta actions appear only when relevant
+- Update to work with farmOS 3.x
 
 ### Fixed
 
@@ -615,7 +618,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha9...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha10...HEAD
+[1.0.0-alpha10]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha9...unbuilt-v1.0.0-alpha10
 [1.0.0-alpha9]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha8...unbuilt-v1.0.0-alpha9
 [1.0.0-alpha8]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha7...unbuilt-v1.0.0-alpha8
 [1.0.0-alpha7]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha6...unbuilt-v1.0.0-alpha7

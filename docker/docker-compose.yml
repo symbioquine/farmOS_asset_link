@@ -1,7 +1,7 @@
-version: '2'
+version: '3'
 services:
   db:
-    image: postgres:12
+    image: postgres:13
     volumes:
       - './db:/var/lib/postgresql/data'
     ports:
@@ -14,14 +14,12 @@ services:
   www:
     depends_on:
       - db
-    image: farmos/farmos:2.x-dev
+    image: farmos/farmos:3.1.1
     entrypoint: /bin/bash
     command:
       - -c
       - |
         set -ex
-
-        apt-get install -y --no-install-recommends jq
 
         wait_db_ready() {
             while { ! exec 3<>/dev/tcp/db/5432; } > /dev/null 2>&1; do sleep 0.1; done
@@ -33,7 +31,7 @@ services:
           wait_db_ready
           su www-data -s /bin/bash -c 'drush site-install farm --locale=en --db-url=pgsql://farm:farm@db/farm --site-name=Test0 --account-name=root --account-pass=test'
 
-          /bin/bash -c "printf \"\n\n\\\$$settings['reverse_proxy'] = TRUE;\n\\\$$settings['reverse_proxy_addresses'] = [\\\$$_SERVER['REMOTE_ADDR']];\n\\\$$settings['reverse_proxy_trusted_headers'] = \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_ALL;\n\" >> /opt/drupal/web/sites/default/settings.php"
+          /bin/bash -c "printf \"\n\n\\\$$settings['reverse_proxy'] = TRUE;\n\\\$$settings['reverse_proxy_addresses'] = [\\\$$_SERVER['REMOTE_ADDR']];\n\\\$$settings['reverse_proxy_trusted_headers'] = \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_FOR | \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_HOST | \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_PORT | \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_PROTO;\n\" >> /opt/drupal/web/sites/default/settings.php"
 
           mkdir -p /opt/drupal/web/sites/default/private/files
           chown -R www-data:www-data /opt/drupal/web/sites/default/private/files
@@ -44,7 +42,7 @@ services:
 
         wait_db_ready
 
-        su www-data -s /bin/bash <<'EOF'
+        /bin/bash <<'EOF'
             set -e
 
             composer config repositories.farmos_dev_modules '{"type": "path", "url": "/farmos_dev_modules/*"}'
