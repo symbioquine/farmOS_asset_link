@@ -1,0 +1,9 @@
+langcode: en
+status: true
+id: UserNameWithIconWidgetDecorator
+dependencies:
+  enforced:
+    module:
+      - farmos_asset_link
+url: '{base_path}alink/plugins/UserNameWithIconWidgetDecorator.alink.vue'
+user_defined: null

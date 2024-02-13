@@ -2,6 +2,12 @@
 import { ref } from 'vue';
 import { uuidv4 } from 'assetlink-plugin-api';
 
+const props = defineProps({
+  isSearching: {
+    type: Boolean,
+  },
+});
+
 const emit = defineEmits(["update:searchRequest"]);
 
 const searchText = ref('');
@@ -30,7 +36,11 @@ const qrCodeScanned = async (qrCodeResult) => {
     <template #search-interface>
       <div class="q-px-md">
         <qr-code-scanner @qr-code-scanned="qrCodeScanned($event)" @qr-code-err="qrCodeErr"></qr-code-scanner>
-        <q-input v-model="searchText" dense disabled />
+        <q-input
+          v-model="searchText"
+          dense
+          disabled
+          :loading="props.isSearching" />
       </div>
     </template>
 

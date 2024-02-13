@@ -9,6 +9,8 @@ export default class OpenAssetInFarmOSMetaActionProvider {
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.open_asset_in_farm_os', slot => {
       slot.type('asset-meta-action');
 
+      slot.showIf(({ asset }) => assetLink.connectionStatus.canReachFarmOS.value && asset.attributes?.drupal_internal__id);
+
       const getTargetUrl = (asset) => createDrupalUrl(`/asset/${asset.attributes.drupal_internal__id}`).toString();
 
       slot.component(({ asset }) =>

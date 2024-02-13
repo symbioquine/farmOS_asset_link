@@ -6,11 +6,21 @@ const emit = defineEmits(['expose-meta-actions', 'expose-route-title']);
 
 const route = useRoute();
 
+const props = defineProps({
+  assetRef: {
+    type: String,
+    required: true,
+  },
+});
+
 const assetLink = inject('assetLink');
 
 const resolvedAsset = ref(null);
 
 const metaActionDefs = computed(() => {
+  if (!resolvedAsset.value) {
+    return [];
+  }
   return assetLink.getSlots({ type: 'asset-meta-action', route, asset: resolvedAsset.value });
 });
 
@@ -32,10 +42,10 @@ watch([assetName, resolvedAsset], () => {
   <q-page padding class="text-left">
     <entity-resolver
       entity-type="asset"
-      :entity-ref="$route.params.assetRef"
+      :entity-ref="props.assetRef"
       #default="{ entity }"
       @entity-resolved="resolvedAsset = $event"
-      :key="$route.params.assetRef">
+      :key="props.assetRef">
         <h4 class="q-my-xs"><render-widget
               name="asset-page-title"
               :context="{ asset: entity }"

@@ -19,6 +19,13 @@ farmos_asset_link.default_plugins:
   requirements:
     _permission: 'access content'
 
+farmos_asset_link.models:
+  path: '/alink/backend/models.json'
+  defaults:
+    _controller: '\Drupal\farmos_asset_link\Controller\FarmAssetLinkModelsController::Render'
+  requirements:
+    _permission: 'access content'
+
 
 
 entity.asset_link_default_plugin.enable:

@@ -1,0 +1,9 @@
+langcode: en
+status: true
+id: LogNameWithDateWidgetDecorator
+dependencies:
+  enforced:
+    module:
+      - farmos_asset_link
+url: '{base_path}alink/plugins/LogNameWithDateWidgetDecorator.alink.vue'
+user_defined: null

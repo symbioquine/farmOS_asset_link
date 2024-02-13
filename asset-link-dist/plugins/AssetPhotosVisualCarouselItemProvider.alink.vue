@@ -64,7 +64,8 @@ export default {
       vCarouselItem.showIf(({ asset }) => true);
 
       vCarouselItem.multiplexContext(({ asset }) => {
-        return asset.relationships.image.data.map(imgRef => ({ imgRef }));
+        const imageRefs = asset.relationships?.image?.data || [];
+        return imageRefs.map(imgRef => ({ imgRef }));
       });
 
       vCarouselItem.component(handle.thisPlugin);

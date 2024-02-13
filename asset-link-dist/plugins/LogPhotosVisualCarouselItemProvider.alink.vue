@@ -38,7 +38,7 @@ resolveImageEntity();
 </script>
 
 <template alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]=
-    'log-visual-carousel-item(multiplexContext: "log.relationships.image.data[*].{ imgRef: @ }")'>
+    'log-visual-carousel-item(multiplexContext: "log.relationships.image.data[*].{ imgRef: @ } || []")'>
   <q-carousel-slide
       v-if="imageEntity">
     <div class="row fit justify-start items-center no-wrap">

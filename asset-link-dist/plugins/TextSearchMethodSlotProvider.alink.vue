@@ -2,6 +2,12 @@
 import { ref } from 'vue';
 import { uuidv4 } from 'assetlink-plugin-api';
 
+const props = defineProps({
+  isSearching: {
+    type: Boolean,
+  },
+});
+
 const searchText = ref('');
 
 const emit = defineEmits(["update:searchRequest"]);
@@ -22,7 +28,11 @@ const onSearchTextUpdated = (text) => {
 
     <template #search-interface>
       <div class="q-px-md">
-        <q-input autofocus v-model="searchText" @update:model-value="(evt) => onSearchTextUpdated(evt)" label="Search" />
+        <q-input
+          autofocus
+          v-model="searchText"
+          @update:model-value="(evt) => onSearchTextUpdated(evt)" label="Search"
+          :loading="props.isSearching" />
       </div>
     </template>
 

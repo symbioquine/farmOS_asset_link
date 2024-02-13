@@ -2,6 +2,12 @@
 import { computed, inject, ref } from 'vue';
 import { uuidv4 } from 'assetlink-plugin-api';
 
+const props = defineProps({
+  isSearching: {
+    type: Boolean,
+  },
+});
+
 const assetLink = inject('assetLink');
 const currentSearchMethod = inject('currentSearchMethod');
 
@@ -84,7 +90,10 @@ if (currentSearchMethod.value === 'proximity-search') {
 
     <template #search-interface>
       <div class="q-px-md">
-        <q-input v-model="searchText" disabled />
+        <q-input
+          v-model="searchText"
+          disabled
+          :loading="props.isSearching" />
       </div>
     </template>
 

@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha10] - 2024-02-13
+
+### Added
+
+- Add a loading indicator for asset search
+- Add an explanation of route prop handling to docs
+- Add log owner to the log page
+- Add log date decorator to log names
+- Add package for a "lite" version of Asset Link which works without a farmOS server
+- Add a welcome/explanation page to Asset Link Lite
+
+### Changed
+
+- Improved log page date formatting
+- Switch to npm workspaces instead of lerna
+- Load farmOS models via a special controller to improve performance/flexibility
+- Refactor structural data preloading into separate/replaceable class
+- Load default plugin list using path relative to Asset Link
+- Make reload and "open in farmOS" meta actions appear only when relevant
+- Update to work with farmOS 3.x
+
+### Fixed
+
+- Improve browser compatibility by avoiding `Blob::arrayBuffer()` fn
+- Fix route prop handling for log and asset pages
+- Improve asset/log page handling of unresolved state
+- Improve handling for assets/logs without certain fields
+- Handle resize events that occur before code editor is instantiated
+- Cleanup some stale config from using Lerna
+- Fix url encoding in handling of `$relateByName` directive
+
 ## [1.0.0-alpha9] - 2023-05-29
 
 ### Added
@@ -587,7 +618,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha9...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha10...HEAD
+[1.0.0-alpha10]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha9...unbuilt-v1.0.0-alpha10
 [1.0.0-alpha9]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha8...unbuilt-v1.0.0-alpha9
 [1.0.0-alpha8]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha7...unbuilt-v1.0.0-alpha8
 [1.0.0-alpha7]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha6...unbuilt-v1.0.0-alpha7
