@@ -240,6 +240,24 @@ routes/pages > slots > widgets
   &lt;/q-page>
 &lt;/template>
 </code></pre>
+<h4 id="params">Params</h4>
+<p>If a route has params in the URL, those will be passed as string props to the Vue component.</p>
+<p>For example;</p>
+<pre class="prettyprint source lang-vue"><code>&lt;script setup>
+const props = defineProps({
+  name: {
+    type: String,
+    required: true,
+  },
+});
+&lt;/script>
+
+&lt;template alink-route[com.example.farmos_asset_link.routes.v0.greeter]=&quot;/greet/:name&quot;>
+  &lt;q-page padding class=&quot;text-left&quot;>
+    &lt;h4>Welcome {{ props.name }}&lt;/h4>
+  &lt;/q-page>
+&lt;/template>
+</code></pre>
 <h3 id="slots">Slots</h3>
 <pre class="prettyprint source lang-javascript"><code>  static onLoad(handle) {
 
