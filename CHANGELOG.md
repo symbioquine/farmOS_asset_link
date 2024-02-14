@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha11] - 2024-02-14
+
+### Fixed
+
+- Fix a bug in how urls are generated for Asset Link Sidecar
+
 ## [1.0.0-alpha10] - 2024-02-13
 
 ### Added
@@ -618,7 +624,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha10...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha11...HEAD
+[1.0.0-alpha11]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha10...unbuilt-v1.0.0-alpha11
 [1.0.0-alpha10]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha9...unbuilt-v1.0.0-alpha10
 [1.0.0-alpha9]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha8...unbuilt-v1.0.0-alpha9
 [1.0.0-alpha8]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha7...unbuilt-v1.0.0-alpha8

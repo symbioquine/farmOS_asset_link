@@ -1,12 +1,12 @@
 {
-  "app.js": "js/app.def6b1a2.js",
+  "app.js": "js/app.79c4bd85.js",
   "css/12.886bc96d.css": "css/12.886bc96d.css",
   "css/932.dac295eb.css": "css/932.dac295eb.css",
   "entrypoints": {
     "app": {
       "assets": {
         "js": [
-          "js/app.def6b1a2.js"
+          "js/app.79c4bd85.js"
         ]
       }
     }
@@ -43,12 +43,12 @@
   "js/624.99e642e2.js.map": "js/624.99e642e2.js.map",
   "js/842.a15b4643.js": "js/842.a15b4643.js",
   "js/842.a15b4643.js.map": "js/842.a15b4643.js.map",
-  "js/932.6a91c64a.js": "js/932.6a91c64a.js",
-  "js/932.6a91c64a.js.map": "js/932.6a91c64a.js.map",
+  "js/932.115c6900.js": "js/932.115c6900.js",
+  "js/932.115c6900.js.map": "js/932.115c6900.js.map",
   "js/938.27ad87d3.js": "js/938.27ad87d3.js",
   "js/938.27ad87d3.js.map": "js/938.27ad87d3.js.map",
   "js/982.2ce9ead8.js": "js/982.2ce9ead8.js",
   "js/982.2ce9ead8.js.map": "js/982.2ce9ead8.js.map",
-  "js/app.def6b1a2.js.map": "js/app.def6b1a2.js.map",
+  "js/app.79c4bd85.js.map": "js/app.79c4bd85.js.map",
   "robots.txt": "robots.txt"
 }
