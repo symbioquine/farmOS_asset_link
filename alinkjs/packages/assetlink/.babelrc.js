@@ -15,6 +15,7 @@ module.exports = api => {
     presets: [],
     plugins: [
       ...plugins,
+      '@babel/plugin-transform-class-static-block',
       [
         require.resolve('babel-plugin-module-resolver'),
         {

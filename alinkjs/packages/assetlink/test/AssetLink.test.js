@@ -135,6 +135,7 @@ describe('Basic Smoke Testing', () => {
       jsdom.reconfigure({ url: farm.url.toString() });
 
       window.assetLinkDrupalBasePath = farm.init_data.path;
+      process.env.BASE_URL = farm.init_data.path + '/alink/'
 
       fetchDelegate = async (url, opts) => {
         const u = new URL(url);
@@ -153,7 +154,7 @@ describe('Basic Smoke Testing', () => {
 
         return await farm.fetch(url, opts);
       };
-    }, /* timeout: */ 10 * 1000);
+    }, /* timeout: */ 60 * 1000);
 
     test('Resolve an Asset', async () => {
         const fetch = jest.fn(fetchDelegate);

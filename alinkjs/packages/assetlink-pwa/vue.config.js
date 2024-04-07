@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const https = require("https");
 const { defineConfig } = require("@vue/cli-service");
+const { DefinePlugin } = require("webpack");
 const { ModuleFederationPlugin } = require("webpack").container;
 
 const DEV_PROXY_TARGET =
@@ -135,6 +136,17 @@ module.exports = defineConfig({
   },
 
   configureWebpack: (config) => {
+    // Uncomment for source-maps - including those from dependencies like vue3-sfc-loader
+    // config.devtool = 'source-map';
+    // config.module.rules = [
+    //   ...config.module.rules,
+    //   {
+    //     test: /\.js$/,
+    //     enforce: "pre",
+    //     use: ["source-map-loader"],
+    //   },
+    // ];
+
     config.resolve.alias = {
       ...config.resolve.alias,
     };
@@ -146,6 +158,11 @@ module.exports = defineConfig({
 
     config.plugins = [
       ...config.plugins, // this is important !
+      new DefinePlugin({
+        __VUE_OPTIONS_API__: 'true',
+        __VUE_PROD_DEVTOOLS__: 'false',
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
+      }),
       new ModuleFederationPlugin({
         name: "assetlink",
         filename: "pwa/remoteEntry.js",

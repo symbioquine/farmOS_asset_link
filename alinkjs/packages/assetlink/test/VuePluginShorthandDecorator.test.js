@@ -1,4 +1,4 @@
-import { parseComponent } from 'vue-template-compiler';
+import { parse as parseComponent } from '@vue/compiler-sfc';
 import jmespath from 'jmespath';
 
 import VuePluginShorthandDecorator from '../src/VuePluginShorthandDecorator';

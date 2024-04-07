@@ -9,6 +9,7 @@ const {
   rootComponent,
   devToolsApi,
   fetch,
+  waitForStructuralDataPreloadingToComplete,
 } = initDefaults();
 
 let assetLink = undefined;
@@ -18,6 +19,9 @@ beforeEach(async () => {
 
 test('Simple Online log query', async () => {
     await assetLink.boot();
+
+    // Avoid warnings caused by preloading happening after tests complete
+    await waitForStructuralDataPreloadingToComplete();
   
     expect(assetLink.connectionStatus.isOnline.value).toBe(true);
   
@@ -50,7 +54,7 @@ test('Simple Online log query', async () => {
   
       const logResults = await assetLink.entitySource.query(q => q.findRecords('log--activity')
         .filter({ attribute: 'is_movement', value: true }));
-  
+
       expect(logResults).toHaveLength(1);
       expect(logResults[0].type).toBe('log--activity');
       expect(logResults[0].id).toBe('6dd89551-c756-42f0-b217-35e72f52b13f');
@@ -65,4 +69,4 @@ test('Simple Online log query', async () => {
     } finally {
       await assetLink.halt();
     }
-  }, /* timeout: */ 1 * 1000);
+  }, /* timeout: */ 10 * 1000);

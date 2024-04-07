@@ -166,11 +166,22 @@ export const initDefaults = () => {
 
     const fetch = jest.fn(fetchDelegate);
 
+    const waitForStructuralDataPreloadingToComplete = async () => {
+      while (true) {
+        const req = fetch.mock.calls.find(c => c[0].toString().includes('/api/taxonomy_vocabulary/taxonomy_vocabulary'));
+        if (req) {
+          return;
+        }
+        await delay(1);
+      }
+    };
+
     return {
         rootComponent,
         devToolsApi,
         isOnline,
         fetch,
+        waitForStructuralDataPreloadingToComplete,
     };
 };
 

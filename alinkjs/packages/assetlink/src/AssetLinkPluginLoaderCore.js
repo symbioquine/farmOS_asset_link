@@ -3,7 +3,7 @@ import { Buffer } from 'buffer/';
 import { markRaw, reactive } from 'vue';
 
 import { loadModule } from 'vue3-sfc-loader/dist/vue3-sfc-loader.esm.js';
-import { parseComponent } from 'vue-template-compiler';
+import { parse as parseComponent } from '@vue/compiler-sfc';
 
 import fetch from 'cross-fetch';
 
@@ -110,10 +110,14 @@ export default class AssetLinkPluginLoaderCore {
         }
 
         const options = {
+          // devMode: true,
           moduleCache: this.moduleCache,
           compiledCache: {
             set: (key, str) => this._store.setItem(`asset-link-cached-compiled-plugin:${key}`, str),
-            get: (key) => this._store.getItem(`asset-link-cached-compiled-plugin:${key}`),
+            get: async (key) => (await this._store.getItem(`asset-link-cached-compiled-plugin:${key}`)) 
+                    // Recent versions of vue3-sfc-loader are comparing strictly against `undefined`, but
+                    // LocalForage returns `null`
+                    || undefined,
           },
           pathResolve: ({ refPath, relPath }) => {
             // Seems to occur prior to loading of the plugin module file itself
@@ -555,6 +559,10 @@ class AssetLinkPluginHandle {
 
 // More backwards compatible alternative to `Blob::arrayBuffer()`
 const blobToArrayBuffer = blob => {
+  // Work-around 'fetch-blob' not being compatible with FileReader in NodeJS environment
+  if (typeof blob.arrayBuffer === 'function') {
+    return blob.arrayBuffer();
+  }
   // TODO: Reject on failures? (possible?)
   return new Promise((resolve, reject) => {
     // Copied from https://stackoverflow.com/a/15981017/1864479

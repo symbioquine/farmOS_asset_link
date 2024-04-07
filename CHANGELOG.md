@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha12] - 2024-04-09
+
+### Changed
+
+- Update Vue to 3.4.15 and vue3-sfc-loader to 0.9.5
+
 ## [1.0.0-alpha11] - 2024-02-14
 
 ### Fixed
@@ -624,7 +630,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha11...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha12...HEAD
+[1.0.0-alpha12]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha11...unbuilt-v1.0.0-alpha12
 [1.0.0-alpha11]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha10...unbuilt-v1.0.0-alpha11
 [1.0.0-alpha10]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha9...unbuilt-v1.0.0-alpha10
 [1.0.0-alpha9]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha8...unbuilt-v1.0.0-alpha9

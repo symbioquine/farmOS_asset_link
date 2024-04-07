@@ -6,7 +6,7 @@ let farm = undefined;
 
 beforeAll(async () => {
     farm = await createTestFarm()
-}, /* timeout: */ 10 * 1000);
+}, /* timeout: */ 60 * 1000);
 
 afterAll(async () => {
     await farm.cleanup()
@@ -16,6 +16,7 @@ test('Simple Test', async () => {
   jsdom.reconfigure({ url: farm.url.toString() });
 
   window.assetLinkDrupalBasePath = farm.init_data.path;
+  process.env.BASE_URL = farm.init_data.path + '/alink/'
 
   const fetch = jest.fn((url, opts) => farm.fetch(url, opts));
 

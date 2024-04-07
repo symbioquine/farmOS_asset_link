@@ -6,14 +6,15 @@ export default class VuePluginShorthandDecorator {
    * based on the shorthand syntax.
    */
   static composeDecorator(existingPluginDecorator, component) {
-    if (!component.template) {
+    const template = component?.descriptor?.template;
+    if (!template) {
       return existingPluginDecorator;
     }
 
     const shorthandRoutes = {};
     const shorthandSlots = {};
     const shorthandWidgetDecorators = {};
-    for (const [key, value] of Object.entries(component.template.attrs || {})) {
+    for (const [key, value] of Object.entries(template.attrs || {})) {
       if (key.indexOf("alink-route") !== -1) {
         const { routeName, routeParams } = parseShorthandRoute(key, value);
         shorthandRoutes[routeName] = routeParams;

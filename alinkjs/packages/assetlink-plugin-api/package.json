@@ -1,6 +1,6 @@
 {
   "name": "assetlink-plugin-api",
-  "version": "1.0.0-alpha11",
+  "version": "1.0.0-alpha12",
   "description": "Plugin API for Asset Link - a contrib module for farmOS 2.x that supercharges links to your farmOS assets with an extensible hybrid PWA experience",
   "license": "GPLV3",
   "repository": {
@@ -15,8 +15,8 @@
     "lint": "vue-cli-service lint"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.16",
-    "@babel/eslint-parser": "^7.12.16",
+    "@babel/core": "7.23.9",
+    "@babel/eslint-parser": "7.23.9",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-plugin-pwa": "~5.0.0",
@@ -46,7 +46,7 @@
     "@quasar/extras": "^1.0.0",
     "qr-scanner": "^1.4.1",
     "quasar": "^2.6.0",
-    "vue": "^3.2.13",
+    "vue": "3.4.15",
     "vue-router": "^4.0.3"
   }
 }

@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const https = require("https");
 const { defineConfig } = require("@vue/cli-service");
+const { DefinePlugin } = require("webpack");
 const { ModuleFederationPlugin } = require("webpack").container;
 const WebpackAssetsManifest = require("webpack-assets-manifest");
 
@@ -99,9 +100,26 @@ module.exports = defineConfig({
   parallel: false,
 
   configureWebpack(config) {
+    // Uncomment for source-maps - including those from dependencies like vue3-sfc-loader
+    // config.devtool = 'source-map';
+    // config.module.rules = [
+    //   ...config.module.rules,
+    //   {
+    //     test: /\.js$/,
+    //     enforce: "pre",
+    //     use: ["source-map-loader"],
+    //   },
+    // ];
+
     config.resolve.alias = {
       ...config.resolve.alias,
     };
+
+    config.plugins.push(new DefinePlugin({
+      __VUE_OPTIONS_API__: 'true',
+      __VUE_PROD_DEVTOOLS__: 'false',
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
+    }));
 
     config.plugins.push(
       new ModuleFederationPlugin({

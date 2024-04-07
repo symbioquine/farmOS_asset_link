@@ -22,7 +22,7 @@ export default function createDrupalUrl(pathSuffix) {
   // Relative to Asset Link's public path build option - which
   // in some scenarios gets replaced at runtime by Drupal
   // when it serves the built app.
-  let basePath = process.env.BASE_URL;
+  let basePath = process.env.BASE_URL || "/alink/";
 
   // For the Sidecar portion of the app, the public path is suffixed
   // with "/sidecar/" which shouldn't be part of the resulting

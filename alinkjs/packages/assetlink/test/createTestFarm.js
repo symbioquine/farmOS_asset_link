@@ -6,7 +6,7 @@ const FAUX_FARM_CLOUD_BASE_URL = 'http://localhost:1880';
 
 // Uses https://github.com/symbioquine/farm-faux-cloud hosted on port 1880 to create fresh test farmOS instances
 export const createTestFarm = async function () {
-    const init_data = await fetch(FAUX_FARM_CLOUD_BASE_URL + '/meta/farm', { method: 'POST' })
+    const init_data = await fetch(FAUX_FARM_CLOUD_BASE_URL + '/meta/farm?with-module=farmos_asset_link', { method: 'POST' })
         .then((response) => response.json());
 
     const url = new URL(`${FAUX_FARM_CLOUD_BASE_URL}${init_data.path}`);
