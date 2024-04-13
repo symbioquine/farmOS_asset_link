@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add docs with more examples of advanced queries via Orbit.js and the plugin API
+
 ### Fixed
 
 - Fix a bug where the EntitySelect component `multiple` option is broken - #47

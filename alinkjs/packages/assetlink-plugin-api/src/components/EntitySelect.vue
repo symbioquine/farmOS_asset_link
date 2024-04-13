@@ -44,7 +44,6 @@ const emit = defineEmits(["update:modelValue"]);
 const model = ref(props.modelValue);
 
 watch(model, () => {
-  console.log("model changed:", model.value);
   if (props.multiple) {
     emit(
       "update:modelValue",

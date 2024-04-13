@@ -16,6 +16,9 @@
       "farm-data-access": {
         "title": "Farm Data Access"
       },
+      "advanced-farm-data-queries": {
+        "title": "Advanced Farm Data Queries"
+      },
       "writing-plugins": {
         "title": "Writing Plugins"
       },
