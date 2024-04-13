@@ -26,7 +26,7 @@ export default {};
 </script>
 
 <script setup>
-import { inject, ref, computed } from "vue";
+import { inject, ref, watch } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import RacingLocalRemoteAsyncIterator from "../RacingLocalRemoteAsyncIterator";
 
@@ -41,12 +41,21 @@ const props = defineProps({
 });
 const emit = defineEmits(["update:modelValue"]);
 
-const assetLink = inject("assetLink");
+const model = ref(props.modelValue);
 
-const model = computed({
-  get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value),
+watch(model, () => {
+  console.log("model changed:", model.value);
+  if (props.multiple) {
+    emit(
+      "update:modelValue",
+      model.value ? model.value.map((item) => item.entity) : []
+    );
+  } else {
+    emit("update:modelValue", model.value?.entity);
+  }
 });
+
+const assetLink = inject("assetLink");
 
 const options = ref([]);
 
@@ -114,8 +123,7 @@ const abortFilterFn = () => {
     filled
     dense
     clearable
-    :modelValue="model && { entity: model }"
-    @update:modelValue="(item) => (model = item?.entity)"
+    v-model="model"
     :multiple="props.multiple"
     :use-input="!model"
     input-debounce="0"
