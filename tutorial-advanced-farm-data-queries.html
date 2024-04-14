@@ -5,7 +5,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asset Link docs Simple Asset Action</title>
+  <title>Asset Link docs Advanced Farm Data Queries</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -129,121 +129,78 @@
             <div class="content">
                 <header class="page-title">
                     <p>Tutorial</p>
-                    <h1>Simple Asset Action</h1>
+                    <h1>Advanced Farm Data Queries</h1>
                 </header>
                 <section>
 
 <article>
-    <p>Let's consider a simple example plugin that provides an action button on all assets which renames an asset to &quot;Bob&quot; when clicked.</p>
-<p><strong>NameBobAssetActionProvider.alink.js</strong></p>
-<pre class="prettyprint source lang-js"><code>import { h } from 'vue';
-import { QBtn } from 'quasar';
-
-export default class NameBobAssetActionProvider {
-  static onLoad(handle, assetLink) {
-
-    handle.defineSlot('com.example.farmos_asset_link.actions.v0.name_asset_bob', slot => {
-      slot.type('asset-action');
-
-      const doActionWorkflow = async (asset) => {
-
-        await assetLink.entitySource.update((t) => {
-          return t.updateRecord({
-            type: asset.type,
-            id: asset.id,
-            attributes: {
-              name: 'Bob',
-            },
-          });
-        }, {label: `Rename asset: &quot;${asset.attributes.name}&quot; to &quot;Bob&quot;`});
-
-      };
-
-      slot.component(({ asset }) =>
-        h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset), 'no-caps': true },  &quot;Rename to 'Bob'&quot; ));
-
-    });
-
-  }
+    <p>Some of the advanced query patterns in Asset Link / Orbit.js take some getting used to. The following examples are provided to help with that.</p>
+<h3 id="filtering-by-nested-relationships">Filtering by Nested Relationships</h3>
+<p>Filtering by nested relationship fields is accomplished using a dotted path - e.g. 'top_level_relationship.some_nested_relationship.some_attribute'. In the case of the following query, we can find animals whose parents have the animal type named &quot;Sheep: Dorset&quot;:</p>
+<pre class="prettyprint source lang-js"><code>await assetLink.entitySource.query(q => q
+  .findRecords(`asset--animal`)
+  .filter({ attribute: 'parent.animal_type.name',  op: '=', value: &quot;Sheep: Dorset&quot; }));
+</code></pre>
+<h3 id="filtering-on-the-union%2Fintersection-of-criteria">Filtering on the Union/Intersection of Criteria</h3>
+<p>Asset Link extends Orbit.js to provide support for Drupal's JSON:API filter group operators - AND/OR. In the following query we can find equipment with &quot;tractor&quot; in either the name or the model.</p>
+<pre class="prettyprint source lang-js"><code>await assetLink.entitySource.query(q => q
+  .findRecords(`asset--equipment`)
+  .filterGroup('OR', fg => fg
+    .filter({ attribute: 'name', op: 'CONTAINS', value: 'tractor' })
+    .filter({ attribute: 'model', op: 'CONTAINS', value: 'tractor' })
+  ));
+</code></pre>
+<p>Similarly, we can also filter by the intersection of multiple criteria. In the following query we can find all the female Dorset sheep.</p>
+<pre class="prettyprint source lang-js"><code>await assetLink.entitySource.query(q => q
+  .findRecords(`asset--animal`)
+  .filterGroup('AND', fg => fg
+    .filter({ attribute: 'sex',  op: '=', value: 'F'})
+    .filter({ attribute: 'animal_type.name', op: '=', value: 'Sheep: Dorset' })
+  ));
+</code></pre>
+<h3 id="multiple-criteria-on-the-same-nested-relationship-field">Multiple Criteria on the Same Nested Relationship Field</h3>
+<p>Filtering with multiple criteria on the same nested relationship field can involve a <a href="https://www.drupal.org/project/drupal/issues/3066202#comment-13181270">known bug in Drupal</a>.</p>
+<p>For example, the following query will return zero results even if there exists an animal with two parents whose <code>drupal_internal__id</code> fields are <code>42</code> and <code>1337</code>.</p>
+<pre class="prettyprint source lang-js"><code>await assetLink.entitySource.query(q => q
+  .findRecords(`asset--animal`)
+  .filterGroup('AND', fg => fg
+    .filter({ attribute: 'parent.drupal_internal__id',  op: '=', value: '42'})
+    .filter({ attribute: 'parent.drupal_internal__id', op: '=', value: '1337' })
+  ));
+</code></pre>
+<p>In such cases, the work-around is to wrap the inner filter criteria in an extra layer of <code>OR</code> filter groups as shown below.</p>
+<pre class="prettyprint source lang-js"><code>await assetLink.entitySource.query(q => q
+  .findRecords(`asset--animal`)
+  .filterGroup('AND', fg => fg
+    .filterGroup('OR', subFg => subFg
+      .filter({ attribute: 'parent.drupal_internal__id',  op: '=', value: '42'}))
+    .filterGroup('OR', subFg => subFg
+      .filter({ attribute: 'parent.drupal_internal__id', op: '=', value: '1337' }))
+  ));
+</code></pre>
+<h3 id="writing-filters-without-the-builder">Writing Filters without the Builder</h3>
+<p>Some parts of the API in Asset Link accept additional filters as a list of objects instead of the builder syntax demonstrated above. The object representation of such filters is equivalent to the builder syntax. The following are some examples of translating between the two;</p>
+<h4 id="attributes">Attributes</h4>
+<pre class="prettyprint source lang-js"><code>.filter({ attribute: 'parent.animal_type.name',  op: '=', value: &quot;Sheep: Dorset&quot; })
+</code></pre>
+<p>is equivalent to</p>
+<pre class="prettyprint source lang-js"><code>{ kind: 'attribute', attribute: 'parent.animal_type.name',  op: '=', value: &quot;Sheep: Dorset&quot; }
+</code></pre>
+<h4 id="filter-groups">Filter Groups</h4>
+<pre class="prettyprint source lang-js"><code>.filterGroup('OR', fg => fg
+  .filter({ attribute: 'name', op: 'CONTAINS', value: 'tractor' })
+  .filter({ attribute: 'model', op: 'CONTAINS', value: 'tractor' })
+)
+</code></pre>
+<p>is equivalent to</p>
+<pre class="prettyprint source lang-js"><code>{
+  kind: 'group',
+  op: 'OR',
+  filter: [
+    { kind: 'attribute', attribute: 'name',  op: 'CONTAINS', value: 'tractor' },
+    { kind: 'attribute', attribute: 'model',  op: 'CONTAINS', value: 'tractor' }
+  ]
 }
-</code></pre>
-<video controls="controls">
-  <source type="video/webm" src="./rename_to_bob.webm"></source>
-  <p>Your browser does not support the video element.</p>
-</video>
-<h2 id="explained-line-by-line(ish)">Explained Line-by-line(ish)</h2>
-<p>First we import some stuff from Vue and Quasar which are used later to render the action button.</p>
-<pre class="prettyprint source lang-js"><code>import { h } from 'vue';
-import { QBtn } from 'quasar';
-</code></pre>
-<p>Next we export a class to hold our plugin functionality. This class should provide static methods as documented in the <a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a> interface.</p>
-<pre class="prettyprint source lang-js"><code>export default class NameBobAssetActionProvider {
-</code></pre>
-<p>Then we provide a <code>static</code> <code>onLoad</code> method which is used to define most of a plugin's functionality. See <a href="IAssetLinkPlugin.html#.onLoad">IAssetLinkPlugin.onLoad</a></p>
-<pre class="prettyprint source lang-js"><code>static onLoad(handle, assetLink) {
-</code></pre>
-<p>Then we call <a href="IAssetLinkPluginHandle.html#defineSlot">IAssetLinkPluginHandle#defineSlot</a> on the <code>handle</code> object, passing a unique id for the action and a function which will define the action.
-Here the <code>slot</code> argument to that function will be an instance of <a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></p>
-<pre class="prettyprint source lang-js"><code>handle.defineSlot('com.example.farmos_asset_link.actions.v0.name_asset_bob', slot => {
-</code></pre>
-<p>The type of our slot is an 'asset-action' which the default plugin <a href="https://github.com/symbioquine/farmOS_asset_link/blob/1752720e1ffe2cf86b453b28bd3d9552848ebf5e/asset-link-dist/alink-plugins/AssetActionsPageSlotProvider.alink.vue#L4">AssetActionsPageSlotProvider</a> renders on the asset pages under the header &quot;Actions&quot;.</p>
-<pre class="prettyprint source lang-js"><code>slot.type('asset-action');
-</code></pre>
-<p>Define an async function that will get called when our action button is clicked.</p>
-<pre class="prettyprint source lang-js"><code>const doActionWorkflow = async (asset) => {
-</code></pre>
-<p>Begin describing a data update transaction <code>t</code> via Orbit.js. See <a href="tutorial-farm-data-access.html">Farm Data Access</a> and the <a href="https://orbitjs.com/docs/updating-data">Orbit.js Updating data</a> docs.</p>
-<pre class="prettyprint source lang-js"><code>await assetLink.entitySource.update((t) => {
-</code></pre>
-<p>Return a single update action as part of this transaction.</p>
-<pre class="prettyprint source lang-js"><code>return t.updateRecord({
-  // The `type` and `id` fields are required to uniquely identify the asset to be updated
-  type: asset.type,
-  id: asset.id,
-  // The asset attributes to be updated
-  attributes: {
-    name: 'Bob',
-  },
-});
-</code></pre>
-<p>Include some metadata describing the update so Asset Link can communicate the progress of this transaction to the user.</p>
-<pre class="prettyprint source lang-js"><code>}, {label: `Rename asset: &quot;${asset.attributes.name}&quot; to &quot;Bob&quot;`});
-</code></pre>
-<p>Define our component as an anonymous render function which accepts the context including the <code>asset</code> property and renders a secondary block button.
-When the button is clicked, we call the <code>doActionWorkflow</code> function defined earlier.</p>
-<pre class="prettyprint source lang-js"><code>slot.component(({ asset }) =>
-  h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(asset) },  &quot;Rename to 'Bob'&quot; ));
-</code></pre>
-<p><img src="./rename_to_bob_button.png" alt=""></p>
-<p>Above we're using Javascript's <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment">destructuring assignment</a> feature to
-unpack the <code>asset</code> property from the slot context (params).</p>
-<p>It could also be written as;</p>
-<pre class="prettyprint source lang-js"><code>slot.component(context =>
-  h(QBtn, { block: true, color: 'secondary', onClick: () => doActionWorkflow(context.asset), 'no-caps': true },  &quot;Rename to 'Bob'&quot; ));
-</code></pre>
-<ul>
-<li>To understand the <code>h</code> function and Vue render functions, see the Vue docs on <a href="https://vuejs.org/guide/extras/render-function.html">render functions</a>.</li>
-<li>For Quasar buttons see the <a href="https://quasar.dev/vue-components/button#standard">Quasar Buttons</a> docs.</li>
-</ul>
-<p>Similarly, if we didn't want to use an anonymous render function, we could pass an actual Vue component there. i.e.</p>
-<pre class="prettyprint source lang-js"><code>import { defineComponent } from 'vue'
-
-const RenameToBobButton = defineComponent({
-  props: {
-    asset: { type: Object, required: true },
-  },
-  methods: {
-    async doActionWorkflow() {
-      // Same as above except that the asset would be referenced via `this.asset`
-    }
-  },
-  template: `
-    &lt;q-btn block color=&quot;secondary&quot; @click=&quot;() => doActionWorkflow()&quot; no-caps>
-      Rename to 'Bob'
-    &lt;/q-btn>`
-});
-
-slot.component(RenameToBobButton);
 </code></pre>
 </article>
 
