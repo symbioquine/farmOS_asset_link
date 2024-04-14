@@ -1,6 +1,6 @@
 {
   "name": "assetlink-sidecar",
-  "version": "1.0.0-alpha12",
+  "version": "1.0.0-alpha13",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

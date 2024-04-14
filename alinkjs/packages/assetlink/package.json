@@ -1,6 +1,6 @@
 {
   "name": "assetlink",
-  "version": "1.0.0-alpha12",
+  "version": "1.0.0-alpha13",
   "description": "",
   "exports": {
     ".": "./dist/index.js",
