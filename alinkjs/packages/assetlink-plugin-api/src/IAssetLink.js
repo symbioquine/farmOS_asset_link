@@ -10,6 +10,8 @@
  * @property {IAssetLinkUI} ui UI components/methods exposed for Asset Link plugins.
  * @property {external:Promise} booted A Promise that is fulfilled once Asset Link has booted.
  * @property {external:localForage} store A localForage instance that is used to store and retrieve data from IndexedDB.
+ * @property {IAssetLinkViewModel} vm A [Vue reactive object](https://vuejs.org/guide/essentials/reactivity-fundamentals.html#reactive)
+ * containing some key state - including booting status of Asset Link and meta information about the instance of farmOS.
  * @property {Object} devToolsApi A semi-private mechanism to interact with the browser dev tools.
  * @property {IAssetLinkPlugin[]} plugins The currently loaded plugins.
  * @property {external:@orbit/memory.MemorySource} entitySource The Orbit.js MemorySource which is used to access/modify farmOS assets/logs/etc.

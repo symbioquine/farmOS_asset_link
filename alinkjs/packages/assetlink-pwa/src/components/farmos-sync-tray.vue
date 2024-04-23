@@ -155,6 +155,24 @@ defineExpose({
       </q-list>
     </q-scroll-area>
     <q-bar>
+      <q-btn dense flat icon="mdi-information-outline">
+        <q-popup-proxy>
+          <q-banner>
+            <q-card flat>
+              <q-card-section class="q-pt-md">
+                Farm Name: {{ assetLink.vm.farmName }}
+              </q-card-section>
+              <q-card-section class="q-pt-none">
+                farmOS Version: {{ assetLink.vm.farmOSVersion }}
+              </q-card-section>
+              <q-card-section class="q-pt-none">
+                System of Measurement: {{ assetLink.vm.systemOfMeasurement }}
+              </q-card-section>
+            </q-card>
+          </q-banner>
+        </q-popup-proxy>
+      </q-btn>
+
       <div>{{ connectionStatusExplanation }}</div>
 
       <q-space />

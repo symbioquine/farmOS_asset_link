@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { reactive, watchEffect } from 'vue';
 
 import localforage from 'localforage';
 
@@ -13,6 +13,9 @@ import HttpAccessDeniedException from '@/HttpAccessDeniedException';
 
 import { createDrupalUrl, EventBus, uuidv4 } from "assetlink-plugin-api";
 import OnlineStructuralDataPreloader from './OnlineStructuralDataPreloader';
+
+
+const FARM_META_INFO_CACHE_KEY = "asset-link-farm-meta-info";
 
 
 /**
@@ -40,6 +43,10 @@ export default class AssetLink {
       failedUpdates: [],
 
       messages: [],
+
+      farmName: undefined,
+      farmOSVersion: undefined,
+      systemOfMeasurement: undefined,
     });
 
     this._liteMode = opts.liteMode || false;
@@ -185,6 +192,18 @@ export default class AssetLink {
     return this._store;
   }
 
+  get farmName() {
+    this.vm.farmName;
+  }
+
+  get farmOSVersion() {
+    this.vm.farmOSVersion;
+  }
+
+  get systemOfMeasurement() {
+    this.vm.systemOfMeasurement;
+  }
+
   /**
    * A semi-private mechanism to interact with the browser dev tools.
    */
@@ -211,6 +230,22 @@ export default class AssetLink {
     this.vm.bootText = "Initializing storage";
 
     await this._store.ready();
+
+    watchEffect(async () => {
+      const cachedFarmMetaInfo = await this._store.getItem(FARM_META_INFO_CACHE_KEY);
+
+      this.vm.farmName = this.connectionStatus.farmName.value || cachedFarmMetaInfo?.farmName;
+      this.vm.farmOSVersion = this.connectionStatus.farmOSVersion.value || cachedFarmMetaInfo?.farmOSVersion;
+      this.vm.systemOfMeasurement = this.connectionStatus.systemOfMeasurement.value || cachedFarmMetaInfo?.systemOfMeasurement;
+
+      const farmMetaInfo = {
+        farmName: this.vm.farmName,
+        farmOSVersion: this.vm.farmOSVersion,
+        systemOfMeasurement: this.vm.systemOfMeasurement,
+      };
+
+      await this._store.setItem(FARM_META_INFO_CACHE_KEY, farmMetaInfo);
+    });
 
     this.cores.pluginLists.eventBus.$on('add-plugin', async pluginUrl => {
       await this.cores.pluginLoader.loadPlugin(pluginUrl);

@@ -35,6 +35,10 @@ export default class FarmOSConnectionStatusDetector {
       return this.canReachFarmOS.value && this.isLoggedIn.value;
     });
 
+    this.farmOSVersion = ref(null);
+    this.farmName = ref(null);
+    this.systemOfMeasurement = ref(null);
+
     // Expose a promise that Asset Link can use during booting to
     // wait until the main connection status checking loop has run
     // at least once. That way booting can proceed with accurate
@@ -129,7 +133,6 @@ export default class FarmOSConnectionStatusDetector {
       const apiData = await res.json();
 
       const farmOsVersion = apiData.meta?.farm?.version;
-
       if (typeof farmOsVersion !== 'string' || (farmOsVersion.indexOf('2') !== 0 && farmOsVersion.indexOf('3') !== 0)) {
         this.canReachFarmOS.value = false;
         return;
@@ -137,7 +140,11 @@ export default class FarmOSConnectionStatusDetector {
 
       this.canReachFarmOS.value = true;
 
+      this.farmOSVersion.value = farmOsVersion;
       this.userRef.value = apiData.meta?.links?.me?.href;
+      this.farmName.value = apiData.meta?.farm?.name;
+      this.systemOfMeasurement.value = apiData.meta?.farm?.system_of_measurement;
+
     } catch (error) {
       this.canReachFarmOS.value = false;
     }
