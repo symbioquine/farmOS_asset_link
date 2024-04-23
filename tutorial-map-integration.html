@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,7 +5,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asset Link docs assetlink-plugin-api/src/currentEpochSecond.js</title>
+  <title>Asset Link docs Map Integration</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -113,7 +111,7 @@
 </div>
     <div id="main">
         <div
-            class="sidebar "
+            class="sidebar tutorials"
             id="sidebarNav"
         >
             
@@ -123,45 +121,59 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-@orbit_jsonapi.html">@orbit/jsonapi</a></li><li><a href="external-@orbit_memory.html">@orbit/memory</a></li><li><a href="external-localForage.html">localForage</a></li><li><a href="external-Promise.html">Promise</a></li><li><a href="external-URL.html">URL</a></li></ul><h3>Classes</h3><ul><li><a href="external-@orbit_jsonapi.JSONAPISource.html">JSONAPISource</a></li><li><a href="external-@orbit_memory.MemorySource.html">MemorySource</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAssetLink.html">IAssetLink</a></li><li><a href="IAssetLinkPlugin.html">IAssetLinkPlugin</a></li><li><a href="IAssetLinkPluginHandle.html">IAssetLinkPluginHandle</a></li><li><a href="IAssetLinkPluginIngestorHandle.html">IAssetLinkPluginIngestorHandle</a></li><li><a href="IAssetLinkPluginRouteHandle.html">IAssetLinkPluginRouteHandle</a></li><li><a href="IAssetLinkPluginSlotHandle.html">IAssetLinkPluginSlotHandle</a></li><li><a href="IAssetLinkPluginWidgetDecoratorHandle.html">IAssetLinkPluginWidgetDecoratorHandle</a></li><li><a href="IAssetLinkUI.html">IAssetLinkUI</a></li><li><a href="IAssetLinkUIDialogs.html">IAssetLinkUIDialogs</a></li><li><a href="IAssetLinkViewModel.html">IAssetLinkViewModel</a></li><li><a href="IFarmOSConnectionStatus.html">IFarmOSConnectionStatus</a></li></ul><h3>Global</h3><ul><li><a href="global.html#assetLinkIncludedLibraries">assetLinkIncludedLibraries</a></li><li><a href="global.html#createDevServerConfig">createDevServerConfig</a></li><li><a href="global.html#createDrupalUrl">createDrupalUrl</a></li><li><a href="global.html#currentEpochSecond">currentEpochSecond</a></li><li><a href="global.html#EventBus">EventBus</a></li><li><a href="global.html#GenerateDefaultPluginConfigYmlFilesPlugin">GenerateDefaultPluginConfigYmlFilesPlugin</a></li><li><a href="global.html#getDrupalBasePath">getDrupalBasePath</a></li><li><a href="global.html#summarizeAssetNames">summarizeAssetNames</a></li></ul></div><div class="category"><h2>components</h2><h3>Modules</h3><ul><li><a href="module-EntityName.html">EntityName</a></li><li><a href="module-EntityResolver.html">EntityResolver</a></li><li><a href="module-EntitySearch.html">EntitySearch</a></li><li><a href="module-EntitySelect.html">EntitySelect</a></li><li><a href="module-FarmMap.html">FarmMap</a></li><li><a href="module-PhotoInput.html">PhotoInput</a></li><li><a href="module-QrCodeScanner.html">QrCodeScanner</a></li><li><a href="module-RenderWidget.html">RenderWidget</a></li><li><a href="module-SearchMethod.html">SearchMethod</a></li><li><a href="module-SearchMethodTileTabber.html">SearchMethodTileTabber</a></li></ul></div>
+                    <div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-user-guide.html">User Guide</a><ul><li><a href="tutorial-installation-and-upgrades.html">Installation and Upgrades</a></li></ul></li><li><a href="tutorial-development.html">Development</a><ul><li><a href="tutorial-extension-model.html">Extension Model</a></li><li><a href="tutorial-farm-data-access.html">Farm Data Access</a></li><li><a href="tutorial-advanced-farm-data-queries.html">Advanced Farm Data Queries</a></li><li><a href="tutorial-writing-plugins.html">Writing Plugins</a></li><li><a href="tutorial-simple-asset-action-plugin.html">Simple Asset Action</a></li><li><a href="tutorial-map-integration.html">Map Integration</a></li><li><a href="tutorial-plugin-as-farm-os-module.html">Packaging a plugin as a farmOS contrib module</a></li><li><a href="tutorial-custom-styles-in-plugins.html">Custom styles in plugins</a></li></ul></li></ul></div>
                 
             </nav>
         </div>
         <div class="core" id="main-content-wrapper">
             <div class="content">
                 <header class="page-title">
-                    <p>Source</p>
-                    <h1>assetlink-plugin-api/src/currentEpochSecond.js</h1>
+                    <p>Tutorial</p>
+                    <h1>Map Integration</h1>
                 </header>
-                
+                <section>
 
+<article>
+    <p>Maps can be embedded in Asset Link using the <a href="module-FarmMap.html"><code>&lt;farm-map&gt;</code> component</a>. There are some limitations that are described below.</p>
+<p>Also check out the <a href="https://github.com/farmOS/farmOS-map/blob/2.x/README.md">farmOS-map readme</a> for more details of working with the underlying library.</p>
+<h3 id="quick-example">Quick Example</h3>
+<p><strong>TestMap.alink.vue</strong></p>
+<pre class="prettyprint source lang-vue"><code>&lt;script setup>
+import { createDrupalUrl } from &quot;assetlink-plugin-api&quot;;
 
+const onMapInitialized = (map) => {
+  map.addBehavior(&quot;sidePanel&quot;);
+  map.addBehavior(&quot;layerSwitcherInSidePanel&quot;);
 
-    
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * Returns the current epoch second as an integer number.
- *
- *  * ### Usage
- *
- * ```js
- * import { currentEpochSecond } from "assetlink-plugin-api";
- *
- * currentEpochSecond() // might return 1660580261
- * ```
- *
- * @return {Number} the current epoch second
- */
-export default function currentEpochSecond() {
-  return parseInt(new Date().getTime() / 1000);
-}
+  const layer = map.addLayer('geojson', {
+    title: 'All Assets',
+    url: createDrupalUrl('/assets/geojson/full/all')
+  });
+
+  layer.getSource().on('change', function () {
+    map.zoomToVectors();
+  });
+};
+&lt;/script>
+
+&lt;template alink-route[com.example.farmos_asset_link.routes.v0.test_map]=&quot;/test-map&quot;>
+&lt;farm-map @map-initialized=&quot;onMapInitialized&quot;>&lt;/farm-map>
+&lt;/template>
 </code></pre>
-        </article>
-    </section>
+<blockquote>
+<p><img src="./test_map.png" alt=""></p>
+</blockquote>
+<h3 id="limitations">Limitations</h3>
+<h4 id="core-farmos-behaviors">Core farmOS behaviors</h4>
+<p>Currently there isn't a good way to load the core behaviors that are shipped with farmOS - as opposed to the behaviors that come with farmOS-map or custom behaviors (both of which do work). This is because the behaviors from farmOS itself rely on Drupal's system for managing Javascript dependencies and Drupal's server-side render event system to populate key settings.</p>
+<h4 id="offline-first">Offline First</h4>
+<p>Asset Link has opted to leverage the version of farmOS-map that is vended with farmOS instead of packaging its own copy. This should reduce the total amount of data users of Asset Link end up loading, but it also means that it is possible for the map library not to be available offline if that functionality hasn't yet been used in Asset Link.</p>
+<p>Further, lazily loaded map layers - including base layers like OpenStreetMap - will tend not to work offline. Some caching improvements may be possible, but in general this will always be a weakness since there is an inherent trade-off between what data gets precached when online and the functionality that is available later when offline.</p>
+<h4 id="openlayers-api-access">OpenLayers API Access</h4>
+<p>farmOS-map is built upon OpenLayers, but chooses to only package the parts of OpenLayers that it uses. This means that applications which need direct access to the OpenLayers API must obtain it directly rather than through farmOS-map. In practice this means only certain kinds of maps can be built via simple <code>.alink.vue</code> Asset Link plugins. More complicated use-cases will require a build step. See <a href="https://www.npmjs.com/package/assetlink-plugin-dev-support">assetlink-plugin-dev-support</a> for more information on making Asset Link plugins that require a build step.</p>
+</article>
 
-
-
+</section>
 
             </div>
             

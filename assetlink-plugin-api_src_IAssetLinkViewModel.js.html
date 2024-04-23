@@ -7,7 +7,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asset Link docs assetlink-plugin-api/src/currentEpochSecond.js</title>
+  <title>Asset Link docs assetlink-plugin-api/src/IAssetLinkViewModel.js</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -131,7 +131,7 @@
             <div class="content">
                 <header class="page-title">
                     <p>Source</p>
-                    <h1>assetlink-plugin-api/src/currentEpochSecond.js</h1>
+                    <h1>assetlink-plugin-api/src/IAssetLinkViewModel.js</h1>
                 </header>
                 
 
@@ -140,23 +140,26 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * Returns the current epoch second as an integer number.
+            <pre class="prettyprint source linenums"><code>/* eslint-disable no-unused-vars */
+
+/**
+ * A [Vue reactive object](https://vuejs.org/guide/essentials/reactivity-fundamentals.html#reactive)
+ * containing some key state - including booting status of Asset Link and meta information about the instance of farmOS.
  *
- *  * ### Usage
- *
- * ```js
- * import { currentEpochSecond } from "assetlink-plugin-api";
- *
- * currentEpochSecond() // might return 1660580261
- * ```
- *
- * @return {Number} the current epoch second
+ * @interface
+ * @property {Boolean} booted Whether Asset Link is done booting
+ * @property {Number} bootProgress A number between 0 and 100 indicating how close to booted Asset Link is
+ * @property {String} bootText A status text indicating the current booting step
+ * @property {Boolean} bootFailed Whether Asset Link failed to boot
+ * @property {Object[]} pendingQueries The current list of pending Orbit.js queries
+ * @property {Object[]} pendingUpdates The current list of pending Orbit.js data updates
+ * @property {Object[]} failedUpdates The list of failed Orbit.js data updates
+ * @property {Object[]} messages A list of status messages to be surfaced in Asset Link
+ * @property {String} farmName The most recent observed farmOS instance name when Asset Link was last connected to the server
+ * @property {String} farmOSVersion The most recent observed farmOS version when Asset Link was last connected to the server
+ * @property {String} systemOfMeasurement The most recent observed farmOS system of measurement when Asset Link was last connected to the server
  */
-export default function currentEpochSecond() {
-  return parseInt(new Date().getTime() / 1000);
-}
-</code></pre>
+export default class IAssetLinkViewModel {}</code></pre>
         </article>
     </section>
 

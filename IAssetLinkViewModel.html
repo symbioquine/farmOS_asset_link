@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,7 +5,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asset Link docs assetlink-plugin-api/src/currentEpochSecond.js</title>
+  <title>Asset Link docs IAssetLinkViewModel</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -130,35 +128,384 @@
         <div class="core" id="main-content-wrapper">
             <div class="content">
                 <header class="page-title">
-                    <p>Source</p>
-                    <h1>assetlink-plugin-api/src/currentEpochSecond.js</h1>
+                    <p>Interface</p>
+                    <h1>IAssetLinkViewModel</h1>
                 </header>
                 
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * Returns the current epoch second as an integer number.
- *
- *  * ### Usage
- *
- * ```js
- * import { currentEpochSecond } from "assetlink-plugin-api";
- *
- * currentEpochSecond() // might return 1660580261
- * ```
- *
- * @return {Number} the current epoch second
- */
-export default function currentEpochSecond() {
-  return parseInt(new Date().getTime() / 1000);
-}
-</code></pre>
-        </article>
-    </section>
+        <h2>IAssetLinkViewModel</h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>A <a href="https://vuejs.org/guide/essentials/reactivity-fundamentals.html#reactive">Vue reactive object</a>
+containing some key state - including booting status of Asset Link and meta information about the instance of farmOS.</p></div>
+        
+
+        
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+<div class="table-container">
+    <table class="props table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>booted</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Boolean</code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>Whether Asset Link is done booting</p></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>bootProgress</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Number</code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>A number between 0 and 100 indicating how close to booted Asset Link is</p></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>bootText</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">String</code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>A status text indicating the current booting step</p></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>bootFailed</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Boolean</code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>Whether Asset Link failed to boot</p></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>pendingQueries</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Array.&lt;Object></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>The current list of pending Orbit.js queries</p></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>pendingUpdates</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Array.&lt;Object></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>The current list of pending Orbit.js data updates</p></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>failedUpdates</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Array.&lt;Object></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>The list of failed Orbit.js data updates</p></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>messages</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Array.&lt;Object></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>A list of status messages to be surfaced in Asset Link</p></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>farmName</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">String</code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>The most recent observed farmOS instance name when Asset Link was last connected to the server</p></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>farmOSVersion</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">String</code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>The most recent observed farmOS version when Asset Link was last connected to the server</p></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>systemOfMeasurement</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">String</code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"><p>The most recent observed farmOS system of measurement when Asset Link was last connected to the server</p></td>
+</tr>
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="assetlink-plugin-api_src_IAssetLinkViewModel.js.html" class="button">View Source</a>
+            <span>
+                <a href="assetlink-plugin-api_src_IAssetLinkViewModel.js.html">assetlink-plugin-api/src/IAssetLinkViewModel.js</a>, <a href="assetlink-plugin-api_src_IAssetLinkViewModel.js.html#line3">line 3</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+        
+    
+    </div>
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
