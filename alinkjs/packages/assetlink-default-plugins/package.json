@@ -1,6 +1,6 @@
 {
   "name": "assetlink-default-plugins",
-  "version": "1.0.0-alpha13",
+  "version": "1.0.0-alpha14",
   "description": "",
   "scripts": {
     "build": "webpack build",
