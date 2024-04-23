@@ -43,18 +43,28 @@ class SkipCacheAwareNetworkFirstStrategy extends Strategy {
   }
 }
 
-// Start of CacheFirst Strategy##################
-// all the api request which matches the following pattern will use CacheFirst strategy for caching
+// Start of SkipCacheAwareNetworkFirstStrategy Strategy##################
+// - Load alink plugin repos from the cache when offline
 registerRoute(
   /https:\/\/.*\.repo\.json/,
   new SkipCacheAwareNetworkFirstStrategy()
 );
+// - Load alink plugins from the cache when offline
 registerRoute(
   /https:\/\/.*\.alink\..*/,
   new SkipCacheAwareNetworkFirstStrategy()
 );
+// - Load farmOS-map from the cache when offline
+registerRoute(
+  /https:\/\/.*\/libraries\/farmOS-map\/?.*/,
+  new SkipCacheAwareNetworkFirstStrategy()
+);
+// End of SkipCacheAwareNetworkFirstStrategy Strategy####################
+
+// Start of NetworkOnly Strategy##################
+//  - Never cache API responses
 registerRoute(/https:\/\/.*\/api\/?.*/, new NetworkOnly());
-// End of CacheFirst Strategy####################
+// End of NetworkOnly Strategy####################
 
 setDefaultHandler(new NetworkFirst());
 
@@ -76,7 +86,7 @@ setCatchHandler(async ({ event }) => {
     return Response.error();
   }
 
-  // Return js/css from our cache
+  // Return alink js/css from our cache
   if (
     url.pathname.startsWith(
       "/__THIS_GETS_REPLACED_AT_RUNTIME_BY_THE_DRUPAL_CONTROLLER__/js/"

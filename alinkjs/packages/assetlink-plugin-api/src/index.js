@@ -19,6 +19,7 @@ import EntityName from "./components/EntityName.vue";
 import EntityResolver from "./components/EntityResolver.vue";
 import EntitySearch from "./components/EntitySearch.vue";
 import EntitySelect from "./components/EntitySelect.vue";
+import FarmMap from "./components/FarmMap.vue";
 import PhotoInput from "./components/PhotoInput.vue";
 import QrCodeScanner from "./components/QrCodeScanner.vue";
 import RenderWidget from "./components/RenderWidget";
@@ -31,6 +32,7 @@ const components = {
   EntitySearch,
   EntitySelect,
   EntityName,
+  FarmMap,
   PhotoInput,
   QrCodeScanner,
   RenderWidget,
@@ -45,6 +47,7 @@ const components = {
  * * [EntityResolver](./module-EntityResolver.html)
  * * [EntitySearch](./module-EntitySearch.html)
  * * [EntitySelect](./module-EntitySelect.html)
+ * * [FarmMap](./module-FarmMap.html)
  * * [PhotoInput](./module-PhotoInput.html)
  * * [QrCodeScanner](./module-QrCodeScanner.html)
  * * [RenderWidget](./module-RenderWidget.html)
