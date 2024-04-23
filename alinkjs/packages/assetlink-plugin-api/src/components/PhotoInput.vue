@@ -10,7 +10,7 @@
  *
  * @category components
  * @vue-prop {Object} [modelValue=null] - The initially selected photo file
- * @vue-event {String} update:modelValue - Emitted when a photo has been captured/selected
+ * @vue-event {Object} update:modelValue - Emitted when a photo has been captured/selected
  */
 export default {};
 </script>
