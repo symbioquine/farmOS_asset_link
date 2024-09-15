@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Allow plugins to provide/consume 'plugin libraries' from each other
+
 ## [1.0.0-alpha14] - 2024-04-23
 
 ### Added

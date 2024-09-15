@@ -400,7 +400,7 @@ between plugins must be flexible.
 
 To achieve that flexibility, Asset Link employs a loose dependency model. Asset Link facilitates a few types of dependencies
 explicitly - such as those related to rendering and to searching farmOS data. Beyond that, plugins can form more complex
-dependencies via plugin ingestion.
+dependencies via plugin ingestion and plugin libraries.
 
 ### Plugin Ingestion
 
@@ -425,9 +425,82 @@ should occur via an "attributed handle";
       pluginIngestor.onEveryPlugin(plugin => {
 
         handle.onBehalfOf(plugin, attributedHandle => {
-          // Asset Link will manage the lifecycle of routes/slots/etc defined via attributedHandle
+          // Asset Link will manage the lifecycle of routes/slots/libraries/etc defined via attributedHandle
         });
 
       });
     });
 ```
+
+### Plugin Libraries
+
+Another common use-case is providing and consuming logic (or potentially state) from other plugins.
+
+This can be achieved via the `provideLibrary` method in a plugin's `onLoad` and consumed using `import` statements in other plugins.
+
+```javascript
+    handle.provideLibrary('com.example.farmos_asset_link.libraryA', library => {
+      library.provides(libraryA);
+    });
+```
+
+The `libraryA` object passed can be any Javascript object. Then the `libraryA` object can be imported from another plugin.
+
+```javascript
+import libraryA from 'plugin-library:com.example.farmos_asset_link.libraryA';
+```
+
+It is also possible to do the following in an `async` context;
+
+```javascript
+const libraryA = await import('plugin-library:com.example.farmos_asset_link.libraryA');
+```
+
+In theory the promise returned by the `import` method could be used to conditionally provide alternate logic until/unless a given library is provided, but that should be rarely needed.
+
+#### Missing Dependencies
+
+If a plugin library dependency is not available, plugin loading and/or the execution of the plugin's `onLoad` method will be blocked until the required library becomes available.
+
+#### Reloaded/Unloaded Dependencies
+
+If a plugin `A` depends on another plugin `B`'s library and plugin `B` is reloaded/unloaded, plugin `A` will get reloaded also. In this way, a library could be updated and all its dependent plugins
+would be updated as well.
+
+#### Library Versions
+
+Asset Link supports plugin libraries optionally specifying a [semantic version v2.0.0 string](https://semver.org/). Not specifying a version is equivalent to specifying version '0.0.1-alpha.1'.
+
+```javascript
+    handle.provideLibrary('com.example.farmos_asset_link.libraryA', library => {
+      library.version('1.2.3');
+      library.provides(libraryA);
+    });
+```
+
+Dependent plugins can similarly specify a version requirement. If the required version is not available (yet?) it is equivalent to the plugin library not being loaded at all. Not specifying a version requirement is equivalent to accepting any version.
+
+```javascript
+// Require version >= 1.2.* and < 2.*.*
+const libraryA = await import('plugin-library:com.example.farmos_asset_link.libraryA:^1.2');
+```
+
+It should be rare, but this means that multiple versions of the same library can coexist and be depended on by different plugins. Asset Link does impose the restriction that a given plugin can only depend on a single version of a particular library though.
+
+Further, Asset Link eagerly satisfies library dependencies. If multiple versions of a library are available that would satisfy a dependency, Asset Link will choose the one with the largest version. However, it does not wait for all libraries to load before choosing so cannot guarantee that the version used *will* be the largest version by the time all the plugins have loaded/reloaded/etc. Thus, it is best to make library dependencies unambiguous and/or only have a single version of each library loaded at any time.
+
+When considering the larger set of plugins loaded in Asset Link, it is the site admin's (or occasionally the user's) responsibility to make sure that the plugins all work together. We must recognize that it is not a tractable problem to capture all the nuances of code/dependency compatibility with versions and version requirements.
+
+#### Asynchronous Library Loading
+
+Libraries must be declared synchronously within a plugin's `onLoad` method. However, it is possible to pass a promise as the second argument to `handle.provideLibrary`. In that case, dependent plugin's `import` statements will not resolve until that promise is itself resolved.
+
+#### Dependency Cycles
+
+Due to the nature of this library mechanism, dependency cycles (e.g. Where `libraryA` depends on `libraryB` which itself depends on `libraryA`) do not cause an infinite loop or any other serious problems, however, they also do not work. A cycle would prevent any of the dependent functionality from actually ever becoming available.
+
+In the future such cycles may be detected and reported, but for now Asset Link silently ignores them.
+
+#### Library Delays and Dependency Tree Depth
+
+Asset Link naively loads plugins in the order it encounters them. This means that, during loading, there may be some time when a library dependency is unavailable because the providing plugin just has not loaded yet. Usually this is not a problem, but sometimes the changes in functionality as plugins eventually load could be jarring to the user. The best way to avoid that is to keep the depth of the dependency tree fairly shallow and to ensure plugins that provide libraries load quickly - especially where they may be deeply depended on.

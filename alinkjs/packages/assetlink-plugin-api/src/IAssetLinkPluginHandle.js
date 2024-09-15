@@ -151,6 +151,28 @@ IAssetLinkPluginHandle.prototype.onBehalfOf = function (
 ) {};
 
 /**
+ * Provide a plugin library
+ *
+ * ### Usage
+ *
+ * ```js
+ * handle.provideLibrary('com.example.farmos_asset_link.libraryA', library => {
+ *   library.version('1.2.3');
+ *   library.provides(libraryA);
+ * });
+ * ```
+ *
+ * @method IAssetLinkPluginHandle#provideLibrary
+ * @param {String} libraryName the name of the library
+ * @param {attributedHandlerFn} libraryProviderFn A method which accepts a {@link IAssetLinkPluginLibraryProvisionHandle}
+ *   and defines the library.
+ */
+IAssetLinkPluginHandle.prototype.provideLibrary = function (
+  libraryName,
+  libraryProviderFn
+) {};
+
+/**
  * Record an error from the current plugin.
  *
  * ### Usage

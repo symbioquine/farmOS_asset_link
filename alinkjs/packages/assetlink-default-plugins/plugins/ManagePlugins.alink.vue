@@ -32,7 +32,7 @@
                   <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin'">
                     <q-item-section @click="removePluginByUrl(prop.node.pluginUrl)">remove</q-item-section>
                   </q-item>
-                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin' && prop.node.getPlugin()?.rawSource">
+                  <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin' && prop.node.getPluginRawSource()">
                     <q-item-section @click="editPluginByUrl(prop.node.pluginUrl)">edit</q-item-section>
                   </q-item>
                   <q-item clickable v-close-popup v-if="prop.node.nodeType === 'plugin' && !prop.node.isBlacklisted">
@@ -110,7 +110,7 @@
 <script>
 import { Buffer } from 'buffer/';
 
-import { defineComponent, h, ref, onMounted, onUnmounted } from 'vue';
+import { defineComponent, h, ref, onMounted, onUnmounted, unref } from 'vue';
 import {
   QBadge,
   QBtn,
@@ -460,9 +460,7 @@ export default {
       await this.assetLink.cores.pluginLists.removePluginFromLocalList(pluginUrl);
     },
     async editPluginByUrl(pluginUrl) {
-      const sourcePlugin = this.pluginsByUrl[pluginUrl.toString()];
-
-      const code = this.pluginsByUrl[pluginUrl.toString()].rawSource;
+      const code = this.assetLink.cores.pluginLoader.vm.pluginRawSourceByUrl[pluginUrl.toString()];
 
       let disableSourcePlugin = false;
 
@@ -585,6 +583,8 @@ export default {
         }
 
         pluginList.plugins.forEach(plugin => {
+          const loaded = unref(this.pluginsByUrl[plugin.url.toString()]?.onLoadDone) || false;
+
           const error = this.getPluginError(plugin);
 
           const isBlacklisted = blacklistedPluginUrls.has(plugin.url.toString());
@@ -592,6 +592,8 @@ export default {
           let pluginIcon = 'mdi-puzzle';
           if (error || isBlacklisted) {
             pluginIcon = 'mdi-puzzle-remove';
+          } else if (!loaded) {
+            pluginIcon = 'mdi-timer-sand';
           }
 
           listRoot.children.push({
@@ -602,6 +604,7 @@ export default {
             error,
             pluginUrl: plugin.url,
             getPlugin: () => this.pluginsByUrl[plugin.url.toString()],
+            getPluginRawSource: () => this.assetLink.cores.pluginLoader.vm.pluginRawSourceByUrl[plugin.url.toString()],
           });
         });
 

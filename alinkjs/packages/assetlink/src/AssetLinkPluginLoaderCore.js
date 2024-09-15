@@ -1,6 +1,10 @@
 import { Buffer } from 'buffer/';
 
-import { markRaw, reactive } from 'vue';
+import semverParse from 'semver/functions/parse';
+import semverValid from 'semver/functions/valid';
+import Range from 'semver/classes/range';
+
+import { markRaw, reactive, ref, watch } from 'vue';
 
 import { loadModule } from 'vue3-sfc-loader/dist/vue3-sfc-loader.esm.js';
 import { parse as parseComponent } from '@vue/compiler-sfc';
@@ -25,7 +29,13 @@ export default class AssetLinkPluginLoaderCore {
     this._devToolsApi = assetLink._devToolsApi;
 
     this._vm = reactive({
+      // Expose the plugin code/data here as soon as it has been retrieved.
+      // This is useful because plugins that have asynchronous dependencies
+      // are not available in the plugins array until they have finished loading.
+      pluginRawSourceByUrl: {},
       plugins: [],
+      unresolvedDependencies: {},
+      resolvedDependencies: {},
     });
 
     this._eventBus = new EventBus();
@@ -57,6 +67,8 @@ export default class AssetLinkPluginLoaderCore {
   async loadPlugin(pluginUrl, opts) {
     const options = opts || {};
 
+    const vm = this.vm;
+
     const pluginFilename = pluginUrl.pathname.split('/').pop();
     const pluginBaseName = pluginFilename.split('.alink.')[0];
     const pluginLoadingOccurrenceId = uuidv4();
@@ -82,6 +94,8 @@ export default class AssetLinkPluginLoaderCore {
       }
 
       rawPluginSource = Buffer.from(pluginData.substring(PLUGIN_DATA_URL_PREFIX.length), 'base64').toString('utf8');
+
+      vm.pluginRawSourceByUrl[pluginUrl.toString()] = rawPluginSource;
 
       let pluginDecorator = p => p;
 
@@ -109,9 +123,36 @@ export default class AssetLinkPluginLoaderCore {
           this.moduleCache = pluginModuleLibrary;
         }
 
+        // Keep track of the dependencies during this instance of loading the plugin such
+        // that subsequent requests for the same dependency resolve identically/immediately.
+        const libraryDependencies = {};
+
+        // Isolate regular module cache from plugin libraries portion of the cache
+        const scopedModuleCacheData = {};
+        const scopedModuleCache = new Proxy(this.moduleCache, {
+          has(target, prop) {
+            if (prop.startsWith('plugin-library:')) {
+              return prop in scopedModuleCacheData;
+            }
+            return prop in target;
+          },
+          get(target, prop) {
+            if (prop.startsWith('plugin-library:')) {
+              return scopedModuleCacheData[prop];
+            }
+            return target[prop];
+          },
+          set(target, prop, value) {
+            if (prop.startsWith('plugin-library:')) {
+              return scopedModuleCacheData[prop] = value;
+            }
+            return Reflect.set(...arguments);
+          }
+        });
+
         const options = {
           // devMode: true,
-          moduleCache: this.moduleCache,
+          moduleCache: scopedModuleCache,
           compiledCache: {
             set: (key, str) => this._store.setItem(`asset-link-cached-compiled-plugin:${key}`, str),
             get: async (key) => (await this._store.getItem(`asset-link-cached-compiled-plugin:${key}`)) 
@@ -130,14 +171,120 @@ export default class AssetLinkPluginLoaderCore {
               return refPath;
             }
 
-            if (this.moduleCache[relPath] === undefined) {
+            if (this.moduleCache[relPath] === undefined && !relPath.startsWith('plugin-library:')) {
               throw new Error(`Unsupported import '${relPath}'. Supported libraries:` + JSON.stringify(pluginModuleLibraryNames));
             }
 
             return relPath;
           },
+          async loadModule(id, options) {
+            // Fallback on the normal module loading unless the requested id is a plugin-library
+            if (!id.startsWith('plugin-library:')) {
+              return undefined;
+            }
+
+            const rawLibraryRequirement = id.slice(15, id.length);
+
+            let libraryNameRequirement = rawLibraryRequirement;
+            let rawLibraryVersionRequirement = undefined;
+            if (rawLibraryRequirement.includes(':')) {
+              [libraryNameRequirement, rawLibraryVersionRequirement] = rawLibraryRequirement.split(':', 2);
+            }
+
+            if (!Object.hasOwn(libraryDependencies, libraryNameRequirement)) {
+              const libraryVersionRequirement = rawLibraryVersionRequirement ? new Range(rawLibraryVersionRequirement) : undefined;
+
+              const resolveLibraryPromise = new Promise((resolve) => {
+                // Keep track of unresolved library dependencies
+                if (!vm.unresolvedDependencies[pluginUrl.toString()]) {
+                  vm.unresolvedDependencies[pluginUrl.toString()] = {};
+                }
+
+                const checkIsSatisfiedBy = (library) => {
+                  if (libraryNameRequirement !== library.libraryName) {
+                    return false;
+                  }
+
+                  if (!libraryVersionRequirement) {
+                    return true;
+                  }
+
+                  return libraryVersionRequirement.test(library.libraryVersion);
+                };
+
+                const satisfyWith = (sourcePluginUrls, library) => {
+                  resolve(library.libraryObject);
+
+                  delete vm.unresolvedDependencies[pluginUrl.toString()][rawLibraryRequirement];
+
+                  // Keep track of dependency relationships between plugins to allow unloading/reloading plugins to correctly
+                  // unload/reload dependent plugins
+                  new Set(sourcePluginUrls).forEach(sourcePluginUrl =>
+                    vm.resolvedDependencies[sourcePluginUrl].add(pluginUrl.toString())
+                  );
+                };
+
+                const trySatisfy = (sourcePluginUrls, library) => {
+                  // Don't try and satisfy this dependency once it has been removed from the unresolved dependencies
+                  if (!Object.hasOwn(vm.unresolvedDependencies[pluginUrl.toString()], rawLibraryRequirement)) {
+                    return;
+                  }
+                  if (checkIsSatisfiedBy(library)) {
+                    satisfyWith(sourcePluginUrls, library);
+                  }
+                };
+
+                const matchingLibrary = vm.plugins
+                  .flatMap(providingPlugin => Object.entries(providingPlugin.providedLibraries).flatMap(([attributedPluginUrl, attributedLibraries]) =>
+                    Object.values(attributedLibraries).map(library => ({
+                      providingPlugin,
+                      attributedPluginUrl,
+                      library,
+                    }))
+                  ))
+                  // Only consider libraries that match the requested name and satisfy the version requirement(s) - if any
+                  .filter(({ library }) => checkIsSatisfiedBy(library))
+                  // Choose the latest version available (right now)
+                  .reduce((a, b) => {
+                    if (a && a.library.libraryVersion > b.library.libraryVersion) {
+                      return a;
+                    }
+                    return b;
+                  }, undefined);
+
+                if (matchingLibrary) {
+                  satisfyWith([matchingLibrary.providingPlugin.pluginUrl.toString(), matchingLibrary.attributedPluginUrl], matchingLibrary.library);
+                  return;
+                }
+
+                vm.unresolvedDependencies[pluginUrl.toString()][rawLibraryRequirement] = {
+                  libraryNameRequirement,
+                  libraryVersionRequirement,
+                  trySatisfy,
+                };
+
+              });
+
+              libraryDependencies[libraryNameRequirement] = {
+                libraryNameRequirement,
+                rawLibraryVersionRequirement,
+                libraryVersionRequirement,
+                resolveLibraryPromise,
+              };
+            }
+
+            if (libraryDependencies[libraryNameRequirement].rawLibraryVersionRequirement !== rawLibraryVersionRequirement) {
+              throw new Error(`Cannot depend on two different versions of ${libraryNameRequirement} from a single plugin.`);
+            }
+
+            return await libraryDependencies[libraryNameRequirement].resolveLibraryPromise;
+          },
           async getFile(url) {
             const fileUrl = new URL(url);
+
+            if (fileUrl.toString().startsWith('plugin-library:')) {
+              throw new Error(`Plugin libraries shouldn't reach this code - instead being handled by loadModule above. url=${url}`);
+            }
 
             const pluginSrc = (fileUrl.toString() === pluginUrlWithoutParams.toString()) ? rawPluginSource : await fetch(fileUrl).then(r => r.text());
 
@@ -157,7 +304,9 @@ export default class AssetLinkPluginLoaderCore {
           },
         };
 
-        pluginInstance = await loadModule(pluginUrlWithoutParams, options);
+        const pluginInstancePromise = loadModule(pluginUrlWithoutParams, options);
+
+        pluginInstance = await pluginInstancePromise;
 
         if (pluginUrl.pathname.endsWith('alink.js')) {
           pluginInstance = pluginInstance.default;
@@ -196,11 +345,16 @@ export default class AssetLinkPluginLoaderCore {
    * will not persist between sessions/reloads.
    */
   registerPlugin(plugin) {
+    plugin.onLoadDone = ref(false);
     plugin.definedRoutes = reactive({});
     plugin.definedSlots = reactive({});
     plugin.definedWidgetDecorators = reactive({});
     plugin.definedPluginIngestor = undefined;
+    plugin.providedLibraries = reactive({});
     plugin.attributedErrors = reactive({});
+
+    // Keep a set of the plugin urls which depend on libraries this plugin provides
+    this.vm.resolvedDependencies[plugin.pluginUrl.toString()] = new Set();
 
     this.vm.plugins.push(plugin);
 
@@ -215,21 +369,43 @@ export default class AssetLinkPluginLoaderCore {
         } catch (e) {
           handle.recordError(e.toString());
         }
+        plugin.onLoadDone.value = true;
       };
       onLoadObserver();
 
       handle._onLoadDone = true;
+    } else {
+      plugin.onLoadDone.value = true;
     }
+
+    const trySatisfyLibraryDependencies = p => {
+      Object.entries(p.providedLibraries).forEach(([attributedPluginUrl, librariesByIdentifier]) => {
+        Object.values(librariesByIdentifier).forEach(library => {
+          Object.values(this.vm.unresolvedDependencies)
+            .flatMap(pluginUnresolvedDeps => Object.values(pluginUnresolvedDeps))
+            .forEach(unresolvedDependency => {
+              unresolvedDependency.trySatisfy([p.pluginUrl.toString(), attributedPluginUrl], library);
+            });
+        });
+      });
+    };
 
     this.vm.plugins.forEach(p => {
       if (p !== plugin && p.definedPluginIngestor) {
         // TODO: Catch errors
         p.definedPluginIngestor.ingestorFn(plugin);
+
+        // Look for attributed libraries that now satisfy an unsatisfied dependency
+        // as a result of a (existing) plugin ingestor acting on the plugin we're registering
+        // here.
+        trySatisfyLibraryDependencies(p);
       }
       if (p !== plugin && plugin.definedPluginIngestor) {
         plugin.definedPluginIngestor.ingestorFn(p);
       }
     });
+
+    trySatisfyLibraryDependencies(plugin);
   }
 
   async unloadPlugin(pluginUrl) {
@@ -245,20 +421,42 @@ export default class AssetLinkPluginLoaderCore {
       plugin.onUnload(this._assetLink);
     }
 
-    const pluginStyles = document.head.querySelectorAll(`style[data-alink-style-plugin-id="${plugin.occurrenceId}"]`) || [];
-    pluginStyles.forEach(e => e.parentNode.removeChild(e));
+    if (plugin) {
+      const pluginStyles = document.head.querySelectorAll(`style[data-alink-style-plugin-id="${plugin.occurrenceId}"]`) || [];
+      pluginStyles.forEach(e => e.parentNode.removeChild(e));
+    }
 
     if (pluginIdx !== -1) {
       this.vm.plugins.splice(pluginIdx, 1);
     }
 
     this.vm.plugins.forEach(otherPlugin => {
-      ['definedRoutes', 'definedSlots', 'definedWidgetDecorators', 'attributedErrors'].forEach(attributedKey => {
+      ['definedRoutes', 'definedSlots', 'definedWidgetDecorators', 'attributedErrors', 'providedLibraries'].forEach(attributedKey => {
         if (otherPlugin[attributedKey]) {
           delete otherPlugin[attributedKey][pluginUrl.toString()];
         }
       });
+
+      // Remove the records of the (now unloaded) plugin's dependencies on other plugins
+      if (this.vm.resolvedDependencies[otherPlugin.pluginUrl.toString()]) {
+        this.vm.resolvedDependencies[otherPlugin.pluginUrl.toString()].delete(pluginUrl.toString());
+      }
     });
+
+    const thisPluginResolvedDeps = Array.from(this.vm.resolvedDependencies[pluginUrl.toString()] || []);
+
+    // Reload any plugins that depended on libraries provided by this plugin
+    // 
+    // Because we've already removed the plugin being unloaded from the this.vm.plugins list, the dependency
+    // will either resolve to a different version provided by some other plugin or else they will be unresolved
+    // until this plugin is loaded again.
+    thisPluginResolvedDeps.forEach(otherPluginUrl => this.reloadPlugin(new URL(otherPluginUrl)));
+
+    // Cleanup our resolved dependencies entry for this plugin
+    delete this.vm.resolvedDependencies[pluginUrl.toString()];
+
+    // Cleanup the raw source for this plugin
+    delete this.vm.pluginRawSourceByUrl[pluginUrl.toString()];
   }
 
   async reloadPlugin(pluginUrl) {
@@ -329,6 +527,8 @@ class AssetLinkPluginHandle {
     this._vm = vm;
     this._eventBus = eventBus;
     this._attributedTo = attributedTo || pluginInstance;
+
+    // Used to prevent certain calls occurring asynchronously after the plugin has already been registered
     this._onLoadDone = false;
   }
 
@@ -545,6 +745,48 @@ class AssetLinkPluginHandle {
     }
 
     this._pluginInstance.attributedErrors[this._attributedTo.pluginUrl.toString()].push(errorString);
+  }
+
+  provideLibrary(libraryName, libraryProviderFn) {
+    if (this._onLoadDone) {
+      throw new Error("Plugin provided libraries must be defined synchronously. Consider specifying a Promise as the libraryObject instead.");
+    }
+
+    const providedLibraryDef = { libraryName };
+
+    const libraryProvisionHandle = {
+        version(rawLibraryVersion) {
+          providedLibraryDef.rawLibraryVersion = rawLibraryVersion;
+        },
+        provides(libraryObject) {
+          providedLibraryDef.libraryObject = markRaw(libraryObject);
+        },
+    };
+
+    libraryProviderFn(libraryProvisionHandle);
+
+    const libraryVersionStr = providedLibraryDef.rawLibraryVersion || '0.0.1-alpha.1';
+
+    const libraryIdentifier = `${libraryName}:${libraryVersionStr}`;
+
+    if (!semverValid(libraryVersionStr)) {
+      throw new Error(`Invalid semantic version: '${libraryIdentifier}'`);
+    }
+
+    const libraryVersion = semverParse(libraryVersionStr);
+
+    if (!Object.hasOwn(providedLibraryDef, 'libraryObject')) {
+      throw new Error("Plugin provided libraries must provide a libraryObject.");
+    }
+
+    const libraryObject = providedLibraryDef.libraryObject;
+
+    this._setAttributedDefinition('providedLibraries', libraryIdentifier, {
+      libraryIdentifier,
+      libraryName,
+      libraryVersion,
+      libraryObject,
+    });
   }
 
   _setAttributedDefinition(defType, defKey, defValue) {

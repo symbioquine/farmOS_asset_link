@@ -18,6 +18,11 @@ import OnlineStructuralDataPreloader from './OnlineStructuralDataPreloader';
 const FARM_META_INFO_CACHE_KEY = "asset-link-farm-meta-info";
 
 
+function sleep(millis) {
+  return new Promise(resolve => setTimeout(resolve, millis));
+}
+
+
 /**
  * Core of the larger Asset Link application and API entry-point for plugins.
  * 
@@ -248,7 +253,13 @@ export default class AssetLink {
     });
 
     this.cores.pluginLists.eventBus.$on('add-plugin', async pluginUrl => {
-      await this.cores.pluginLoader.loadPlugin(pluginUrl);
+      const loadPluginPromise = this.cores.pluginLoader.loadPlugin(pluginUrl);
+
+      // Don't block the whole event bus for slow plugins
+      await Promise.race([
+        sleep(500).then(() => false),
+        loadPluginPromise.then(() => true),
+      ]);
     });
 
     this.cores.pluginLists.eventBus.$on('remove-plugin', async pluginUrl => {
