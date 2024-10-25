@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha15] - 2024-09-25
+
+### Added
+
+- Allow plugins to provide/consume 'plugin libraries' from each other
+
+### Changed
+
+- Update testing docker-compose.yml files to use farmos/farmos:3.3.1
+
+### Fixed
+
+- Fix a warning traversing schema refs that have no linked schemas
+- Remove deprecated version key from testing docker-compose.yml files
+
 ## [1.0.0-alpha14] - 2024-04-23
 
 ### Added
@@ -651,7 +666,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha14...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha15...HEAD
+[1.0.0-alpha15]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha14...unbuilt-v1.0.0-alpha15
 [1.0.0-alpha14]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha13...unbuilt-v1.0.0-alpha14
 [1.0.0-alpha13]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha12...unbuilt-v1.0.0-alpha13
 [1.0.0-alpha12]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha11...unbuilt-v1.0.0-alpha12

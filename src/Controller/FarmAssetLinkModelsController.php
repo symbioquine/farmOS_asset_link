@@ -23,7 +23,7 @@ class FarmAssetLinkModelsController extends ControllerBase {
     $models = [];
 
     foreach($serverSchema['allOf'] as $schemaRef) {
-      if (!$schemaRef['links']) {
+      if (empty($schemaRef['links'])) {
         continue;
       }
 
