@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Allow plugins to provide/consume 'plugin libraries' from each other
 
+### Changed
+
+- Update testing docker-compose.yml files to use farmos/farmos:3.3.1
+
 ### Fixed
 
 - Fix a warning traversing schema refs that have no linked schemas
