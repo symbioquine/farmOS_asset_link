@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Allow plugins to provide/consume 'plugin libraries' from each other
 
+### Fixed
+
+- Fix a warning traversing schema refs that have no linked schemas
+
 ## [1.0.0-alpha14] - 2024-04-23
 
 ### Added
