@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix a warning traversing schema refs that have no linked schemas
+- Remove deprecated version key from testing docker-compose.yml files
 
 ## [1.0.0-alpha14] - 2024-04-23
 
