@@ -7,7 +7,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asset Link docs assetlink-plugin-api/src/index.js</title>
+  <title>Asset Link docs assetlink-plugin-api/src/IAssetLinkPluginLibraryProvisionHandle.js</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -131,7 +131,7 @@
             <div class="content">
                 <header class="page-title">
                     <p>Source</p>
-                    <h1>assetlink-plugin-api/src/index.js</h1>
+                    <h1>assetlink-plugin-api/src/IAssetLinkPluginLibraryProvisionHandle.js</h1>
                 </header>
                 
 
@@ -140,66 +140,49 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import { defineAsyncComponent } from "vue";
+            <pre class="prettyprint source linenums"><code>/* eslint-disable no-unused-vars */
 
 /**
- * @alias module:something-nifty/lib/plugins/Plugin
+ * An object which is passed into the method a plugin provides for providing a
+ * plugin library via {@link IAssetLinkPluginHandle#provideLibrary}.
+ *
+ * @interface
  */
-export { default as createAlinkUrl } from "./createAlinkUrl";
-export { default as createDrupalUrl } from "./createDrupalUrl";
-export { default as currentEpochSecond } from "./currentEpochSecond";
-export { default as getDrupalBasePath } from "./getDrupalBasePath";
-export { default as summarizeAssetNames } from "./summarizeAssetNames";
-export { default as RacingLocalRemoteAsyncIterator } from "./RacingLocalRemoteAsyncIterator";
-export { default as EventBus } from "./EventBus";
+export default class IAssetLinkPluginLibraryProvisionHandle {}
 
-// Code mirror is pretty big so we'll make it an async component with its own chunk
-const CodeEditor = defineAsyncComponent(() =>
-  import("./components/CodeEditor.vue")
-);
-import EntityName from "./components/EntityName.vue";
-import EntityResolver from "./components/EntityResolver.vue";
-import EntitySearch from "./components/EntitySearch.vue";
-import EntitySelect from "./components/EntitySelect.vue";
-import FarmMap from "./components/FarmMap.vue";
-import PhotoInput from "./components/PhotoInput.vue";
-import QrCodeScanner from "./components/QrCodeScanner.vue";
-import RenderWidget from "./components/RenderWidget";
-import SearchMethodTileTabber from "./components/SearchMethodTileTabber";
-import SearchMethod from "./components/SearchMethod.vue";
-
-const components = {
-  CodeEditor,
-  EntityResolver,
-  EntitySearch,
-  EntitySelect,
-  EntityName,
-  FarmMap,
-  PhotoInput,
-  QrCodeScanner,
-  RenderWidget,
-  SearchMethod,
-  SearchMethodTileTabber,
-};
 /**
- * @export components
- * @desc
- * * [CodeEditor](./module-CodeEditor.html)
- * * [EntityName](./module-EntityName.html)
- * * [EntityResolver](./module-EntityResolver.html)
- * * [EntitySearch](./module-EntitySearch.html)
- * * [EntitySelect](./module-EntitySelect.html)
- * * [FarmMap](./module-FarmMap.html)
- * * [PhotoInput](./module-PhotoInput.html)
- * * [QrCodeScanner](./module-QrCodeScanner.html)
- * * [RenderWidget](./module-RenderWidget.html)
- * * [SearchMethod](./module-SearchMethod.html)
- * * [SearchMethodTileTabber](./module-SearchMethodTileTabber.html)
+ * Specify the version for this plugin-provided library.
+ *
+ * ### Usage
+ *
+ * ```js
+ * library.version('1.2.3');
+ * ```
+ *
+ * @method IAssetLinkPluginLibraryProvisionHandle#version
+ * @param {String} rawLibraryVersion the semantic version string of the library - defaults
+ *   to '0.0.1-alpha.1' if this is not called.
  */
-export { components };
+IAssetLinkPluginLibraryProvisionHandle.prototype.version = function (
+  rawLibraryVersion
+) {};
 
-export { formatRFC3339, parseJSON as parseJSONDate } from "date-fns";
-export { v4 as uuidv4 } from "uuid";
+/**
+ * Specify the object for this plugin-provided library.
+ *
+ * ### Usage
+ *
+ * ```js
+ * library.provides(libraryA);
+ * ```
+ *
+ * @method IAssetLinkPluginLibraryProvisionHandle#provides
+ * @param {Object|external:Promise} libraryObject the library object to be exposed or a promise that resolves
+ *   to it.
+ */
+IAssetLinkPluginLibraryProvisionHandle.prototype.provides = function (
+  libraryObject
+) {};
 </code></pre>
         </article>
     </section>

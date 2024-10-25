@@ -450,7 +450,7 @@ seen here is different from Asset Link slots.</em></p>
 between plugins must be flexible.</p>
 <p>To achieve that flexibility, Asset Link employs a loose dependency model. Asset Link facilitates a few types of dependencies
 explicitly - such as those related to rendering and to searching farmOS data. Beyond that, plugins can form more complex
-dependencies via plugin ingestion.</p>
+dependencies via plugin ingestion and plugin libraries.</p>
 <h3 id="plugin-ingestion">Plugin Ingestion</h3>
 <p>In its <code>onLoad</code> method a plugin may choose to be notified about every other plugin by defining a plugin ingestor;</p>
 <pre class="prettyprint source lang-javascript"><code>    handle.definePluginIngestor(pluginIngestor => {
@@ -467,12 +467,52 @@ should occur via an &quot;attributed handle&quot;;</p>
       pluginIngestor.onEveryPlugin(plugin => {
 
         handle.onBehalfOf(plugin, attributedHandle => {
-          // Asset Link will manage the lifecycle of routes/slots/etc defined via attributedHandle
+          // Asset Link will manage the lifecycle of routes/slots/libraries/etc defined via attributedHandle
         });
 
       });
     });
 </code></pre>
+<h3 id="plugin-libraries">Plugin Libraries</h3>
+<p>Another common use-case is providing and consuming logic (or potentially state) from other plugins.</p>
+<p>This can be achieved via the <code>provideLibrary</code> method in a plugin's <code>onLoad</code> and consumed using <code>import</code> statements in other plugins.</p>
+<pre class="prettyprint source lang-javascript"><code>    handle.provideLibrary('com.example.farmos_asset_link.libraryA', library => {
+      library.provides(libraryA);
+    });
+</code></pre>
+<p>The <code>libraryA</code> object passed can be any Javascript object. Then the <code>libraryA</code> object can be imported from another plugin.</p>
+<pre class="prettyprint source lang-javascript"><code>import libraryA from 'plugin-library:com.example.farmos_asset_link.libraryA';
+</code></pre>
+<p>It is also possible to do the following in an <code>async</code> context;</p>
+<pre class="prettyprint source lang-javascript"><code>const libraryA = await import('plugin-library:com.example.farmos_asset_link.libraryA');
+</code></pre>
+<p>In theory the promise returned by the <code>import</code> method could be used to conditionally provide alternate logic until/unless a given library is provided, but that should be rarely needed.</p>
+<h4 id="missing-dependencies">Missing Dependencies</h4>
+<p>If a plugin library dependency is not available, plugin loading and/or the execution of the plugin's <code>onLoad</code> method will be blocked until the required library becomes available.</p>
+<h4 id="reloaded%2Funloaded-dependencies">Reloaded/Unloaded Dependencies</h4>
+<p>If a plugin <code>A</code> depends on another plugin <code>B</code>'s library and plugin <code>B</code> is reloaded/unloaded, plugin <code>A</code> will get reloaded also. In this way, a library could be updated and all its dependent plugins
+would be updated as well.</p>
+<h4 id="library-versions">Library Versions</h4>
+<p>Asset Link supports plugin libraries optionally specifying a <a href="https://semver.org/">semantic version v2.0.0 string</a>. Not specifying a version is equivalent to specifying version '0.0.1-alpha.1'.</p>
+<pre class="prettyprint source lang-javascript"><code>    handle.provideLibrary('com.example.farmos_asset_link.libraryA', library => {
+      library.version('1.2.3');
+      library.provides(libraryA);
+    });
+</code></pre>
+<p>Dependent plugins can similarly specify a version requirement. If the required version is not available (yet?) it is equivalent to the plugin library not being loaded at all. Not specifying a version requirement is equivalent to accepting any version.</p>
+<pre class="prettyprint source lang-javascript"><code>// Require version >= 1.2.* and &lt; 2.*.*
+const libraryA = await import('plugin-library:com.example.farmos_asset_link.libraryA:^1.2');
+</code></pre>
+<p>It should be rare, but this means that multiple versions of the same library can coexist and be depended on by different plugins. Asset Link does impose the restriction that a given plugin can only depend on a single version of a particular library though.</p>
+<p>Further, Asset Link eagerly satisfies library dependencies. If multiple versions of a library are available that would satisfy a dependency, Asset Link will choose the one with the largest version. However, it does not wait for all libraries to load before choosing so cannot guarantee that the version used <em>will</em> be the largest version by the time all the plugins have loaded/reloaded/etc. Thus, it is best to make library dependencies unambiguous and/or only have a single version of each library loaded at any time.</p>
+<p>When considering the larger set of plugins loaded in Asset Link, it is the site admin's (or occasionally the user's) responsibility to make sure that the plugins all work together. We must recognize that it is not a tractable problem to capture all the nuances of code/dependency compatibility with versions and version requirements.</p>
+<h4 id="asynchronous-library-loading">Asynchronous Library Loading</h4>
+<p>Libraries must be declared synchronously within a plugin's <code>onLoad</code> method. However, it is possible to pass a promise as the second argument to <code>handle.provideLibrary</code>. In that case, dependent plugin's <code>import</code> statements will not resolve until that promise is itself resolved.</p>
+<h4 id="dependency-cycles">Dependency Cycles</h4>
+<p>Due to the nature of this library mechanism, dependency cycles (e.g. Where <code>libraryA</code> depends on <code>libraryB</code> which itself depends on <code>libraryA</code>) do not cause an infinite loop or any other serious problems, however, they also do not work. A cycle would prevent any of the dependent functionality from actually ever becoming available.</p>
+<p>In the future such cycles may be detected and reported, but for now Asset Link silently ignores them.</p>
+<h4 id="library-delays-and-dependency-tree-depth">Library Delays and Dependency Tree Depth</h4>
+<p>Asset Link naively loads plugins in the order it encounters them. This means that, during loading, there may be some time when a library dependency is unavailable because the providing plugin just has not loaded yet. Usually this is not a problem, but sometimes the changes in functionality as plugins eventually load could be jarring to the user. The best way to avoid that is to keep the depth of the dependency tree fairly shallow and to ensure plugins that provide libraries load quickly - especially where they may be deeply depended on.</p>
 </article>
 
 </section>
