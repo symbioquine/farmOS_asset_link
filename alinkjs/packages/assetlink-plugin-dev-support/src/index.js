@@ -104,12 +104,14 @@ function GenerateDefaultPluginConfigYmlFilesPlugin(options) {
 
         const configOutputFilename = `${configOutputDir}/farmos_asset_link.asset_link_default_plugin.${nameWithoutExt}.yml`;
 
+        const pluginUrl = options.pluginUrlFn ? options.pluginUrlFn(filename, options) : `{module:${options.drupalModuleName}}/${filename}`;
+
         fs.writeFileSync(configOutputFilename, yaml.dump({
           langcode: 'en',
           status: true,
           id: nameWithoutExt,
           dependencies: { enforced: { module: [ options.drupalModuleName ] } },
-          url: `{module:${options.drupalModuleName}}/${filename}`,
+          url: pluginUrl,
           user_defined : null,
         }));
       });

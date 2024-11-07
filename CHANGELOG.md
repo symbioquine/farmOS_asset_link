@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Generate the plugin config yml files via plugin dev support
+
 ## [1.0.0-alpha15] - 2024-09-25
 
 ### Added
