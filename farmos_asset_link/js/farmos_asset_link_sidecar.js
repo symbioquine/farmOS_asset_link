@@ -4,11 +4,12 @@
     // Skip adding sidebar to map popups.
     return;
   }
-  const matches = window.location.href.match(/https?:\/\/.*\/asset\/(\d+)/);
 
-  console.log(matches);
+  const urlRegexes = drupalSettings.farmos_asset_link.sidebar_url_patterns.map(pattern => new RegExp(pattern));
 
-  if (!matches || matches.length < 2) {
+  const anyMatchingRegex = urlRegexes.find(re => re.test(window.location.href));
+
+  if (!anyMatchingRegex) {
     console.log("No match returning without sidecar...");
     return;
   }

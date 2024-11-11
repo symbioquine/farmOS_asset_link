@@ -206,6 +206,11 @@ module.exports = {
       configOutputDir: `${__dirname}/../../../farmos_asset_link/config/install`,
       drupalModuleName: 'farmos_asset_link',
       pluginUrlFn: (filename) => `{base_path}alink/plugins/${filename}`,
+      pluginConfigMutator: (pluginConfig) => {
+        if (pluginConfig.id === 'OpenInAssetLinkMetaActionProvider') {
+          pluginConfig.sidebarUrlPattern = "https?:\\/\\/.*\\/(asset|log)\\/(\\d+)";
+        }
+      },
     }),
   ],
   devServer: createDevServerConfig(),

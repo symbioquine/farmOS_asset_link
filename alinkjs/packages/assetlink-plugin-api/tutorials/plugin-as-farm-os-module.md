@@ -25,6 +25,7 @@ dependencies:
     module:
       - name_bob_alink_plugin
 url: '{module:name_bob_alink_plugin}/NameBobAssetActionProvider.alink.js'
+sidebarUrlPattern: null
 ```
 
 **Important:** If the plugin is named "NameBobAssetActionProvider.alink.js", then the `id` field of the config yml must be
@@ -66,6 +67,20 @@ url: '{module:name_bob_alink_plugin}/NameBobAssetActionProvider.alink.js'
 Then the plugin would only be installed when the farmOS Material asset type is also available.
 
 Here is the most cogent description of this feature I have located so far: https://lightning.acquia.com/blog/optional-config-weirdness-drupal-8
+
+## Sidebar URL Patterns
+
+In the interest of performance, the Asset Link sidebar does not load on all farmOS pages by default. Instead, the pages where the sidebar should
+load are whitelisted by URL.
+
+### Yaml
+
+Because that whitelist check occurs before any plugin code is executed, the whitelist is encoded in default plugin config entities. The most consistent
+behavior can be obtained by placing the whitelist regex pattern in a default plugin yaml file so that it is available to Asset Link immediately.
+
+```yml
+sidebarUrlPattern: 'https?:\/\/.*\/asset\/(\d+)'
+```
 
 ## Plugin Dev Support
 

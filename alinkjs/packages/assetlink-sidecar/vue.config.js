@@ -1,5 +1,4 @@
 const fs = require("fs");
-const path = require("path");
 const https = require("https");
 const { defineConfig } = require("@vue/cli-service");
 const { DefinePlugin } = require("webpack");
@@ -115,11 +114,13 @@ module.exports = defineConfig({
       ...config.resolve.alias,
     };
 
-    config.plugins.push(new DefinePlugin({
-      __VUE_OPTIONS_API__: 'true',
-      __VUE_PROD_DEVTOOLS__: 'false',
-      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
-    }));
+    config.plugins.push(
+      new DefinePlugin({
+        __VUE_OPTIONS_API__: "true",
+        __VUE_PROD_DEVTOOLS__: "false",
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "false",
+      })
+    );
 
     config.plugins.push(
       new ModuleFederationPlugin({

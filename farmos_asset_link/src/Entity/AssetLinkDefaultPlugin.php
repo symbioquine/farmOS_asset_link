@@ -37,12 +37,14 @@ use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
  *   entity_keys = {
  *     "id" = "id",
  *     "url" = "url",
+ *     "sidebarUrlPattern" = "sidebarUrlPattern",
  *     "user_defined" = "user_defined",
  *     "status" = "status",
  *   },
  *   config_export = {
  *     "id",
  *     "url",
+ *     "sidebarUrlPattern",
  *     "user_defined",
  *     "status",
  *   },
@@ -71,6 +73,13 @@ class AssetLinkDefaultPlugin extends ConfigEntityBase implements ConfigEntityInt
    * @var string
    */
   protected $url;
+
+  /**
+   * The URL whitelist regex for which pages the sidebar loads on
+   *
+   * @var string
+   */
+  protected $sidebarUrlPattern;
 
   /**
    * The plugin status.
@@ -113,6 +122,13 @@ class AssetLinkDefaultPlugin extends ConfigEntityBase implements ConfigEntityInt
    */
   public function url() {
     return $this->url;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function sidebarUrlPattern() {
+    return $this->sidebarUrlPattern;
   }
 
   /**

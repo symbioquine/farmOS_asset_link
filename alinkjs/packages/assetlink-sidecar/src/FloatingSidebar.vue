@@ -1,12 +1,5 @@
 <script setup>
-import {
-  inject,
-  onMounted,
-  getCurrentInstance,
-  ref,
-  computed,
-  provide,
-} from "vue";
+import { inject, onMounted, getCurrentInstance, computed, provide } from "vue";
 
 import AssetLinkIcon from "@/icons/asset-link.svg";
 import AssetLink from "assetlink/AssetLink";
@@ -19,25 +12,10 @@ const assetLink = new AssetLink(rootComponent, devToolsApi);
 
 provide("assetLink", assetLink);
 
-const resolvedAsset = ref(null);
-
-const sidecarMenuItemDefs = computed(() => {
+const sidebarMenuItemDefs = computed(() => {
   return assetLink.getSlots({
-    type: "sidecar-menu-slot",
-    asset: resolvedAsset.value,
+    type: "sidebar-menu-slot",
   });
-});
-
-const assetRef = computed(() => {
-  const matches = window.location.href.match(/https?:\/\/.*\/asset\/(\d+)/);
-
-  if (!matches || matches.length < 2) {
-    return undefined;
-  }
-
-  const assetDrupalInternalId = matches[1];
-
-  return assetDrupalInternalId;
 });
 
 onMounted(() => {
@@ -53,13 +31,18 @@ onMounted(() => {
       v-if="assetLink.connectionStatus.isLoggedIn"
     >
       <q-fab
-        v-if="!assetLink.vm.booted"
-        disable
-        :loading="true"
+        v-if="!assetLink.vm.booted || sidebarMenuItemDefs.length"
+        :disable="!assetLink.vm.booted"
+        :loading="!assetLink.vm.booted"
         color="orange-5"
+        icon="keyboard_arrow_left"
+        direction="left"
       >
         <template v-slot:icon>
+          <q-icon :name="'img:' + AssetLinkIcon" v-if="assetLink.vm.booted" />
+
           <q-circular-progress
+            v-else
             show-value
             font-size="16px"
             class="text-red"
@@ -73,32 +56,14 @@ onMounted(() => {
             <q-icon :name="'img:' + AssetLinkIcon" />
           </q-circular-progress>
         </template>
+
+        <component
+          v-for="slotDef in sidebarMenuItemDefs"
+          :key="slotDef.id"
+          :is="slotDef.component"
+          v-bind="slotDef.props"
+        ></component>
       </q-fab>
-
-      <entity-resolver
-        entity-type="asset"
-        v-if="assetLink.vm.booted"
-        :entity-ref="assetRef"
-        @entity-resolved="resolvedAsset = $event"
-      >
-        <q-fab
-          color="orange-5"
-          icon="keyboard_arrow_left"
-          direction="left"
-          v-if="sidecarMenuItemDefs.length"
-        >
-          <template v-slot:icon>
-            <q-icon :name="'img:' + AssetLinkIcon" />
-          </template>
-
-          <component
-            v-for="slotDef in sidecarMenuItemDefs"
-            :key="slotDef.id"
-            :is="slotDef.component"
-            v-bind="slotDef.props"
-          ></component>
-        </q-fab>
-      </entity-resolver>
     </q-page-sticky>
   </q-layout>
 </template>
