@@ -51,6 +51,14 @@ class AssetLinkDefaultPluginForm extends EntityForm {
       '#required' => TRUE,
     ];
 
+    $form['sidebarUrlPattern'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Sidebar URL Pattern'),
+      '#maxlength' => 255,
+      '#default_value' => $plugin->sidebarUrlPattern(),
+      '#description' => $this->t("URL whitelist regex for which pages the sidebar loads on"),
+    ];
+
     $form['status'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enabled'),

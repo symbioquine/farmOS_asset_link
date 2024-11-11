@@ -8,6 +8,9 @@ farmos_asset_link.asset_link_default_plugin.*:
     url:
       type: string
       label: 'url'
+    sidebarUrlPattern:
+      type: string
+      label: 'sidebarUrlPattern'
     status:
       type: boolean
       label: 'Status'
