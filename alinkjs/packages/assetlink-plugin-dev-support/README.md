@@ -386,3 +386,64 @@ Update **webpack.config.js**;
 ## Example package with Built Vue SFC Plugins
 
 See https://github.com/symbioquine/example-assetlink-built-vue-plugin-pkg
+
+## GenerateDefaultPluginConfigYmlFilesPlugin API
+
+farmOS modules that package Asset Link plugins can just hardcode the install yaml files, but this convenience
+Webpack plugin is also provided to generate them automatically.
+
+```javascript
+function GenerateDefaultPluginConfigYmlFilesPlugin(options)
+```
+
+### options.pluginDir
+
+This is the directory where the plugins are located. Usually, this will just be `__dirname`.
+
+```javascript
+pluginDir: __dirname
+```
+
+### options.drupalModuleName
+
+This is the name of the drupal module in which the resulting yaml files will be packaged.
+
+```javascript
+drupalModuleName: 'example_alink_plugins'
+```
+
+### options.configOutputDir
+
+Optionally, it is possible to specify where the resulting yaml files will be output to.
+
+Defaults to `${options.pluginDir}/config/install` if not specified.
+
+```javascript
+configOutputDir: `${__dirname}/../somewhere/else`
+```
+
+### options.pluginUrlFn
+
+Optionally, it is possible to specify the plugin URL as a function of the plugin filename and the options.
+
+Defaults to ```(filename, options) => `{module:${options.drupalModuleName}}/${filename}` ``` if not specified.
+
+```javascript
+pluginUrlFn: (filename) => `{base_path}alink/plugins/${filename}`,
+```
+
+### options.pluginConfigMutator
+
+Optionally, it is possible to specify a function that will mutate the final yaml config before it is written
+to disk. This can be used to add module dependencies or sidebar whitelists.
+
+Defaults to `(pluginConfig) => { /* No-op */ }` if not specified.
+
+```javascript
+pluginConfigMutator: (pluginConfig) => {
+  if (pluginConfig.id === 'MyPlansPlugin') {
+    pluginConfig.sidebarUrlPattern = "https?:\\/\\/.*\\/plan\\/(\\d+)";
+    pluginConfig.dependencies.enforced.module.push('farm_crop_plan');
+  }
+}
+```

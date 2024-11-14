@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Improve the plugin dev support docs and add a pluginConfigMutator option
+
 ### Changed
 
 - Generate the plugin config yml files via plugin dev support

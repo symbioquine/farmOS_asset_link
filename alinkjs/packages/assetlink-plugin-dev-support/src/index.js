@@ -106,14 +106,20 @@ function GenerateDefaultPluginConfigYmlFilesPlugin(options) {
 
         const pluginUrl = options.pluginUrlFn ? options.pluginUrlFn(filename, options) : `{module:${options.drupalModuleName}}/${filename}`;
 
-        fs.writeFileSync(configOutputFilename, yaml.dump({
+        const pluginConfig = {
           langcode: 'en',
           status: true,
           id: nameWithoutExt,
           dependencies: { enforced: { module: [ options.drupalModuleName ] } },
           url: pluginUrl,
           user_defined : null,
-        }));
+        };
+
+        if (options.pluginConfigMutator) {
+          options.pluginConfigMutator(pluginConfig);
+        }
+
+        fs.writeFileSync(configOutputFilename, yaml.dump(pluginConfig));
       });
 
     });
