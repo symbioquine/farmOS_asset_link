@@ -125,6 +125,25 @@ IAssetLinkPluginHandle.prototype.definePluginIngestor = function (
 ) {};
 
 /**
+ * Whitelist a sidebar URL pattern locally.
+ * 
+ *
+ * ### Usage
+ *
+ * ```js
+ * handle.whitelistSidebarUrlPattern(/https?:\/\/.*\/plan\/(\d+)/);
+ * ```
+ * 
+ * See [these extension model docs](tutorial-extension-model.html#local-sidebar-whitelist-patterns) for more details.
+ *
+ * @method IAssetLinkPluginHandle#whitelistSidebarUrlPattern
+ * @param {RegExp} urlPattern The sidebar URL pattern to be whitelisted locally.
+ */
+IAssetLinkPluginHandle.prototype.whitelistSidebarUrlPattern = function (
+  urlPattern
+) {};
+
+/**
  * @callback attributedHandlerFn
  * @param  {IAssetLinkPluginHandle} attributedHandle - The handle used to define a route
  */

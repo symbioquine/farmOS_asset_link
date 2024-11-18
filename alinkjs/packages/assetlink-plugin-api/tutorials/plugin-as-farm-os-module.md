@@ -79,7 +79,7 @@ Because that whitelist check occurs before any plugin code is executed, the whit
 behavior can be obtained by placing the whitelist regex pattern in a default plugin yaml file so that it is available to Asset Link immediately.
 
 ```yml
-sidebarUrlPattern: 'https?:\/\/.*\/asset\/(\d+)'
+sidebarUrlPattern: 'https?:\/\/.*\/plan\/(\d+)'
 ```
 
 ## Plugin Dev Support

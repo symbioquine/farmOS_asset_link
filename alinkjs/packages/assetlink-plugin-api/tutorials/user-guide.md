@@ -3,11 +3,15 @@
 Asset Link is a highly extensible mobile app for farmOS which aims to connect users with their farmOS data via a minimal action-driven
 user interface.
 
-Once Asset Link is installed in farmOS, it adds a big orange floating button on the right hand side of each Asset Page.
+## Sidebar
+
+Once Asset Link is installed in farmOS, it adds a big orange floating button on the right hand side of each asset and log page.
 
 ![](./farmOS_asset_page.png)
 
-This button can be used to navigate from farmOS into the Asset Link page for that same asset.
+This button can be used to navigate from farmOS into the Asset Link page for that same asset or log.
+
+## Asset Link
 
 ### Asset Page
 

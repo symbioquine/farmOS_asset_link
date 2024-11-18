@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Improve the plugin dev support docs and add a pluginConfigMutator option
 - Add a whitelist mechanism to control when the sidebar appears in farmOS
+- Add a local sidebar whitelist mechanism in the plugin API
 
 ### Changed
 

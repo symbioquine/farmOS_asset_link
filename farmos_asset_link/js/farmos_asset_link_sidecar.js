@@ -5,7 +5,15 @@
     return;
   }
 
-  const urlRegexes = drupalSettings.farmos_asset_link.sidebar_url_patterns.map(pattern => new RegExp(pattern));
+  const urlRegexesFromDrupal = (drupalSettings.farmos_asset_link.sidebar_url_patterns || []).map(pattern => new RegExp(pattern));
+
+  const urlRegexesFromLocalStorageJson = localStorage.getItem('alink-sidebar-local-whitelist-patterns') || '{}';
+
+  const urlRegexesFromLocalStorage = Object.values(JSON.parse(urlRegexesFromLocalStorageJson)).flatMap(l => l).map(([pattern, flags]) => new RegExp(pattern, flags));
+
+  const urlRegexes = [...urlRegexesFromDrupal, ...urlRegexesFromLocalStorage];
+
+  console.log(urlRegexes);
 
   const anyMatchingRegex = urlRegexes.find(re => re.test(window.location.href));
 

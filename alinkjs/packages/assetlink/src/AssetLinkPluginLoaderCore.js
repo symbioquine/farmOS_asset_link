@@ -12,6 +12,7 @@ import { parse as parseComponent } from '@vue/compiler-sfc';
 import fetch from 'cross-fetch';
 
 import VuePluginShorthandDecorator from '@/VuePluginShorthandDecorator';
+import SidebarPatternWhitelisting from '@/SidebarPatternWhitelisting';
 import { default as pluginModuleLibrary, pluginModuleLibraryNames } from '@/pluginModuleLibrary';
 
 import { currentEpochSecond, EventBus, uuidv4 } from "assetlink-plugin-api";
@@ -33,12 +34,16 @@ export default class AssetLinkPluginLoaderCore {
       // This is useful because plugins that have asynchronous dependencies
       // are not available in the plugins array until they have finished loading.
       pluginRawSourceByUrl: {},
+
       plugins: [],
+
       unresolvedDependencies: {},
       resolvedDependencies: {},
     });
 
     this._eventBus = new EventBus();
+
+    this._sidebarPatternWhitelisting = new SidebarPatternWhitelisting();
   }
 
   /**
@@ -352,6 +357,7 @@ export default class AssetLinkPluginLoaderCore {
     plugin.definedPluginIngestor = undefined;
     plugin.providedLibraries = reactive({});
     plugin.attributedErrors = reactive({});
+    plugin.sidebarUrlPatterns = new Set();
 
     // Keep a set of the plugin urls which depend on libraries this plugin provides
     this.vm.resolvedDependencies[plugin.pluginUrl.toString()] = new Set();
@@ -377,6 +383,8 @@ export default class AssetLinkPluginLoaderCore {
     } else {
       plugin.onLoadDone.value = true;
     }
+
+    this._sidebarPatternWhitelisting.updateEntriesForPlugin(plugin.pluginUrl, Array.from(plugin.sidebarUrlPatterns));
 
     const trySatisfyLibraryDependencies = p => {
       Object.entries(p.providedLibraries).forEach(([attributedPluginUrl, librariesByIdentifier]) => {
@@ -408,7 +416,7 @@ export default class AssetLinkPluginLoaderCore {
     trySatisfyLibraryDependencies(plugin);
   }
 
-  async unloadPlugin(pluginUrl) {
+  async unloadPlugin(pluginUrl, options) {
     if (this.moduleCache && this.moduleCache[pluginUrl.toString()]) {
       delete this.moduleCache[pluginUrl.toString()];
     }
@@ -457,10 +465,16 @@ export default class AssetLinkPluginLoaderCore {
 
     // Cleanup the raw source for this plugin
     delete this.vm.pluginRawSourceByUrl[pluginUrl.toString()];
+
+    // If the plugin is not being reloaded, cleanup any local sidebar whitelist entries now
+    // (Otherwise, those get refreshed/rewritten when it is next loaded.)
+    if (!options?.isReloading) {
+      this._sidebarPatternWhitelisting.clearEntriesForPlugin(pluginUrl);
+    }
   }
 
   async reloadPlugin(pluginUrl) {
-    await this.unloadPlugin(pluginUrl);
+    await this.unloadPlugin(pluginUrl, { isReloading: true });
     await this.loadPlugin(pluginUrl, { skipCache: true });
   }
 
@@ -727,6 +741,17 @@ class AssetLinkPluginHandle {
     }
 
     this._pluginInstance.definedPluginIngestor = ingestorDef;
+  }
+
+  whitelistSidebarUrlPattern(urlPattern) {
+    if (this._onLoadDone) {
+      throw new Error("Plugin sidebar url patterns must be defined synchronously.");
+    }
+    if (this._pluginInstance !== this._attributedTo) {
+      throw new Error("Plugin sidebar url patterns cannot be attributed to other plugins.");
+    }
+
+    this._pluginInstance.sidebarUrlPatterns.add(urlPattern);
   }
 
   onBehalfOf(otherPlugin, attributedHandlerFn) {
