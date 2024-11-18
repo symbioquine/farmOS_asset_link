@@ -144,7 +144,11 @@ import {
 //To be used on app.use(Quasar, { ... })
 export default {
   iconSet,
-  config: {},
+  config: {
+    globalNodes: {
+      class: "quasar-style-wrap",
+    },
+  },
   components: {
     QAjaxBar,
     QAvatar,

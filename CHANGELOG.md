@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Generate the plugin config yml files via plugin dev support
 - Change the sidebar/sidecar to use mdi-v6 icons like the PWA part
 
+### Fixed
+
+- Fix Quasar styling for "global components" like dialogs appearing in farmOS
+
 ## [1.0.0-alpha15] - 2024-09-25
 
 ### Added
