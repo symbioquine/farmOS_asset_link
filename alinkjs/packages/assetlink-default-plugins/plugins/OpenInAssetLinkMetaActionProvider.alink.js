@@ -28,7 +28,7 @@ export default class OpenInFarmOSMetaActionProvider {
       };
 
       slot.component(() =>
-        h(QFabAction, { onClick: () => openInAssetLink(), color: 'grey-8', icon: 'launch' })
+        h(QFabAction, { onClick: () => openInAssetLink(), color: 'grey-8', icon: 'mdi-launch' })
       );
     });
 

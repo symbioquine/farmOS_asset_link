@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Generate the plugin config yml files via plugin dev support
+- Change the sidebar/sidecar to use mdi-v6 icons like the PWA part
 
 ## [1.0.0-alpha15] - 2024-09-25
 
