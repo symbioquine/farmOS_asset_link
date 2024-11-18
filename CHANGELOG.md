@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha16] - 2024-11-18
+
 ### Added
 
 - Improve the plugin dev support docs and add a pluginConfigMutator option
@@ -681,7 +683,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha15...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha16...HEAD
+[1.0.0-alpha16]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha15...unbuilt-v1.0.0-alpha16
 [1.0.0-alpha15]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha14...unbuilt-v1.0.0-alpha15
 [1.0.0-alpha14]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha13...unbuilt-v1.0.0-alpha14
 [1.0.0-alpha13]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha12...unbuilt-v1.0.0-alpha13
