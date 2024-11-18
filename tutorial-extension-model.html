@@ -445,6 +445,17 @@ seen here is different from Asset Link slots.</em></p>
       >{{ asset.attributes.name }}&lt;/render-widget>
 &lt;/h2>
 </code></pre>
+<h2 id="local-sidebar-whitelist-patterns">Local Sidebar Whitelist Patterns</h2>
+<p>There is a bit of special logic that pertains to the Asset Link <a href="tutorial-user-guide.html#sidebar">Sidebar</a> which appears in farmOS itself.</p>
+<p>Specifically, there are two ways for plugins to contribute whitelist patterns which tell Asset Link which pages that sidebar should appear on.</p>
+<p>One of these is outside the plugin javascript API and is described in the tutorial on <a href="tutorial-plugin-as-farm-os-module.html#sidebar-url-patterns">packaging plugins as farmOS modules</a>.</p>
+<p>The second is via the <a href="IAssetLinkPluginHandle.html#whitelistSidebarUrlPattern">plugin javascript API</a>. In its <code>onLoad</code> method a plugin may specify additional whitelist patterns which we will call &quot;local sidebar whitelist patterns&quot; because they are local to the current Asset Link instance.</p>
+<pre class="prettyprint source lang-javascript"><code>    handle.whitelistSidebarUrlPattern(/https?:\/\/.*\/plan\/(\d+)/);
+</code></pre>
+<p>These patterns are stored in local storage and used early in the sidebar initialization logic to determine whether the sidebar (and the rest of Asset Link) should load.</p>
+<p>This allows for plugin development which adds functionality to the sidebar for new pages without packaging them as farmOS modules, but has the downside that
+the patterns will not be available until the plugin has loaded at least once locally. Thus, it is recommended to only use this mechanism for development or
+in cases where that inconsistent loading behavior is acceptable.</p>
 <h2 id="plugin-dependencies">Plugin Dependencies</h2>
 <p>Asset Link Plugins can be loaded/unloaded/reloaded at any time - though normally they change infrequently. As such, dependencies
 between plugins must be flexible.</p>

@@ -246,14 +246,22 @@ function GenerateDefaultPluginConfigYmlFilesPlugin(options) {
 
         const configOutputFilename = `${configOutputDir}/farmos_asset_link.asset_link_default_plugin.${nameWithoutExt}.yml`;
 
-        fs.writeFileSync(configOutputFilename, yaml.dump({
+        const pluginUrl = options.pluginUrlFn ? options.pluginUrlFn(filename, options) : `{module:${options.drupalModuleName}}/${filename}`;
+
+        const pluginConfig = {
           langcode: 'en',
           status: true,
           id: nameWithoutExt,
           dependencies: { enforced: { module: [ options.drupalModuleName ] } },
-          url: `{module:${options.drupalModuleName}}/${filename}`,
+          url: pluginUrl,
           user_defined : null,
-        }));
+        };
+
+        if (options.pluginConfigMutator) {
+          options.pluginConfigMutator(pluginConfig);
+        }
+
+        fs.writeFileSync(configOutputFilename, yaml.dump(pluginConfig));
       });
 
     });

@@ -154,6 +154,7 @@ dependencies:
     module:
       - name_bob_alink_plugin
 url: '{module:name_bob_alink_plugin}/NameBobAssetActionProvider.alink.js'
+sidebarUrlPattern: null
 </code></pre>
 <p><strong>Important:</strong> If the plugin is named &quot;NameBobAssetActionProvider.alink.js&quot;, then the <code>id</code> field of the config yml must be
 &quot;NameBobAssetActionProvider&quot; and the yml file itself must be named &quot;farmos_asset_link.asset_link_default_plugin.NameBobAssetActionProvider.yml&quot;.
@@ -181,6 +182,14 @@ url: '{module:name_bob_alink_plugin}/NameBobAssetActionProvider.alink.js'
 </code></pre>
 <p>Then the plugin would only be installed when the farmOS Material asset type is also available.</p>
 <p>Here is the most cogent description of this feature I have located so far: https://lightning.acquia.com/blog/optional-config-weirdness-drupal-8</p>
+<h2 id="sidebar-url-patterns">Sidebar URL Patterns</h2>
+<p>In the interest of performance, the Asset Link sidebar does not load on all farmOS pages by default. Instead, the pages where the sidebar should
+load are whitelisted by URL.</p>
+<h3 id="yaml">Yaml</h3>
+<p>Because that whitelist check occurs before any plugin code is executed, the whitelist is encoded in default plugin config entities. The most consistent
+behavior can be obtained by placing the whitelist regex pattern in a default plugin yaml file so that it is available to Asset Link immediately.</p>
+<pre class="prettyprint source lang-yml"><code>sidebarUrlPattern: 'https?:\/\/.*\/plan\/(\d+)'
+</code></pre>
 <h2 id="plugin-dev-support">Plugin Dev Support</h2>
 <p>Asset link also provides some tooling that may help with building the yaml files above and serving plugins for live development. Check
 out the <a href="https://www.npmjs.com/package/assetlink-plugin-dev-support">assetlink-plugin-dev-support</a> package for more information about that.</p>
