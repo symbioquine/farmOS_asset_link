@@ -7,3 +7,4 @@ dependencies:
       - farmos_asset_link
 url: '{base_path}alink/plugins/OpenInAssetLinkMetaActionProvider.alink.js'
 user_defined: null
+sidebarUrlPattern: https?:\/\/.*\/(asset|log)\/(\d+)

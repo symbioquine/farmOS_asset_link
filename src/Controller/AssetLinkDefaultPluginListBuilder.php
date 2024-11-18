@@ -15,6 +15,7 @@ class AssetLinkDefaultPluginListBuilder extends ConfigEntityListBuilder {
    */
   public function buildHeader() {
     $header['url'] = $this->t('URL');
+    $header['sidebarUrlPattern'] = $this->t('Sidebar URL Pattern');
     $header['status'] = $this->t('Status');
     return $header + parent::buildHeader();
   }
@@ -24,6 +25,7 @@ class AssetLinkDefaultPluginListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['url'] = $entity->url();
+    $row['sidebarUrlPattern'] = $entity->sidebarUrlPattern();
     $row['status'] = $entity->status() ? $this->t('Enabled') : $this->t('Disabled');
 
     return $row + parent::buildRow($entity);

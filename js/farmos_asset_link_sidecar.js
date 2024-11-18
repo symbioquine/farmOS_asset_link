@@ -4,11 +4,20 @@
     // Skip adding sidebar to map popups.
     return;
   }
-  const matches = window.location.href.match(/https?:\/\/.*\/asset\/(\d+)/);
 
-  console.log(matches);
+  const urlRegexesFromDrupal = (drupalSettings.farmos_asset_link.sidebar_url_patterns || []).map(pattern => new RegExp(pattern));
 
-  if (!matches || matches.length < 2) {
+  const urlRegexesFromLocalStorageJson = localStorage.getItem('alink-sidebar-local-whitelist-patterns') || '{}';
+
+  const urlRegexesFromLocalStorage = Object.values(JSON.parse(urlRegexesFromLocalStorageJson)).flatMap(l => l).map(([pattern, flags]) => new RegExp(pattern, flags));
+
+  const urlRegexes = [...urlRegexesFromDrupal, ...urlRegexesFromLocalStorage];
+
+  console.log(urlRegexes);
+
+  const anyMatchingRegex = urlRegexes.find(re => re.test(window.location.href));
+
+  if (!anyMatchingRegex) {
     console.log("No match returning without sidecar...");
     return;
   }

@@ -10,7 +10,29 @@ use Drupal\jsonapi\ResourceType\ResourceType;
 function farmos_asset_link_page_attachments(array &$attachments) {
   // TODO: special handling for not-yet-logged-in users
 
+  $storage = \Drupal::entityTypeManager()->getStorage('asset_link_default_plugin');
+
+  $ids = \Drupal::entityQuery('asset_link_default_plugin')
+    ->condition('sidebarUrlPattern', '', '<>')->execute();
+
+  $defaultPluginConfigs = $storage->loadMultiple($ids);
+
+  $sidebarUrlPatterns = [];
+
+  foreach($defaultPluginConfigs as $defaultPluginConfig) {
+    if (!$defaultPluginConfig->status()) {
+      continue;
+    }
+
+    $sidebarUrlPatterns[] = $defaultPluginConfig->sidebarUrlPattern();
+  }
+
   $attachments['#attached']['library'][] = 'farmos_asset_link/farmos_asset_link_sidecar';
+
+  $attachments['#attached']['drupalSettings']['farmos_asset_link'] = [
+    'sidebar_url_patterns' => $sidebarUrlPatterns,
+  ];
+
 }
 
 

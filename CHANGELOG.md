@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha16] - 2024-11-18
+
+### Added
+
+- Improve the plugin dev support docs and add a pluginConfigMutator option
+- Add a whitelist mechanism to control when the sidebar appears in farmOS
+- Add a local sidebar whitelist mechanism in the plugin API
+
+### Changed
+
+- Generate the plugin config yml files via plugin dev support
+- Change the sidebar/sidecar to use mdi-v6 icons like the PWA part
+
+### Fixed
+
+- Fix Quasar styling for "global components" like dialogs appearing in farmOS
+
 ## [1.0.0-alpha15] - 2024-09-25
 
 ### Added
@@ -666,7 +683,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha15...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha16...HEAD
+[1.0.0-alpha16]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha15...unbuilt-v1.0.0-alpha16
 [1.0.0-alpha15]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha14...unbuilt-v1.0.0-alpha15
 [1.0.0-alpha14]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha13...unbuilt-v1.0.0-alpha14
 [1.0.0-alpha13]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha12...unbuilt-v1.0.0-alpha13
