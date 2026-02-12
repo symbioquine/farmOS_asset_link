@@ -132,8 +132,10 @@ export default class FarmOSConnectionStatusDetector {
 
       const apiData = await res.json();
 
+      const farmOsMajorVersionIsSupported = v => typeof v === 'string' && v.length >= 1 && ['2', '3', '4'].includes(v.substring(0, 1));
+
       const farmOsVersion = apiData.meta?.farm?.version;
-      if (typeof farmOsVersion !== 'string' || (farmOsVersion.indexOf('2') !== 0 && farmOsVersion.indexOf('3') !== 0)) {
+      if (farmOsMajorVersionIsSupported(farmOsVersion)) {
         this.canReachFarmOS.value = false;
         return;
       }
