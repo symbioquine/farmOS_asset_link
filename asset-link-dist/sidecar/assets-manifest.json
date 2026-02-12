@@ -1,12 +1,12 @@
 {
-  "app.js": "js/app.415aa435.js",
+  "app.js": "js/app.8f3c722d.js",
   "css/12.886bc96d.css": "css/12.886bc96d.css",
   "css/584.c1cd462c.css": "css/584.c1cd462c.css",
   "entrypoints": {
     "app": {
       "assets": {
         "js": [
-          "js/app.415aa435.js"
+          "js/app.8f3c722d.js"
         ]
       }
     }
@@ -39,8 +39,8 @@
   "js/287.3edebfa1.js.map": "js/287.3edebfa1.js.map",
   "js/361.8833262c.js": "js/361.8833262c.js",
   "js/361.8833262c.js.map": "js/361.8833262c.js.map",
-  "js/584.4f2e8ff3.js": "js/584.4f2e8ff3.js",
-  "js/584.4f2e8ff3.js.map": "js/584.4f2e8ff3.js.map",
+  "js/584.b2870700.js": "js/584.b2870700.js",
+  "js/584.b2870700.js.map": "js/584.b2870700.js.map",
   "js/602.8bd42330.js": "js/602.8bd42330.js",
   "js/602.8bd42330.js.map": "js/602.8bd42330.js.map",
   "js/624.afe1c366.js": "js/624.afe1c366.js",
@@ -49,6 +49,6 @@
   "js/842.8300472b.js.map": "js/842.8300472b.js.map",
   "js/982.2ce9ead8.js": "js/982.2ce9ead8.js",
   "js/982.2ce9ead8.js.map": "js/982.2ce9ead8.js.map",
-  "js/app.415aa435.js.map": "js/app.415aa435.js.map",
+  "js/app.8f3c722d.js.map": "js/app.8f3c722d.js.map",
   "robots.txt": "robots.txt"
 }
