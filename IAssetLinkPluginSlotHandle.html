@@ -546,7 +546,7 @@ render multiple times with different inputs.</p></td>
     <div class="description">
         <p>Specify a function which determines whether this slot should apply for a given context.</p>
 <h3 id="usage">Usage</h3>
-<pre class="prettyprint source lang-js"><code>pageSlot.showIf(context => context.asset.attributes.status !== 'archived');
+<pre class="prettyprint source lang-js"><code>pageSlot.showIf(context => !context.asset.attributes.archived);
 </code></pre>
     </div>
     
