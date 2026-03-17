@@ -30,7 +30,7 @@ IAssetLinkPluginWidgetDecoratorHandle.prototype.targetWidgetName = function (
  * ### Usage
  *
  * ```js
- * pageSlot.appliesIf(context => context.asset.attributes.status !== 'archived');
+ * pageSlot.appliesIf(context => !context.asset.attributes.archived);
  * ```
  *
  * @method IAssetLinkPluginWidgetDecoratorHandle#appliesIf

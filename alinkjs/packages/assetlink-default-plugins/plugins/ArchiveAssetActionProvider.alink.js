@@ -9,7 +9,7 @@ export default class ArchiveAssetActionProvider {
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.archive', archiveAction => {
       archiveAction.type('asset-action');
 
-      archiveAction.showIf(({ asset }) => asset.attributes.status !== 'archived');
+      archiveAction.showIf(({ asset }) => !asset.attributes.archived);
 
       const doActionWorkflow = async (asset) => {
         const confirmed = await assetLink.ui.dialog.confirm(`Are you sure you want to archive "${asset.attributes.name}"?`);
@@ -23,8 +23,8 @@ export default class ArchiveAssetActionProvider {
             type: asset.type,
             id: asset.id,
             attributes: {
-              status: 'archived',
-              archived: formatRFC3339(new Date()),
+              archived: true,
+              last_archived: formatRFC3339(new Date()),
             },
           });
         }, {label: `Archive asset: ${asset.attributes.name}`});
@@ -39,7 +39,7 @@ export default class ArchiveAssetActionProvider {
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.unarchive', unarchiveAction => {
       unarchiveAction.type('asset-action');
 
-      unarchiveAction.showIf(({ asset }) => asset.attributes.status === 'archived');
+      unarchiveAction.showIf(({ asset }) => asset.attributes.archived);
 
       const doActionWorkflow = async (asset) => {
         const confirmed = await assetLink.ui.dialog.confirm(`Are you sure you want to unarchive "${asset.attributes.name}"?`);
@@ -53,8 +53,7 @@ export default class ArchiveAssetActionProvider {
             type: asset.type,
             id: asset.id,
             attributes: {
-              status: 'active',
-              archived: null,
+              archived: false,
             },
           });
         }, {label: `Unarchive asset: ${asset.attributes.name}`});

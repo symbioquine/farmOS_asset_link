@@ -82,7 +82,7 @@ IAssetLinkPluginHandle.prototype.defineSlot = function (
  * handle.defineWidgetDecorator('com.example.farmos_asset_link.widget_decorator.v0.asset_name_with_peace_sign', widgetDecorator => {
  *   widgetDecorator.targetWidgetName('asset-name');
  *
- *   widgetDecorator.appliesIf(context => context.asset.attributes.status !== 'archived');
+ *   widgetDecorator.appliesIf(context => !context.asset.attributes.archived);
  *
  *   widgetDecorator.component(handle.thisPlugin);
  * });

@@ -72,7 +72,7 @@ describe('Basic Smoke Testing', () => {
                 "id": "e9fa0fcb-b334-4350-8294-f2d2c51a9a25",
                 "attributes": {
                   "name": "Tommy",
-                  "status": "active",
+                  "archived": false,
                   "birthdate": "2016-01-01T08:00:00+00:00",
                   "sex": "M"
                 },
@@ -100,7 +100,7 @@ describe('Basic Smoke Testing', () => {
               "id": "8966a8f7-861f-4a8e-ae53-70bdc28896df",
               "attributes": {
                 "name": "Rabbit Cage #1",
-                "status": "active",
+                "archived": false,
                 "is_location": true,
                 "is_fixed": true,
                 "land_type": "paddock",
@@ -122,7 +122,7 @@ describe('Basic Smoke Testing', () => {
               "id": "4c9fe5c1-a349-4b75-8310-f60e956f44de",
               "attributes": {
                 "name": "Rabbitry",
-                "status": "active",
+                "archived": false,
                 "is_location": true,
                 "is_fixed": true,
                 "land_type": "paddock",

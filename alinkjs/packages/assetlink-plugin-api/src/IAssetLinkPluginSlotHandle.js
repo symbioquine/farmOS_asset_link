@@ -29,7 +29,7 @@ IAssetLinkPluginSlotHandle.prototype.type = function (type) {};
  * ### Usage
  *
  * ```js
- * pageSlot.showIf(context => context.asset.attributes.status !== 'archived');
+ * pageSlot.showIf(context => !context.asset.attributes.archived);
  * ```
  *
  * @method IAssetLinkPluginSlotHandle#showIf

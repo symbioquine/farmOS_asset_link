@@ -17,9 +17,6 @@ default:
   name:
     -
       value: 'Tractor: Slow Red'
-  status:
-    -
-      value: active
   created:
     -
       value: 1654610981

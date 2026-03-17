@@ -6,7 +6,8 @@ import VuePluginShorthandDecorator from '../src/VuePluginShorthandDecorator';
 
 
 test('jmespath learning tests', () => {
-  expect(jmespath.search({ asset: { attributes: { status: 'pending' } } }, 'asset.attributes.status == `pending`')).toBe(true);
+  expect(jmespath.search({ asset: { attributes: { archived: true } } }, 'asset.attributes.archived')).toBe(true);
+  expect(jmespath.search({ asset: { attributes: { archived: false } } }, '!(asset.attributes.archived)')).toBe(true);
   expect(jmespath.search({ pageName: 'asset-page', other: 'value0' }, 'pageName == `asset-page`')).toBe(true);
 });
 
@@ -81,7 +82,7 @@ test('slot shorthand with weight', () => {
 
 test('slot shorthand with showIf predicate', () => {
   const rawPluginSource = `
-    <template alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]='\t\t\n\rtoolbar-item ( showIf  : \t"asset.\\"attributes\\".status"\n )   '>
+    <template alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]='\t\t\n\rtoolbar-item ( showIf  : \t"asset.\\"attributes\\".archived"\n )   '>
       <span>Hello from Vue!</span>
     </template>
   `;
@@ -103,8 +104,8 @@ test('slot shorthand with showIf predicate', () => {
 
   const predicate = slotHandle.showIf.mock.calls[0][0];
 
-  expect(predicate({ asset: { attributes: { status: 'pending' } } })).toBeTruthy();
-  expect(predicate({ asset: { attributes: { status: 'done' } } })).toBeTruthy();
+  expect(predicate({ asset: { attributes: { archived: true } } })).toBeTruthy();
+  expect(predicate({ asset: { attributes: { archived: false } } })).toBeFalsy();
   expect(predicate({ asset: { attributes: {  } } })).toBeFalsy();
   expect(predicate({ asset: {  } })).toBeFalsy();
   expect(predicate({})).toBeFalsy();
@@ -142,17 +143,17 @@ test('slot shorthand with broken showIf predicate - missing colon', () => {
   const rawPluginSource = `
     <script setup>
     </script>
-    <template alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]="toolbar-item(showIf 'asset.attributes.status')">
+    <template alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]="toolbar-item(showIf 'asset.attributes.archived')">
       <span>Hello from Vue!</span>
     </template>
   `;
 
-  expect(() => decorateAndCallOnload(rawPluginSource)).toThrow(/^Plugin shorthand args must have the arg name followed by a colon ':'\. Got: 'showIf 'asset\.attributes\.status''$/);
+  expect(() => decorateAndCallOnload(rawPluginSource)).toThrow(/^Plugin shorthand args must have the arg name followed by a colon ':'\. Got: 'showIf 'asset\.attributes\.archived''$/);
 });
 
 test('slot shorthand with broken showIf predicate - missing end quote', () => {
   const rawPluginSource = `
-    <template alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]="toolbar-item(showIf: 'asset.attributes.status)">
+    <template alink-slot[com.example.farmos_asset_link.slots.v0.my_slot]="toolbar-item(showIf: 'asset.attributes.archived)">
       <span>Hello from Vue!</span>
     </template>
   `;
@@ -193,7 +194,7 @@ test('widget decorator shorthand with appliesIf predicate and weight', () => {
   const rawPluginSource = `
     <template
         alink-widget-decorator[com.example.farmos_asset_link.widget_decorator.v0.asset_name_with_peace_sign]
-          ="asset-name(weight: 150, appliesIf: 'asset.attributes.status != \`archived\`')">
+          ="asset-name(weight: 150, appliesIf: '!(asset.attributes.archived)')">
       <span><slot></slot> &#9774;</span>
     </template>
   `;
@@ -217,8 +218,8 @@ test('widget decorator shorthand with appliesIf predicate and weight', () => {
 
   const predicate = widgetDecoratorHandle.appliesIf.mock.calls[0][0];
 
-  expect(predicate({ asset: { attributes: { status: 'archived' } } })).toBeFalsy();
-  expect(predicate({ asset: { attributes: { status: 'active' } } })).toBeTruthy();
+  expect(predicate({ asset: { attributes: { archived: true } } })).toBeFalsy();
+  expect(predicate({ asset: { attributes: { archived: false } } })).toBeTruthy();
   expect(predicate({ asset: { attributes: {  } } })).toBeTruthy();
   expect(predicate({ asset: {  } })).toBeTruthy();
   expect(predicate({})).toBeTruthy();

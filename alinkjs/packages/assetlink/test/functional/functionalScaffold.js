@@ -16,7 +16,7 @@ export const fetchDelegate = async (url, opts) => {
       const loggedInMinimalApiResponse = JSON.stringify({
         meta: {
           farm: {
-            version: "2.0.0",
+            version: "4.0.0",
           },
           links: {
             me: {

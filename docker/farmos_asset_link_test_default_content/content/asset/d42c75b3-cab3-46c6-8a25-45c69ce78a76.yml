@@ -14,9 +14,6 @@ default:
   name:
     -
       value: 'Field A'
-  status:
-    -
-      value: active
   created:
     -
       value: 1660403906

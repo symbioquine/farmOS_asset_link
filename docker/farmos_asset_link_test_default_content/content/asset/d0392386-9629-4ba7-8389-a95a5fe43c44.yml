@@ -14,9 +14,6 @@ default:
   name:
     -
       value: 'Sheep Herd Alpha'
-  status:
-    -
-      value: active
   created:
     -
       value: 1677424095

@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:13
+    image: postgres:16
     volumes:
       - './db:/var/lib/postgresql/data'
     ports:
@@ -13,7 +13,8 @@ services:
   www:
     depends_on:
       - db
-    image: farmos/farmos:3.3.1
+    image: farmos/farmos:4.0.0-beta2
+    user: root
     entrypoint: /bin/bash
     command:
       - -c
@@ -27,6 +28,12 @@ services:
         if [ -d /opt/drupal ] && ! [ "$$(ls -A /opt/drupal/)" ]; then
           echo "farmOS codebase not detected. Copying from pre-built files in the Docker image."
           cp -rp /var/farmOS/. /opt/drupal
+
+          mkdir -p /opt/drupal/keys
+          openssl genrsa -out /opt/drupal/keys/private.key 2048
+          openssl rsa -in /opt/drupal/keys/private.key -pubout -out /opt/drupal/keys/public.key
+          chown -R www-data:www-data /opt/drupal/keys
+
           wait_db_ready
           su www-data -s /bin/bash -c 'drush site-install farm --locale=en --db-url=pgsql://farm:farm@db/farm --site-name=Test0 --account-name=root --account-pass=test'
 
@@ -46,13 +53,25 @@ services:
 
             composer config repositories.farmos_dev_modules '{"type": "path", "url": "/farmos_dev_modules/*"}'
 
-            composer require symbioquine/farmos_asset_link @dev
+            composer require --with-all-dependencies symbioquine/farmos_asset_link @dev
             composer require symbioquine/farmos_asset_link_test_default_content @dev
 
-            drush --root=/opt/drupal pm-enable --yes farm_group
-            drush --root=/opt/drupal pm-enable --yes farm_material
-            drush --root=/opt/drupal pm-enable --yes farm_inventory
-            drush --root=/opt/drupal pm-enable --yes farm_seed
+            drush --root=/opt/drupal pm-enable --yes farm_equipment \
+              farm_material \
+              farm_water \
+              farm_animal \
+              farm_plant \
+              farm_land \
+              farm_animal \
+              farm_structure \
+              farm_land_types \
+              farm_group \
+              farm_inventory \
+              farm_seed \
+              farm_activity \
+              farm_harvest \
+              farm_quantity_standard \
+              farm_api
 
             drush --root=/opt/drupal pm-enable farmos_asset_link
             drush --root=/opt/drupal pm-enable farmos_asset_link_test_default_content

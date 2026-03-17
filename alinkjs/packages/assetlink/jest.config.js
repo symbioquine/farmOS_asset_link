@@ -1,4 +1,4 @@
-const esModules = ['assetlink-plugin-api', 'uuid', 'vue3-sfc-loader', 'quasar'].join('|');
+const esModules = ['assetlink-plugin-api', 'uuid', 'vue3-sfc-loader', 'quasar', 'fetch-inject'].join('|');
 
 /** @returns {Promise<import('jest').Config>} */
 module.exports = async () => {
