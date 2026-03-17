@@ -65,7 +65,7 @@ export default {
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.move', moveAction => {
       moveAction.type('asset-action');
 
-      moveAction.showIf(({ asset }) => asset.attributes.status !== 'archived');
+      moveAction.showIf(({ asset }) => !asset.attributes.archived);
 
       const doActionWorkflow = async (asset) => {
         const destinations = await assetLink.ui.dialog.custom(handle.thisPlugin, { asset });

@@ -105,7 +105,7 @@ const resolveCurrentGroupMembers = async () => {
 
           const currentMember = entitySourceCache.query((q) => q.findRecord({ type: possibleMember.type, id: possibleMember.id }));
 
-          if (!currentMember || currentMember.attributes.status === 'archived') {
+          if (!currentMember || currentMember.attributes.archived) {
             return [];
           }
 

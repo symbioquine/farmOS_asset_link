@@ -7,7 +7,7 @@ export default class RenameAssetActionProvider {
     handle.defineSlot('net.symbioquine.farmos_asset_link.actions.v0.rename', renameAction => {
       renameAction.type('asset-action');
 
-      renameAction.showIf(({ asset }) => asset.attributes.status !== 'archived');
+      renameAction.showIf(({ asset }) => !asset.attributes.archived);
 
       const doActionWorkflow = async (asset) => {
         const newName = await assetLink.ui.dialog.promptText(`What should "${asset.attributes.name}" be renamed to?`);

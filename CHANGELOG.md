@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha18] - 2026-03-17
+
+### Changed
+
+- More thorough fixes for compatibility with farmOS 4.x
+
 ## [1.0.0-alpha17] - 2026-02-12
 
 ### Changed
@@ -689,7 +695,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial dev release
 
-[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha17...HEAD
+[unreleased]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha18...HEAD
+[1.0.0-alpha18]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha17...unbuilt-v1.0.0-alpha18
 [1.0.0-alpha17]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha16...unbuilt-v1.0.0-alpha17
 [1.0.0-alpha16]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha15...unbuilt-v1.0.0-alpha16
 [1.0.0-alpha15]: https://github.com/symbioquine/farmOS_asset_link/compare/unbuilt-v1.0.0-alpha14...unbuilt-v1.0.0-alpha15
