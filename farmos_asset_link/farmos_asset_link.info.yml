@@ -4,4 +4,4 @@ type: module
 package: farmOS Contrib
 core_version_requirement: ^9 || ^10 || ^11
 dependencies:
-  - subrequests:subrequests
+  - farm_api
