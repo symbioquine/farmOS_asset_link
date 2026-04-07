@@ -7,4 +7,4 @@ For now, check out the following resources:
 * {@tutorial farm-data-access}
 * {@tutorial plugin-as-farm-os-module}
 * {@tutorial custom-styles-in-plugins}
-* [The default plugins that come with Asset Link](https://github.com/symbioquine/farmOS_asset_link/tree/release/asset-link-dist/alink-plugins)
+* [The default plugins that come with Asset Link](https://github.com/symbioquine/farmOS_asset_link/tree/release/asset-link-dist/plugins)
