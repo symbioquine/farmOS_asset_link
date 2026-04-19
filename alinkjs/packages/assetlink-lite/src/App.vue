@@ -221,9 +221,17 @@ export default defineComponent({
 
         const resolved = router.resolve(currentRoutePath);
 
+        // If the current path resolves to the name of the route being
+        // added, then cause the current route to reload (not a full page
+        // refresh, just set the current route location to the same values).
+        // This handles both the initial "page" load and the scenario where
+        // a plugin is edited and happens to be providing the current route.
         if (resolved.name === routeDef.name) {
-          // await router.replace('/');
-          await router.replace(currentRoutePath);
+          await router.replace({
+            path: currentRoutePath,
+            params: route.params,
+            hash: route.hash,
+          });
         }
       },
       /* eslint-disable no-console,no-unused-vars */

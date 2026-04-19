@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - [Depend on farmOS API module #50](https://github.com/symbioquine/farmOS_asset_link/pull/50)
+- Improve handling of routes to support query and hash url parameters
 
 ## [1.0.0-alpha18] - 2026-03-17
 
