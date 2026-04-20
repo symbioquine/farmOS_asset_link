@@ -13,7 +13,7 @@ services:
   www:
     depends_on:
       - db
-    image: farmos/farmos:4.0.0-beta2
+    image: farmos/farmos:4.0.1
     user: root
     entrypoint: /bin/bash
     command:

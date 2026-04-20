@@ -170,7 +170,7 @@ import {
   watch,
   ref,
 } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { useRouter, useRoute, parseQuery } from "vue-router";
 
 import { useServiceWorkerUX } from "@/useServiceWorkerUX";
 
@@ -251,8 +251,8 @@ export default defineComponent({
         if (resolved.name === routeDef.name) {
           await router.replace({
             path: currentRoutePath,
-            params: route.params,
-            hash: route.hash,
+            query: parseQuery(window.location.search),
+            hash: window.location.hash,
           });
         }
       },
